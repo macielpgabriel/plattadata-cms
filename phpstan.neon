@@ -1,0 +1,28 @@
+parameters:
+  paths:
+    - src
+
+  level: 0
+
+  excludePaths:
+    - vendor/*
+    - storage/*
+    - public/index.php
+    - bootstrap/*
+    - database/*
+
+  ignoreErrors:
+    - '#Call to an undefined static method.*Cache::delete#'
+    - '#Dynamic call to static method#'
+    - '#Call to method on null#'
+    - '#Cannot access property#'
+    - '#Method .* is never used#'
+    - '#Class .* is never used#'
+    - '#Variable .* might not be defined#'
+    - '#Variable .* in empty\(\) always exists#'
+    - '#Variable .* in isset\(\) always exists#'
+
+  reportUnmatchedIgnoredErrors: false
+
+  bootstrapFiles:
+    - vendor/autoload.php
