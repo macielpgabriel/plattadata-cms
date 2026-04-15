@@ -809,16 +809,28 @@ final class CompanyController
         
         return array_filter(array_map(function($item) {
             if (is_string($item)) {
-                return ['codigo' => $item, 'descricao' => ''];
+                return ['codigo' => $this->formatCnaeCode($item), 'descricao' => ''];
             }
             if (is_array($item)) {
+                $rawCode = $item['codigo'] ?? $item['code'] ?? $item['id'] ?? '';
                 return [
-                    'codigo' => $item['codigo'] ?? $item['code'] ?? $item['id'] ?? '',
+                    'codigo' => $this->formatCnaeCode((string) $rawCode),
                     'descricao' => $item['descricao'] ?? $item['description'] ?? '',
                 ];
             }
             return null;
         }, $secondary));
+    }
+
+    private function formatCnaeCode(string $code): string
+    {
+        $digits = preg_replace('/\D/', '', $code);
+        
+        if (strlen($digits) < 7) {
+            return $code;
+        }
+        
+        return substr($digits, 0, 2) . '.' . substr($digits, 2, 3) . '-' . substr($digits, 5, 1) . '/' . substr($digits, 6);
     }
 
     private function resolveMainCnae(array $rawData): array
@@ -833,7 +845,7 @@ final class CompanyController
             ?? ($rawData['atividade_principal'][0]['descricao'] ?? ($rawData['atividade_principal'][0]['text'] ?? ($rawData['estabelecimento']['atividade_principal']['descricao'] ?? '')));
         
         return [
-            'codigo' => (string) $code,
+            'codigo' => $this->formatCnaeCode((string) $code),
             'descricao' => (string) $desc,
         ];
     }
