@@ -424,12 +424,69 @@ final class IbgeService
     
     public function getPopulacaoBrasil(): int
     {
-        return 203080400;
+        return $this->getBrasilIndicador('populacao') ?? 203080400;
     }
     
     public function getPibBrasil(): float
     {
-        return 9983000000000;
+        return $this->getBrasilIndicador('pib') ?? 9983000000000;
+    }
+    
+    public function getBrasilIndicador(string $indicador): ?float
+    {
+        $cacheKey = "brasil_{$indicador}";
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return (float) $cached;
+        }
+        
+        try {
+            $pdo = Database::connection();
+            $stmt = $pdo->prepare("SELECT valor FROM brasil_info WHERE indicador = :indicador LIMIT 1");
+            $stmt->execute(['indicador' => $indicador]);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($result && $result['valor'] !== null) {
+                Cache::set($cacheKey, $result['valor'], self::CACHE_TTL);
+                return (float) $result['valor'];
+            }
+        } catch (\Throwable $e) {
+            Logger::warning("Erro ao buscar {$indicador} do Brasil: " . $e->getMessage());
+        }
+        
+        return null;
+    }
+    
+    public function syncBrasilDados(): bool
+    {
+        try {
+            $pdo = Database::connection();
+            
+            $dados = [
+                ['indicador' => 'populacao', 'valor' => 203080400, 'texto' => '203.080.400', 'fuente' => 'IBGE - Census 2022', 'ano' => 2022],
+                ['indicador' => 'pib', 'valor' => 9983000000000, 'texto' => '9,983 trilhões', 'fuente' => 'IBGE - PIB 2020', 'ano' => 2020],
+                ['indicador' => 'area_km2', 'valor' => 8515767, 'texto' => '8.515.767', 'fuente' => 'IBGE', 'ano' => 2022],
+                ['indicador' => 'municipios', 'valor' => 5570, 'texto' => '5.570', 'fuente' => 'IBGE', 'ano' => 2022],
+            ];
+            
+            $stmt = $pdo->prepare("
+                INSERT INTO brasil_info (indicador, valor, texto, fuente, ano, updated_at)
+                VALUES (:indicador, :valor, :texto, :fuente, :ano, NOW())
+                ON DUPLICATE KEY UPDATE valor = :valor, texto = :texto, fuente = :fuente, ano = :ano, updated_at = NOW()
+            ");
+            
+            foreach ($dados as $d) {
+                $stmt->execute($d);
+            }
+            
+            Cache::forget('brasil_populacao');
+            Cache::forget('brasil_pib');
+            
+            return true;
+        } catch (\Throwable $e) {
+            Logger::error("Erro ao sincronizar dados do Brasil: " . $e->getMessage());
+            return false;
+        }
     }
     
     public function estimateMunicipalityTaxData(int $ibgeCode, string $name, string $uf): array
