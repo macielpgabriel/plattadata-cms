@@ -13,9 +13,12 @@ final class CompanyRepository
     private const FULLTEXT_INDEX_NAME = 'ft_companies_search';
 
     private static ?bool $hasCompaniesFullTextIndex = null;
+    private static bool $ensuredCoreColumns = false;
 
     public function searchPaginated(string $term, ?string $state, int $page = 1, int $perPage = 15): array
     {
+        $this->ensureCoreColumnsForReadQueries();
+
         $page = max(1, $page);
         $perPage = max(1, min($perPage, 100));
         $offset = ($page - 1) * $perPage;
@@ -128,8 +131,77 @@ final class CompanyRepository
         return self::$hasCompaniesFullTextIndex;
     }
 
+    private function ensureCoreColumnsForReadQueries(): void
+    {
+        if (self::$ensuredCoreColumns) {
+            return;
+        }
+
+        $columns = $this->companiesColumnMap();
+        $ddl = [];
+
+        if (!isset($columns['is_hidden'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN is_hidden TINYINT(1) NOT NULL DEFAULT 0";
+        }
+        if (!isset($columns['source_provider'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN source_provider VARCHAR(64) NULL";
+        }
+        if (!isset($columns['last_synced_at'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN last_synced_at DATETIME NULL";
+        }
+        if (!isset($columns['updated_at'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP";
+        }
+        if (!isset($columns['phone'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN phone VARCHAR(30) NULL";
+        }
+
+        foreach ($ddl as $statement) {
+            try {
+                Database::connection()->exec($statement);
+            } catch (PDOException $exception) {
+            }
+        }
+
+        if (!isset($columns['is_hidden'])) {
+            try {
+                Database::connection()->exec('CREATE INDEX idx_hidden ON companies (is_hidden)');
+            } catch (PDOException $exception) {
+            }
+        }
+
+        self::$ensuredCoreColumns = true;
+        self::$hasCompaniesFullTextIndex = null;
+    }
+
+    private function companiesColumnMap(): array
+    {
+        try {
+            $stmt = Database::connection()->query(
+                "SELECT column_name
+                 FROM information_schema.columns
+                 WHERE table_schema = DATABASE()
+                   AND table_name = 'companies'"
+            );
+
+            $map = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $columnName) {
+                $columnName = (string) $columnName;
+                if ($columnName !== '') {
+                    $map[$columnName] = true;
+                }
+            }
+
+            return $map;
+        } catch (PDOException $exception) {
+            return [];
+        }
+    }
+
     public function findByMunicipality(int $ibgeCode, string $city, string $state, int $page = 1, int $perPage = 15): array
     {
+        $this->ensureCoreColumnsForReadQueries();
+
         $page = max(1, $page);
         $perPage = max(1, min($perPage, 100));
         $offset = ($page - 1) * $perPage;
@@ -194,6 +266,8 @@ final class CompanyRepository
 
     public function findByCnpj(string $cnpj, bool $includeHidden = false): ?array
     {
+        $this->ensureCoreColumnsForReadQueries();
+
         $sql = 'SELECT * FROM companies WHERE cnpj = :cnpj';
         if (!$includeHidden) {
             $sql .= ' AND is_hidden = 0';
@@ -218,6 +292,8 @@ final class CompanyRepository
 
     public function recent(int $limit = 12): array
     {
+        $this->ensureCoreColumnsForReadQueries();
+
         $stmt = Database::connection()->prepare(
             'SELECT cnpj, legal_name, trade_name, city, state, source_provider, last_synced_at, updated_at
              FROM companies WHERE is_hidden = 0 ORDER BY updated_at DESC LIMIT :limit'
@@ -230,6 +306,8 @@ final class CompanyRepository
 
     public function sitemapEntries(int $limit = 5000): array
     {
+        $this->ensureCoreColumnsForReadQueries();
+
         $stmt = Database::connection()->prepare('SELECT cnpj, updated_at FROM companies WHERE is_hidden = 0 ORDER BY updated_at DESC LIMIT :limit');
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
