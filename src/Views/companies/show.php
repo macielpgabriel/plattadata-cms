@@ -1128,8 +1128,12 @@ endforeach; ?>
                     <small class="text-muted d-block">CNAEs Secundários</small>
                     <div class="d-flex flex-wrap gap-1">
                         <?php foreach ($extendedData['cnaes_secundarios'] as $cnae): ?>
-                        <span class="badge bg-light text-dark border">
-                            <?= is_array($cnae) ? ($cnae['codigo'] ?? $cnae['cnae'] ?? '') : $cnae ?>
+                        <?php
+                        $cnaeCode = is_array($cnae) ? ($cnae['codigo'] ?? $cnae['cnae'] ?? '') : $cnae;
+                        $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? '')) : '';
+                        ?>
+                        <span class="badge bg-light text-dark border" <?= $cnaeDesc !== '' ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
+                            <?= e((string) $cnaeCode) ?><?= $cnaeDesc !== '' ? ' — ' . e($cnaeDesc) : '' ?>
                         </span>
                         <?php endforeach; ?>
                     </div>
