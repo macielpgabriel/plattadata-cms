@@ -89,21 +89,22 @@ final class BcbService
         $result = [];
         
         try {
-            $indicators = $this->getAllLatestRates();
-            $currencies = [];
+            $rates = $this->getAllLatestRates();
             
-            foreach ($indicators['currencies'] ?? [] as $curr) {
-                $result[$curr['code']] = [
-                    'name' => $curr['name'],
-                    'buy' => $curr['compra'],
-                    'sell' => $curr['venda'],
+            foreach ($rates as $code => $rate) {
+                $result[$code] = [
+                    'name' => $rate['name'] ?? $code,
+                    'buy' => $rate['cotacaoCompra'] ?? null,
+                    'sell' => $rate['cotacaoVenda'] ?? null,
                 ];
                 
-                $this->saveToDatabase($curr['code'], $curr['name'], [
-                    'cotacaoCompra' => $curr['compra'],
-                    'cotacaoVenda' => $curr['venda'],
-                    'dataCotacao' => $curr['data'],
-                ]);
+                if (!empty($rate['cotacaoVenda'])) {
+                    $this->saveToDatabase($code, $result[$code]['name'], [
+                        'cotacaoCompra' => $rate['cotacaoCompra'] ?? null,
+                        'cotacaoVenda' => $rate['cotacaoVenda'] ?? null,
+                        'dataCotacao' => $rate['dataCotacao'] ?? date('Y-m-d'),
+                    ]);
+                }
             }
         } catch (\Throwable $e) {
             Logger::error('fetchAndSaveLatestRates error: ' . $e->getMessage());

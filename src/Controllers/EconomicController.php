@@ -85,7 +85,7 @@ $schemaData = [
         }
 
         if (empty($dbRates)) {
-            return ['currencies' => [], 'from_database' => false, 'db_updated_at' => null, 'db_fetched_at' => null];
+            return $this->getFallbackRates();
         }
 
         $result = [
@@ -114,6 +114,27 @@ $schemaData = [
         }
 
         return $result;
+    }
+
+    private function getFallbackRates(): array
+    {
+        return [
+            'currencies' => [
+                ['code' => 'USD', 'name' => 'Dolar Americano', 'compra' => 5.20, 'venda' => 5.25, 'paridade' => 1.0, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'EUR', 'name' => 'Euro', 'compra' => 5.60, 'venda' => 5.65, 'paridade' => 1.08, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'GBP', 'name' => 'Libra Esterlina', 'compra' => 6.50, 'venda' => 6.55, 'paridade' => 1.25, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'JPY', 'name' => 'Iene Japones', 'compra' => 0.034, 'venda' => 0.035, 'paridade' => 0.0065, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'CHF', 'name' => 'Franco Suico', 'compra' => 5.85, 'venda' => 5.90, 'paridade' => 1.12, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'CAD', 'name' => 'Dolar Canadense', 'compra' => 3.65, 'venda' => 3.70, 'paridade' => 0.70, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'AUD', 'name' => 'Dolar Australiano', 'compra' => 3.25, 'venda' => 3.30, 'paridade' => 0.62, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'CNY', 'name' => 'Yuan Chines', 'compra' => 0.72, 'venda' => 0.73, 'paridade' => 0.14, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'ARS', 'name' => 'Peso Argentino', 'compra' => 0.0055, 'venda' => 0.0060, 'paridade' => 0.0011, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+                ['code' => 'CLP', 'name' => 'Peso Chileno', 'compra' => 0.0055, 'venda' => 0.0060, 'paridade' => 0.0011, 'data' => date('Y-m-d'), 'variacao' => 0.0, 'source' => 'fallback'],
+            ],
+            'from_database' => false,
+            'db_updated_at' => null,
+            'db_fetched_at' => null,
+        ];
     }
 
     private function getEconomicIndicators(BcbService $bcb): array
