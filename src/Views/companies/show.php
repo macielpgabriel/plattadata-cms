@@ -24,6 +24,13 @@ foreach (($qsa ?? []) as $partner):
     $qsaByQualification[$qual] = ($qsaByQualification[$qual] ?? 0) + 1;
 endforeach; ?>
 <?php
+// Garante que o raw_data seja um array para facilitar a busca de fallbacks
+$rawArr = is_array($rawData ?? null) ? $rawData : json_decode($company['raw_data'] ?? '{}', true);
+if (!is_array($rawArr)) {
+    $rawArr = [];
+}
+?>
+<?php
 $financialData = $enrichedData['financial_data'] ?? [];
 $partnerData = $enrichedData['partner_data'] ?? [];
 $marketData = $enrichedData['market_data'] ?? [];
@@ -434,30 +441,33 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <dt class="col-5 col-sm-5">Porte</dt>
                     <dd class="col-7 col-sm-7">
                         <?php 
+                        $porteVal = '-';
+                        $invalidValues = ['', '0', '00', '-', 'null', 'NULL', 'NAO INFORMADO'];
+                        $porteMap = [
+                            '01' => 'Micro Empresa (ME)', '1' => 'Micro Empresa (ME)', 'ME' => 'Micro Empresa (ME)',
+                            '03' => 'Empresa de Pequeno Porte (EPP)', '3' => 'Empresa de Pequeno Porte (EPP)', 'EPP' => 'Empresa de Pequeno Porte (EPP)',
+                            '05' => 'Demais (Grande Porte)', '5' => 'Demais (Grande Porte)', 'DEMAIS' => 'Demais (Grande Porte)'
+                        ];
+
                         $porteCandidates = [
                             $company['company_size'] ?? '',
                             $extendedData['porte'] ?? '',
-                            $rawData['porte'] ?? '',
-                            $rawData['descricao_porte'] ?? '',
-                            $rawData['porte_descricao'] ?? '',
-                            $rawData['estabelecimento']['porte']['descricao'] ?? '',
-                            $rawData['estabelecimento']['porte'] ?? '',
-                            $rawData['porte_prefecture'] ?? ''
+                            $rawArr['porte'] ?? '',
+                            $rawArr['descricao_porte'] ?? '',
+                            $rawArr['porte_descricao'] ?? '',
+                            $rawArr['estabelecimento']['porte']['descricao'] ?? '',
+                            $rawArr['estabelecimento']['porte'] ?? '',
+                            $rawArr['porte_prefecture'] ?? ''
                         ];
-                        $porteVal = '-';
-                        $invalidValues = ['', '0', '00', '-', 'null', 'NULL'];
-                        $porteMap = [
-                            '01' => 'Micro Empresa (ME)', '1' => 'Micro Empresa (ME)',
-                            '03' => 'Empresa de Pequeno Porte (EPP)', '3' => 'Empresa de Pequeno Porte (EPP)',
-                            '05' => 'Demais (Grande Porte)', '5' => 'Demais (Grande Porte)'
-                        ];
+
                         foreach ($porteCandidates as $candidate) {
                             if (is_array($candidate)) {
                                 $candidate = $candidate['descricao'] ?? $candidate['text'] ?? $candidate['description'] ?? $candidate['id'] ?? '';
                             }
                             $c = trim((string)$candidate);
-                            if (!in_array($c, $invalidValues, true)) {
-                                $porteVal = $porteMap[$c] ?? $c;
+                            $upperC = mb_strtoupper($c);
+                            if (!in_array($upperC, $invalidValues, true)) {
+                                $porteVal = $porteMap[$upperC] ?? ($porteMap[$c] ?? $c);
                                 break;
                             }
                         }
