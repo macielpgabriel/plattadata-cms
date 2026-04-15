@@ -90,6 +90,7 @@ final class SetupService
         $this->ensureExtendedDataSchema($pdo);
         $this->ensureMentionAlertsSchema($pdo);
 
+        // AGORA verifica o lock - apenas após criar todas as tabelas críticas
         if ($this->isSetupLocked()) {
             return;
         }
