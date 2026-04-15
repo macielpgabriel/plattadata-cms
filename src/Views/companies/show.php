@@ -432,7 +432,13 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                         <?php endif; ?>
                     </dd>
                     <dt class="col-5 col-sm-5">Porte</dt>
-                    <dd class="col-7 col-sm-7"><?= e($company['company_size'] ?? $rawData['porte'] ?? $rawData['porte_prefecture'] ?? '-') ?></dd>
+                    <dd class="col-7 col-sm-7">
+                        <?php 
+                        $porteVal = $company['company_size'] ?? $extendedData['porte'] ?? $rawData['porte'] ?? $rawData['descricao_porte'] ?? $rawData['porte_descricao'] ?? $rawData['porte_prefecture'] ?? '-';
+                        if (is_array($porteVal)) { $porteVal = $porteVal['descricao'] ?? $porteVal['text'] ?? $porteVal['description'] ?? '-'; }
+                        ?>
+                        <?= e((string)$porteVal) ?>
+                    </dd>
                     <dt class="col-5 col-sm-5">Natureza Juridica</dt>
                     <dd class="col-7 col-sm-7 text-muted"><?= e($company['legal_nature'] ?? $rawData['natureza_juridica'] ?? $rawData['tipo_de_sociedade'] ?? '-') ?></dd>
                     <dt class="col-5 col-sm-5">Simples Nacional</dt>
