@@ -76,21 +76,11 @@ date_default_timezone_set(in_array($timezone, timezone_identifiers_list(), true)
 SecurityHeadersService::apply();
 \App\Services\AccessLogService::log($_SERVER['REQUEST_URI'] ?? '/');
 
-// IP Blocklist
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-if (\App\Services\IpBlocklistService::isBlocked($clientIp)) {
-    http_response_code(403);
-    echo "Acesso bloqueado.";
-    exit;
-}
-
-// Cleanup 1%
-if (random_int(1, 100) === 1) \App\Services\IpBlocklistService::cleanup();
-
 // Setup e Retenção
 $setupLockFile = base_path('storage/.setup_completed');
-if (!is_file($setupLockFile)) {
-    (new SetupService())->runInitialSetup();
+$setupService = new SetupService();
+if (!is_file($setupLockFile) || !$setupService->hasCriticalTables()) {
+    $setupService->runInitialSetup();
 }
 
 $retentionLockFile = base_path('storage/.retention_last_run');
@@ -101,3 +91,13 @@ if ((bool) config('app.lgpd.retention.enabled', true)) {
     }
 }
 
+// IP Blocklist
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+if (\App\Services\IpBlocklistService::isBlocked($clientIp)) {
+    http_response_code(403);
+    echo "Acesso bloqueado.";
+    exit;
+}
+
+// Cleanup 1%
+if (random_int(1, 100) === 1) \App\Services\IpBlocklistService::cleanup();

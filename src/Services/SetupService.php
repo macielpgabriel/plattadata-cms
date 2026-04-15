@@ -50,6 +50,23 @@ final class SetupService
         return $this->databaseService->isDatabaseReady();
     }
 
+    public function hasCriticalTables(): bool
+    {
+        $pdo = $this->databaseService->connectApplicationDatabase();
+        if ($pdo === null) {
+            return false;
+        }
+
+        $criticalTables = ['users', 'companies', 'site_settings'];
+        foreach ($criticalTables as $tableName) {
+            if (!$this->schemaService->tableExists($pdo, $tableName)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function getLastConnectionError(): ?string
     {
         return $this->lastConnectionError;
