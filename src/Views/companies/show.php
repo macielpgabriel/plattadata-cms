@@ -644,14 +644,14 @@ endforeach; ?>
                     <?php else: ?>
                         <?php foreach (array_slice($secondaryCnaes, 0, 10) as $cnae): ?>
                             <?php
-                            $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? '')) : trim((string) $cnae);
-                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ''))) : '';
+                            $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '')) : trim((string) $cnae);
+                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ($cnae['texto'] ?? '')))) : '';
                             
                             $cleanSecCode = preg_replace('/\D/', '', $secCode);
                             $cleanSecDesc = preg_replace('/\D/', '', $secDesc);
                             ?>
                             <li>
-                                <?php if ($secCode !== '' && $secDesc !== '' && ($cleanSecCode !== $cleanSecDesc || strlen($secDesc) > 15)): ?>
+                                <?php if ($secCode !== '' && $secDesc !== '' && ($cleanSecCode !== $cleanSecDesc || strlen($secDesc) > 10)): ?>
                                     <?= e($secCode) ?> - <?= e($secDesc) ?>
                                 <?php elseif ($secCode !== ''): ?>
                                     <?= e($secCode) ?>
