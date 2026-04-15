@@ -620,11 +620,11 @@ endforeach; ?>
                 <div class="mb-3">
                     <div class="fw-semibold small">Principal</div>
                     <?php
-                    $mainCnaeCode = trim((string) ($mainCnae['codigo'] ?? ''));
-                    $mainCnaeDesc = trim((string) ($mainCnae['descricao'] ?? ($rawData['cnae_fiscal_descricao'] ?? '')));
+                $mainCnaeCode = trim((string) ($mainCnae['codigo'] ?? $mainCnae['code'] ?? ''));
+                $mainCnaeDesc = trim((string) ($mainCnae['descricao'] ?? $mainCnae['text'] ?? $mainCnae['description'] ?? ($rawData['cnae_fiscal_descricao'] ?? '')));
                     ?>
                     <div class="small">
-                        <?php if ($mainCnaeCode !== '' && $mainCnaeDesc !== ''): ?>
+                    <?php if ($mainCnaeCode !== '' && $mainCnaeDesc !== '' && $mainCnaeCode !== $mainCnaeDesc): ?>
                             <?= e($mainCnaeCode) ?> - <?= e($mainCnaeDesc) ?>
                         <?php elseif ($mainCnaeCode !== ''): ?>
                             <?= e($mainCnaeCode) ?>
@@ -642,11 +642,11 @@ endforeach; ?>
                     <?php else: ?>
                         <?php foreach (array_slice($secondaryCnaes, 0, 10) as $cnae): ?>
                             <?php
-                            $secCode = trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? ''));
-                            $secDesc = trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ''));
+                            $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? '')) : trim((string) $cnae);
+                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
                             ?>
                             <li>
-                                <?php if ($secCode !== '' && $secDesc !== ''): ?>
+                                <?php if ($secCode !== '' && $secDesc !== '' && $secCode !== $secDesc): ?>
                                     <?= e($secCode) ?> - <?= e($secDesc) ?>
                                 <?php elseif ($secCode !== ''): ?>
                                     <?= e($secCode) ?>
@@ -1129,11 +1129,11 @@ endforeach; ?>
                     <div class="d-flex flex-wrap gap-1">
                         <?php foreach ($extendedData['cnaes_secundarios'] as $cnae): ?>
                         <?php
-                        $cnaeCode = is_array($cnae) ? ($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '') : $cnae;
+                        $cnaeCode = is_array($cnae) ? trim((string)($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '')) : trim((string)$cnae);
                         $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
                         ?>
-                        <span class="badge bg-light text-dark border" <?= $cnaeDesc !== '' ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
-                            <?= e((string) $cnaeCode) ?><?= $cnaeDesc !== '' ? ' — ' . e($cnaeDesc) : '' ?>
+                        <span class="badge bg-light text-dark border" <?= ($cnaeDesc !== '' && $cnaeDesc !== $cnaeCode) ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
+                            <?= e((string) $cnaeCode) ?><?= ($cnaeDesc !== '' && $cnaeDesc !== $cnaeCode) ? ' — ' . e($cnaeDesc) : '' ?>
                         </span>
                         <?php endforeach; ?>
                     </div>
