@@ -76,7 +76,7 @@ $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state[
                         <div class="col-6 col-sm-3">
                             <div class="p-3 bg-warning-subtle rounded-3 border text-center">
                                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">Participação Brasil</small>
-                                <span class="h5 fw-bold mb-0 text-warning"><?= isset($arrecadacaoEstado['participacao']) ? number_format($arrecadacaoEstado['participacao'], 1, ',', '.') . '%' : '-' ?></span>
+                                <span class="h5 fw-bold mb-0 text-warning"><?= isset($arrecadacao['participacao']) ? number_format($arrecadacao['participacao'], 1, ',', '.') . '%' : '-' ?></span>
                             </div>
                         </div>
                     </div>
@@ -340,20 +340,20 @@ $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state[
                             <div class="p-3 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-25 h-100">
                                 <small class="text-success d-block mb-1 small fw-bold text-uppercase">Arrecadação Estimada</small>
                                 <span class="h5 fw-bold text-success mb-0">
-                                    R$ <?= number_format(($arrecadacaoEstado['arrecadacao'] ?? 0)/1e9, 2, ',', '.') ?> bi
+                                    R$ <?= number_format(($arrecadacao['arrecadacao'] ?? 0)/1e9, 2, ',', '.') ?> bi
                                 </span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="p-3 bg-secondary-subtle rounded-3 border h-100">
                                 <small class="text-muted d-block mb-1 small fw-bold text-uppercase">Ranking Nacional</small>
-                                <span class="h5 fw-bold mb-0"><?= $arrecadacaoEstado['ranking'] ?? '-' ?>º</span>
+                                <span class="h5 fw-bold mb-0"><?= $arrecadacao['ranking'] ?? '-' ?>º</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="p-3 bg-secondary-subtle rounded-3 border h-100">
                                 <small class="text-muted d-block mb-1 small fw-bold text-uppercase">Participação Brasil</small>
-                                <span class="h5 fw-bold mb-0"><?= number_format($arrecadacaoEstado['participacao'] ?? 0, 1, ',', '.') ?>%</span>
+                                <span class="h5 fw-bold mb-0"><?= number_format($arrecadacao['participacao'] ?? 0, 1, ',', '.') ?>%</span>
                             </div>
                         </div>
                     </div>
