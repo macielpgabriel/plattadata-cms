@@ -106,7 +106,23 @@ final class LocationController
         
         $dadosBrasil = [];
         foreach ($rawDados as $key => $data) {
-            $dadosBrasil[$key] = $data['valor'] ?? $data['texto'] ?? null;
+            if ($key === '_meta') {
+                continue;
+            }
+            if ($data['valor'] !== null && $data['valor'] !== 0) {
+                $dadosBrasil[$key] = $data['valor'];
+            } elseif (!empty($data['texto'])) {
+                $dadosBrasil[$key] = $data['texto'];
+            } else {
+                $dadosBrasil[$key] = null;
+            }
+        }
+        
+        $dadosBrasil['capital'] = $dadosBrasil['capital'] ?? 'Brasília';
+        $dadosBrasil['area_km2'] = $dadosBrasil['area_km2'] ?? 8515767;
+        
+        if (isset($rawDados['_meta']['fontes'])) {
+            $dadosBrasil['_fontes'] = $rawDados['_meta']['fontes'];
         }
         
         $populacao = $dadosBrasil['populacao'] ?? 203080400;

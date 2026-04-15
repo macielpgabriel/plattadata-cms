@@ -486,9 +486,12 @@ final class IbgeService
             $dados = [];
             $fontes = [];
             foreach ($results as $row) {
+                $valor = $row['valor'] !== null ? (float) $row['valor'] : null;
+                $texto = $row['texto'];
+                
                 $dados[$row['indicador']] = [
-                    'valor' => (float) $row['valor'],
-                    'texto' => $row['texto'],
+                    'valor' => $valor,
+                    'texto' => $texto,
                 ];
                 if ($row['fuente'] && $row['ano']) {
                     $fontes[$row['fuente']] = $row['ano'];
