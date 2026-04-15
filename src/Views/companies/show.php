@@ -622,9 +622,11 @@ endforeach; ?>
                     <?php
                 $mainCnaeCode = trim((string) ($mainCnae['codigo'] ?? $mainCnae['code'] ?? ''));
                 $mainCnaeDesc = trim((string) ($mainCnae['descricao'] ?? $mainCnae['text'] ?? $mainCnae['description'] ?? ($rawData['cnae_fiscal_descricao'] ?? '')));
+                $cleanMainCode = preg_replace('/\D/', '', $mainCnaeCode);
+                $cleanMainDesc = preg_replace('/\D/', '', $mainCnaeDesc);
                     ?>
                     <div class="small">
-                    <?php if ($mainCnaeCode !== '' && $mainCnaeDesc !== '' && $mainCnaeCode !== $mainCnaeDesc): ?>
+                    <?php if ($mainCnaeCode !== '' && $mainCnaeDesc !== '' && $cleanMainCode !== $cleanMainDesc): ?>
                             <?= e($mainCnaeCode) ?> - <?= e($mainCnaeDesc) ?>
                         <?php elseif ($mainCnaeCode !== ''): ?>
                             <?= e($mainCnaeCode) ?>
@@ -644,9 +646,11 @@ endforeach; ?>
                             <?php
                             $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? '')) : trim((string) $cnae);
                             $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
+                            $cleanSecCode = preg_replace('/\D/', '', $secCode);
+                            $cleanSecDesc = preg_replace('/\D/', '', $secDesc);
                             ?>
                             <li>
-                                <?php if ($secCode !== '' && $secDesc !== '' && $secCode !== $secDesc): ?>
+                                <?php if ($secCode !== '' && $secDesc !== '' && $cleanSecCode !== $cleanSecDesc): ?>
                                     <?= e($secCode) ?> - <?= e($secDesc) ?>
                                 <?php elseif ($secCode !== ''): ?>
                                     <?= e($secCode) ?>
@@ -1131,9 +1135,11 @@ endforeach; ?>
                         <?php
                         $cnaeCode = is_array($cnae) ? trim((string)($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '')) : trim((string)$cnae);
                         $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
+                        $cleanBadgeCode = preg_replace('/\D/', '', $cnaeCode);
+                        $cleanBadgeDesc = preg_replace('/\D/', '', $cnaeDesc);
                         ?>
-                        <span class="badge bg-light text-dark border" <?= ($cnaeDesc !== '' && $cnaeDesc !== $cnaeCode) ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
-                            <?= e((string) $cnaeCode) ?><?= ($cnaeDesc !== '' && $cnaeDesc !== $cnaeCode) ? ' — ' . e($cnaeDesc) : '' ?>
+                        <span class="badge bg-light text-dark border" <?= ($cnaeDesc !== '' && $cleanBadgeCode !== $cleanBadgeDesc) ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
+                            <?= e((string) $cnaeCode) ?><?= ($cnaeDesc !== '' && $cleanBadgeCode !== $cleanBadgeDesc) ? ' — ' . e($cnaeDesc) : '' ?>
                         </span>
                         <?php endforeach; ?>
                     </div>
