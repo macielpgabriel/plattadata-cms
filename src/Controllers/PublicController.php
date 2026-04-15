@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Csrf;
 use App\Core\Session;
 use App\Core\View;
+use App\Core\Logger;
 use App\Services\CnpjService;
 use App\Services\RateLimiterService;
 use App\Services\SetupService;
@@ -92,7 +93,7 @@ final class PublicController
         $configuredLimit = (int) site_setting('public_search_rate_limit_per_minute', (string) config('app.rate_limit.cnpj_search_public_per_minute', 20));
         $max = max(1, min($configuredLimit, 300));
         $limit = (new RateLimiterService())->hit('cnpj_search_public', 'ip:' . $ip, $max, 60);
-        if (!(bool) ($limit['allowed'] ?? true)) {
+        if (!(bool) ($limit['success'] ?? true)) {
             $retry = (int) ($limit['retry_after'] ?? 60);
             Session::flash('error', 'Muitas consultas em pouco tempo. Aguarde ' . $retry . ' segundos e tente novamente.');
             redirect('/');

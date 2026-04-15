@@ -63,10 +63,11 @@ final class CnpjService
                 'attempts' => $attempts,
             ]);
 
-            throw new RuntimeException(
-                'Nao foi possivel localizar dados para este CNPJ nos provedores disponiveis: '
-                . implode('; ', $errorDetails)
-            );
+            $errorMsg = 'Nao foi possivel localizar dados para este CNPJ nos provedores disponiveis: '
+                . implode('; ', $errorDetails);
+            Logger::error($errorMsg);
+
+            throw new RuntimeException($errorMsg);
         }
 
         $payload = $this->enrichmentService->enrichData($cnpj, $payload);
@@ -75,6 +76,8 @@ final class CnpjService
             'provider' => $providerUsed,
             'attempts' => $attempts
         ]);
+
+        Logger::info('CNPJ upsert completed', ['cnpj' => $cnpj, 'company_id' => $company['id'] ?? null, 'provider' => $providerUsed]);
 
         if (isset($company['id'])) {
             $this->syncCompanyData((int)$company['id'], $cnpj, $payload, $providerUsed);
