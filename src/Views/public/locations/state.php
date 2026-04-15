@@ -7,8 +7,8 @@ $stateRegion = is_string($state['region'] ?? '') ? $state['region'] : '';
 $stateUf = is_string($state['uf'] ?? '') ? $state['uf'] : '';
 $stateCapital = is_string($state['capital_city'] ?? '') ? $state['capital_city'] : 'Não Informado';
 $statePopulation = !empty($state['population']) ? number_format((float)$state['population'], 0, ',', '.') : '-';
-$stateGdp = !empty($state['gdp']) ? ($state['gdp'] >= 1e9 ? number_format($state['gdp']/1e9, 1, ',', '.') . ' Bi' : number_format($state['gdp']/1e6, 0, ',', '.') . ' Mi') : '-';
-$stateGdpPerCapita = !empty($state['gdp_per_capita']) ? 'R$ ' . number_format((float)$state['gdp_per_capita'], 0, ',', '.') : '-';
+$stateGdp = !empty($state['gdp']) ? (($state['gdp'] / 1000) >= 1 ? number_format($state['gdp'] / 1000, 1, ',', '.') . ' Bi' : number_format((float) $state['gdp'], 0, ',', '.') . ' Mi') : '-';
+$stateGdpPerCapita = !empty($state['gdp_per_capita']) ? number_format((float) $state['gdp_per_capita'], 0, ',', '.') : '-';
 $stateArea = number_format((float)($state['area_km2'] ?? 0), 2, ',', '.');
 $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state['capital_city']) : 'Capital';
 ?>
@@ -70,7 +70,7 @@ $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state[
                         <div class="col-6 col-sm-3">
                             <div class="p-3 bg-primary-subtle rounded-3 border text-center">
                                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">PIB Per Capita</small>
-                                <span class="h5 fw-bold mb-0 text-primary"><?= $stateGdpPerCapita ?></span>
+                                <span class="h5 fw-bold mb-0 text-primary">R$ <?= $stateGdpPerCapita ?></span>
                             </div>
                         </div>
                         <div class="col-6 col-sm-3">
