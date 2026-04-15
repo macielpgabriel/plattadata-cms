@@ -830,7 +830,9 @@ final class CompanyController
             return $code;
         }
         
-        return substr($digits, 0, 2) . '.' . substr($digits, 2, 3) . '-' . substr($digits, 5, 1) . '/' . substr($digits, 6);
+        $digits = substr($digits, 0, 7);
+        
+        return substr($digits, 0, 2) . '.' . substr($digits, 2, 3) . '-' . substr($digits, 5, 1) . '/' . substr($digits, 6, 1);
     }
 
     private function resolveMainCnae(array $rawData): array
@@ -923,7 +925,13 @@ final class CompanyController
 
     private function normalizeCnaeCode(string $code): string
     {
-        return preg_replace('/[^0-9]/', '', $code);
+        $digits = preg_replace('/[^0-9]/', '', $code);
+        
+        if (strlen($digits) > 7) {
+            $digits = substr($digits, 0, 7);
+        }
+        
+        return $digits;
     }
 
     private function enrichSecondaryCnaes(array $secondaryCnaes): array
