@@ -434,8 +434,27 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <dt class="col-5 col-sm-5">Porte</dt>
                     <dd class="col-7 col-sm-7">
                         <?php 
-                        $porteVal = $company['company_size'] ?? $extendedData['porte'] ?? $rawData['porte'] ?? $rawData['descricao_porte'] ?? $rawData['porte_descricao'] ?? $rawData['porte_prefecture'] ?? '-';
-                        if (is_array($porteVal)) { $porteVal = $porteVal['descricao'] ?? $porteVal['text'] ?? $porteVal['description'] ?? '-'; }
+                        // Usa ?: para pular strings vazias e ?? para nulos
+                        $porteRaw = $company['company_size'] ?: ($extendedData['porte'] ?? $rawData['porte'] ?? $rawData['descricao_porte'] ?? $rawData['porte_descricao'] ?? $rawData['porte_prefecture'] ?? '');
+                        
+                        if (is_array($porteRaw)) { 
+                            $porteRaw = $porteRaw['descricao'] ?? $porteRaw['text'] ?? $porteRaw['description'] ?? $porteRaw['id'] ?? ''; 
+                        }
+                        
+                        $porteVal = (string) $porteRaw;
+                        
+                        // Mapeamento de códigos da Receita Federal para descrição amigável
+                        $porteMap = [
+                            '01' => 'Micro Empresa (ME)', '1' => 'Micro Empresa (ME)',
+                            '03' => 'Empresa de Pequeno Porte (EPP)', '3' => 'Empresa de Pequeno Porte (EPP)',
+                            '05' => 'Demais (Grande Porte)', '5' => 'Demais (Grande Porte)'
+                        ];
+                        
+                        if (isset($porteMap[$porteVal])) {
+                            $porteVal = $porteMap[$porteVal];
+                        }
+                        
+                        $porteVal = (trim($porteVal) !== '' && $porteVal !== '0') ? $porteVal : '-';
                         ?>
                         <?= e((string)$porteVal) ?>
                     </dd>
