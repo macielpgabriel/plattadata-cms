@@ -23,6 +23,15 @@ foreach (($qsa ?? []) as $partner):
     if ($qual === '') { $qual = '-'; }
     $qsaByQualification[$qual] = ($qsaByQualification[$qual] ?? 0) + 1;
 endforeach; ?>
+<?php
+$financialData = $enrichedData['financial_data'] ?? [];
+$partnerData = $enrichedData['partner_data'] ?? [];
+$marketData = $enrichedData['market_data'] ?? [];
+$complianceData = $enrichedData['compliance_data'] ?? [];
+$socialData = $enrichedData['social_data'] ?? [];
+$predictiveData = $enrichedData['predictive_data'] ?? [];
+$extendedData = $enrichedData['extended_data'] ?? [];
+?>
 
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="breadcrumb-container">
@@ -639,19 +648,24 @@ endforeach; ?>
                 </div>
                 <div class="fw-semibold small mb-2">Secundarios</div>
                 <ul class="mb-0 small ps-3">
-                    <?php if (empty($secondaryCnaes)): ?>
+                    <?php 
+                    $displaySecCnaes = !empty($extendedData['cnaes_secundarios']) 
+                        ? $extendedData['cnaes_secundarios'] 
+                        : ($secondaryCnaes ?? []);
+                    ?>
+                    <?php if (empty($displaySecCnaes)): ?>
                         <li class="text-muted">Nenhum informado.</li>
                     <?php else: ?>
-                        <?php foreach (array_slice($secondaryCnaes, 0, 10) as $cnae): ?>
+                        <?php foreach (array_slice($displaySecCnaes, 0, 10) as $cnae): ?>
                             <?php
                             $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '')) : trim((string) $cnae);
-                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ($cnae['texto'] ?? '')))) : '';
+                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ($cnae['texto'] ?? ($cnae['cnae_fiscal_descricao'] ?? ''))))) : '';
                             
                             $cleanSecCode = preg_replace('/\D/', '', $secCode);
                             $cleanSecDesc = preg_replace('/\D/', '', $secDesc);
                             ?>
                             <li>
-                                <?php if ($secCode !== '' && $secDesc !== '' && ($cleanSecCode !== $cleanSecDesc || strlen($secDesc) > 10)): ?>
+                                <?php if ($secCode !== '' && $secDesc !== '' && ($cleanSecCode !== $cleanSecDesc || strlen($secDesc) > 5)): ?>
                                     <?= e($secCode) ?> - <?= e($secDesc) ?>
                                 <?php elseif ($secCode !== ''): ?>
                                     <?= e($secCode) ?>
@@ -809,15 +823,6 @@ endforeach; ?>
         </div>
     </div>
     <?php endif; ?>
-
-    <?php
-    $financialData = $enrichedData['financial_data'] ?? [];
-    $partnerData = $enrichedData['partner_data'] ?? [];
-    $marketData = $enrichedData['market_data'] ?? [];
-    $complianceData = $enrichedData['compliance_data'] ?? [];
-    $socialData = $enrichedData['social_data'] ?? [];
-    $predictiveData = $enrichedData['predictive_data'] ?? [];
-    ?>
 
     <?php if (!empty($financialData) || !empty($marketData)): ?>
     <div class="col-12">
@@ -1110,10 +1115,7 @@ endforeach; ?>
     </div>
     <?php endif; ?>
 
-    <?php 
-    $extendedData = $enrichedData['extended_data'] ?? [];
-    if (!empty($extendedData['cnaes_secundarios']) || !empty($extendedData['natureza_juridica'])):
-    ?>
+    <?php if (!empty($extendedData['cnaes_secundarios']) || !empty($extendedData['natureza_juridica'])): ?>
     <div class="col-12">
         <div class="card mb-4 fade-in">
             <div class="card-body">
