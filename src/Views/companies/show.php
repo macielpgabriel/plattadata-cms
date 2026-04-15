@@ -645,12 +645,13 @@ endforeach; ?>
                         <?php foreach (array_slice($secondaryCnaes, 0, 10) as $cnae): ?>
                             <?php
                             $secCode = is_array($cnae) ? trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? '')) : trim((string) $cnae);
-                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
+                            $secDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ''))) : '';
+                            
                             $cleanSecCode = preg_replace('/\D/', '', $secCode);
                             $cleanSecDesc = preg_replace('/\D/', '', $secDesc);
                             ?>
                             <li>
-                                <?php if ($secCode !== '' && $secDesc !== '' && $cleanSecCode !== $cleanSecDesc): ?>
+                                <?php if ($secCode !== '' && $secDesc !== '' && ($cleanSecCode !== $cleanSecDesc || strlen($secDesc) > 15)): ?>
                                     <?= e($secCode) ?> - <?= e($secDesc) ?>
                                 <?php elseif ($secCode !== ''): ?>
                                     <?= e($secCode) ?>
@@ -1134,12 +1135,13 @@ endforeach; ?>
                         <?php foreach ($extendedData['cnaes_secundarios'] as $cnae): ?>
                         <?php
                         $cnaeCode = is_array($cnae) ? trim((string)($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '')) : trim((string)$cnae);
-                        $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
+                        $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ($cnae['cnae_descricao'] ?? ''))) : '';
+                        
                         $cleanBadgeCode = preg_replace('/\D/', '', $cnaeCode);
                         $cleanBadgeDesc = preg_replace('/\D/', '', $cnaeDesc);
                         ?>
-                        <span class="badge bg-light text-dark border" <?= ($cnaeDesc !== '' && $cleanBadgeCode !== $cleanBadgeDesc) ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
-                            <?= e((string) $cnaeCode) ?><?= ($cnaeDesc !== '' && $cleanBadgeCode !== $cleanBadgeDesc) ? ' — ' . e($cnaeDesc) : '' ?>
+                        <span class="badge bg-light text-dark border" <?= ($cnaeDesc !== '' && ($cleanBadgeCode !== $cleanBadgeDesc || strlen($cnaeDesc) > 15)) ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
+                            <?= e((string) $cnaeCode) ?><?= ($cnaeDesc !== '' && ($cleanBadgeCode !== $cleanBadgeDesc || strlen($cnaeDesc) > 15)) ? ' — ' . e($cnaeDesc) : '' ?>
                         </span>
                         <?php endforeach; ?>
                     </div>
