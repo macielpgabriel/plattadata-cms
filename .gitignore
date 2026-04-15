@@ -1,0 +1,104 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Composer
+vendor/
+composer.lock
+.composer.json
+
+# Logs
+storage/logs/*
+!storage/logs/.gitkeep
+*.log
+
+# Cache
+storage/cache/*
+!storage/cache/.gitkeep
+.cache/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS
+.vscode
+.env.*.swp
+*.pid
+
+# Node (if used)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# PHPUnit
+.phpunit.result.cache
+phpunit.xml
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*.old
+
+# API Keys and Credentials
+.api_keys
+.credentials
+secrets.json
+private_key.pem
+.pem
+.key
+
+# Session Files
+sessions/*
+!sessions/.gitkeep
+
+# Upload directories (if storing sensitive files)
+uploads/user_data/*
+!uploads/user_data/.gitkeep
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build artifacts
+dist/
+build/
+
+# SSL Certificates
+*.crt
+*.key
+*.pem
+*.pfx
+
+# Docker
+.docker/
+docker-compose.override.yml
