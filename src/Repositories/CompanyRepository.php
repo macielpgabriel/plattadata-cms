@@ -158,6 +158,60 @@ final class CompanyRepository
         if (!isset($columns['email'])) {
             $ddl[] = "ALTER TABLE companies ADD COLUMN email VARCHAR(200) NULL";
         }
+        if (!isset($columns['raw_data'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN raw_data JSON NULL";
+        }
+        if (!isset($columns['postal_code'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN postal_code VARCHAR(8) NULL";
+        }
+        if (!isset($columns['district'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN district VARCHAR(120) NULL";
+        }
+        if (!isset($columns['street'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN street VARCHAR(180) NULL";
+        }
+        if (!isset($columns['address_number'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN address_number VARCHAR(20) NULL";
+        }
+        if (!isset($columns['address_complement'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN address_complement VARCHAR(100) NULL";
+        }
+        if (!isset($columns['municipal_ibge_code'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN municipal_ibge_code VARCHAR(7) NULL";
+        }
+        if (!isset($columns['cnae_main_code'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN cnae_main_code VARCHAR(7) NULL";
+        }
+        if (!isset($columns['legal_nature'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN legal_nature VARCHAR(100) NULL";
+        }
+        if (!isset($columns['company_size'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN company_size VARCHAR(2) NULL";
+        }
+        if (!isset($columns['simples_opt_in'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN simples_opt_in TINYINT(1) NULL";
+        }
+        if (!isset($columns['mei_opt_in'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN mei_opt_in TINYINT(1) NULL";
+        }
+        if (!isset($columns['capital_social'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN capital_social DECIMAL(17,2) NULL";
+        }
+        if (!isset($columns['state_registration'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN state_registration VARCHAR(30) NULL";
+        }
+        if (!isset($columns['municipal_registration'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN municipal_registration VARCHAR(30) NULL";
+        }
+        if (!isset($columns['motivo_situacao'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN motivo_situacao VARCHAR(200) NULL";
+        }
+        if (!isset($columns['data_situacao'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN data_situacao DATE NULL";
+        }
+        if (!isset($columns['query_failures'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN query_failures INT NOT NULL DEFAULT 0";
+        }
 
         foreach ($ddl as $statement) {
             try {
