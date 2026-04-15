@@ -19,7 +19,7 @@ final class CompanySchemaService
     public function ensureAdvancedCompanySchema(PDO $pdo): void
     {
         $lock = base_path('storage/.schema_v4_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->columnExists($pdo, 'companies', 'query_failures') && $this->schemaService->tableExists($pdo, 'company_enrichments') && $this->schemaService->tableExists($pdo, 'company_source_payloads')) {
             return;
         }
 

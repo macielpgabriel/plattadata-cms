@@ -10,6 +10,10 @@ use PDOException;
 
 final class CompanyRepository
 {
+    private const FULLTEXT_INDEX_NAME = 'ft_companies_search';
+
+    private static ?bool $hasCompaniesFullTextIndex = null;
+
     public function searchPaginated(string $term, ?string $state, int $page = 1, int $perPage = 15): array
     {
         $page = max(1, $page);
@@ -29,12 +33,16 @@ final class CompanyRepository
                 $filters[] = '(cnpj LIKE :term_digits)';
                 $params['term_digits'] = '%' . $digits . '%';
             } else {
-                // Caso contrário, tenta busca FULLTEXT por nome/cidade
-                $useFullText = true;
-                $filters[] = 'MATCH(legal_name, trade_name, city) AGAINST(:term IN BOOLEAN MODE)';
-                // Adiciona + para garantir que todos os termos sejam considerados ou use sintaxe boolean se preferir
-                // Aqui vamos usar uma abordagem simples: se tiver mais de uma palavra, tratamos para o modo boolean
-                $params['term'] = $term . '*';
+                if ($this->hasFullTextSearchSupport()) {
+                    // Caso contrário, tenta busca FULLTEXT por nome/cidade
+                    $useFullText = true;
+                    $filters[] = 'MATCH(legal_name, trade_name, city) AGAINST(:term IN BOOLEAN MODE)';
+                    $params['term'] = $term . '*';
+                } else {
+                    // Fallback para instalações sem índice FULLTEXT criado ainda.
+                    $filters[] = '(legal_name LIKE :term_like OR trade_name LIKE :term_like OR city LIKE :term_like)';
+                    $params['term_like'] = '%' . $term . '%';
+                }
             }
         }
 
@@ -89,6 +97,35 @@ final class CompanyRepository
             'per_page' => $perPage,
             'last_page' => $lastPage,
         ];
+    }
+
+    private function hasFullTextSearchSupport(): bool
+    {
+        if (self::$hasCompaniesFullTextIndex !== null) {
+            return self::$hasCompaniesFullTextIndex;
+        }
+
+        try {
+            $stmt = Database::connection()->prepare(
+                'SELECT COUNT(*) AS total
+                 FROM information_schema.statistics
+                 WHERE table_schema = DATABASE()
+                   AND table_name = :table_name
+                   AND index_name = :index_name
+                   AND index_type = :index_type'
+            );
+            $stmt->execute([
+                'table_name' => 'companies',
+                'index_name' => self::FULLTEXT_INDEX_NAME,
+                'index_type' => 'FULLTEXT',
+            ]);
+
+            self::$hasCompaniesFullTextIndex = ((int) ($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0)) > 0;
+        } catch (PDOException $exception) {
+            self::$hasCompaniesFullTextIndex = false;
+        }
+
+        return self::$hasCompaniesFullTextIndex;
     }
 
     public function findByMunicipality(int $ibgeCode, string $city, string $state, int $page = 1, int $perPage = 15): array

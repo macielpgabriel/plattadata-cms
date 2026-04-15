@@ -358,7 +358,7 @@ final class SetupService
                     INDEX idx_city (city),
                     INDEX idx_status (status),
                     INDEX idx_hidden (is_hidden)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf88mb4_unicode_ci'
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
             );
             Logger::info('Setup: Tabela companies criada com sucesso');
         } catch (PDOException $exception) {
@@ -620,7 +620,7 @@ final class SetupService
     private function ensureLocationAndTaxSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.schema_location_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'states') && $this->schemaService->tableExists($pdo, 'municipalities') && $this->schemaService->tableExists($pdo, 'company_tax_data')) {
             return;
         }
 
@@ -729,7 +729,7 @@ final class SetupService
     private function ensureGdpSectorsSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.schema_gdp_v1_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->columnExists($pdo, 'municipalities', 'gdp_agri') && $this->schemaService->columnExists($pdo, 'states', 'gdp_agri')) {
             return;
         }
 
@@ -761,7 +761,7 @@ final class SetupService
     private function ensureQsaAndCnaeSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.schema_qsa_v1_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'company_partners') && $this->schemaService->tableExists($pdo, 'company_secondary_cnaes') && $this->schemaService->tableExists($pdo, 'cnae_activities')) {
             return;
         }
 
@@ -1121,7 +1121,7 @@ final class SetupService
     private function ensureVehicleFleetTypesSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.schema_vehicle_types_v1_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'municipality_vehicle_types')) {
             return;
         }
 
@@ -1154,7 +1154,7 @@ final class SetupService
     private function ensureIpBlocklistSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.ipblocklist_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'blocked_ips') && $this->schemaService->tableExists($pdo, 'ip_failed_attempts')) {
             return;
         }
 
@@ -1190,7 +1190,7 @@ final class SetupService
     private function ensureApiKeysSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.api_keys_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'api_keys') && $this->schemaService->tableExists($pdo, 'api_access_logs')) {
             return;
         }
 
@@ -1241,7 +1241,7 @@ final class SetupService
     private function ensureExtendedDataSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.extended_data_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'partner_history') && $this->schemaService->tableExists($pdo, 'company_competitors') && $this->schemaService->tableExists($pdo, 'compliance_records') && $this->schemaService->tableExists($pdo, 'company_scores') && $this->schemaService->tableExists($pdo, 'cnae_statistics')) {
             return;
         }
 
@@ -1373,7 +1373,7 @@ final class SetupService
     private function ensureMentionAlertsSchema(PDO $pdo): void
     {
         $lock = base_path('storage/.mention_alerts_completed');
-        if (is_file($lock)) {
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'company_mentions') && $this->schemaService->tableExists($pdo, 'company_mentions_history') && $this->schemaService->tableExists($pdo, 'mention_alert_subscriptions')) {
             return;
         }
 
