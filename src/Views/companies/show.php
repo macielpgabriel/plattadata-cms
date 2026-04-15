@@ -642,8 +642,8 @@ endforeach; ?>
                     <?php else: ?>
                         <?php foreach (array_slice($secondaryCnaes, 0, 10) as $cnae): ?>
                             <?php
-                            $secCode = trim((string) ($cnae['codigo'] ?? ''));
-                            $secDesc = trim((string) ($cnae['descricao'] ?? ''));
+                            $secCode = trim((string) ($cnae['codigo'] ?? $cnae['code'] ?? ''));
+                            $secDesc = trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? ''));
                             ?>
                             <li>
                                 <?php if ($secCode !== '' && $secDesc !== ''): ?>
@@ -1129,8 +1129,8 @@ endforeach; ?>
                     <div class="d-flex flex-wrap gap-1">
                         <?php foreach ($extendedData['cnaes_secundarios'] as $cnae): ?>
                         <?php
-                        $cnaeCode = is_array($cnae) ? ($cnae['codigo'] ?? $cnae['cnae'] ?? '') : $cnae;
-                        $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? '')) : '';
+                        $cnaeCode = is_array($cnae) ? ($cnae['codigo'] ?? $cnae['code'] ?? $cnae['cnae'] ?? '') : $cnae;
+                        $cnaeDesc = is_array($cnae) ? trim((string) ($cnae['descricao'] ?? $cnae['text'] ?? $cnae['description'] ?? '')) : '';
                         ?>
                         <span class="badge bg-light text-dark border" <?= $cnaeDesc !== '' ? 'title="' . e($cnaeDesc) . '"' : '' ?>>
                             <?= e((string) $cnaeCode) ?><?= $cnaeDesc !== '' ? ' — ' . e($cnaeDesc) : '' ?>
