@@ -858,7 +858,17 @@ final class CompanyController
             return '';
         }
 
-        $normalized = $this->normalizeCnaeCode($code);
+        $digits = preg_replace('/[^0-9]/', '', $code);
+        
+        if (strlen($digits) > 7) {
+            $digits = substr($digits, 0, 7);
+        }
+        
+        if (strlen($digits) < 7) {
+            return $code;
+        }
+
+        $normalized = $digits;
         $likePattern = $normalized . '%';
 
         try {
@@ -887,7 +897,7 @@ final class CompanyController
         } catch (\Throwable $e) {
         }
 
-        return $code;
+        return '';
     }
 
     private function fetchAndSaveCnaeFromApi(string $code): void

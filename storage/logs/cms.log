@@ -1,0 +1,1 @@
+{"timestamp":"2026-04-15 00:10:54","level":"ERROR","message":"IpBlocklist check error: Database connection failed: could not find driver","context":[],"request_id":"req_69df01beac48a5.96472297","remote_ip":"0.0.0.0","user_id":null,"uri":"","method":""}
