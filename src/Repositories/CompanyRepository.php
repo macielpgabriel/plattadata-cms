@@ -155,6 +155,9 @@ final class CompanyRepository
         if (!isset($columns['phone'])) {
             $ddl[] = "ALTER TABLE companies ADD COLUMN phone VARCHAR(30) NULL";
         }
+        if (!isset($columns['email'])) {
+            $ddl[] = "ALTER TABLE companies ADD COLUMN email VARCHAR(200) NULL";
+        }
 
         foreach ($ddl as $statement) {
             try {
@@ -317,6 +320,8 @@ final class CompanyRepository
 
     public function upsertFromApi(string $cnpj, array $payload, string $source = 'api', array $sourceContext = []): array
     {
+        $this->ensureCoreColumnsForReadQueries();
+        
         $connection = Database::connection();
         $existing = $this->findByCnpj($cnpj);
         $jsonData = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
