@@ -757,9 +757,37 @@ final class SetupService
                 $pdo->exec("INSERT INTO brasil_info (indicador, valor, texto, fuente, ano) VALUES
                     ('populacao', 203080400, '203.080.400', 'IBGE - Census 2022', 2022),
                     ('pib', 9983000000000, '9,983 trilhões', 'IBGE - PIB 2020', 2020),
+                    ('pib_per_capita', 49186, 'R$ 49.186', 'IBGE - PIB 2020', 2020),
                     ('area_km2', 8515767, '8.515.767', 'IBGE', 2022),
                     ('municipios', 5570, '5.570', 'IBGE', 2022),
-                    ('estados', 27, '27', 'IBGE', 2022)");
+                    ('estados', 27, '27', 'IBGE', 2022),
+                    ('capital', NULL, 'Brasília', 'IBGE', 2022),
+                    ('taxa_desemprego', 7.8, '7,8%', 'IBGE', 2024),
+                    ('ipca', 4.62, '4,62%', 'IBGE', 2024),
+                    ('hospitais', 6220, '6.220', 'CNES', 2023),
+                    ('medicos_por_10mil', 26.9, '26,9/10mil', 'CNES', 2023),
+                    ('leitos_por_10mil', 20.3, '20,3/10mil', 'CNES', 2023),
+                    ('mortalidade_infantil', 12.62, '12,62', 'IBGE', 2022),
+                    ('escolas', 178156, '178.156', 'INEP', 2023),
+                    ('analfabetismo', 7.2, '7,2%', 'IBGE', 2022),
+                    ('atividade_fisica', 37.9, '37,9%', 'IBGE', 2022),
+                    ('taxa_fecundidade', 1.76, '1,76', 'IBGE', 2022),
+                    ('frota_veiculos', 104742583, '104.742.583', 'DENATRAN', 2023),
+                    ('aeroportos', 693, '693', 'ANAC', 2023),
+                    ('energia_eletrica', 385912, '385.912 GWh', 'MME', 2022),
+                    ('densidade_2022', 23.86, '23,86 hab/km²', 'IBGE', 2022),
+                    ('exportacoes', 335610000000, 'US$ 335 bi', 'MDIC', 2023),
+                    ('importacoes', 267800000000, 'US$ 268 bi', 'MDIC', 2023),
+                    ('iluminacao_eletrica', 99.7, '99,7%', 'IBGE', 2022),
+                    ('agua_rede', 85.5, '85,5%', 'IBGE', 2022),
+                    ('esgotamento', 63.2, '63,2%', 'IBGE', 2022),
+                    ('internet', 90.0, '90,0%', 'IBGE', 2022),
+                    ('telefone_movel', 96.3, '96,3%', 'IBGE', 2022),
+                    ('microcomputador', 42.6, '42,6%', 'IBGE', 2022),
+                    ('televisao', 95.5, '95,5%', 'IBGE', 2022),
+                    ('nome_masculino', NULL, 'José', 'IBGE - Nomes', 2022),
+                    ('nome_feminino', NULL, 'Maria', 'IBGE - Nomes', 2022),
+                    ('sobrenome', NULL, 'Silva', 'IBGE - Nomes', 2022)");
             }
         } catch (PDOException $e) {
             Logger::warning('Setup brasil_info: ' . $e->getMessage());

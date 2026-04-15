@@ -102,8 +102,15 @@ final class LocationController
 
     public function brasil(): void
     {
-        $populacao = $this->ibgeService->getPopulacaoBrasil();
-        $pib = $this->ibgeService->getPibBrasil();
+        $rawDados = $this->ibgeService->getAllBrasilDados();
+        
+        $dadosBrasil = [];
+        foreach ($rawDados as $key => $data) {
+            $dadosBrasil[$key] = $data['valor'] ?? $data['texto'] ?? null;
+        }
+        
+        $populacao = $dadosBrasil['populacao'] ?? 203080400;
+        $pib = $dadosBrasil['pib'] ?? 9983000000000;
         
         $totalEmpresas = 0;
         $numMunicipios = 0;
@@ -139,6 +146,7 @@ final class LocationController
             'totalEmpresas' => $totalEmpresas,
             'numMunicipios' => $numMunicipios,
             'syncNeeded' => $syncNeeded,
+            'dadosBrasil' => $dadosBrasil,
         ]);
     }
 

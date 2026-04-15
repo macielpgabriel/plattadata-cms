@@ -457,6 +457,48 @@ final class IbgeService
         return null;
     }
     
+    public function getBrasilTexto(string $indicador): ?string
+    {
+        try {
+            $pdo = Database::connection();
+            $stmt = $pdo->prepare("SELECT texto FROM brasil_info WHERE indicador = :indicador LIMIT 1");
+            $stmt->execute(['indicador' => $indicador]);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $result['texto'] ?? null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+    
+    public function getAllBrasilDados(): array
+    {
+        $cacheKey = "brasil_all_dados";
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+        
+        try {
+            $pdo = Database::connection();
+            $stmt = $pdo->query("SELECT indicador, valor, texto FROM brasil_info");
+            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            
+            $dados = [];
+            foreach ($results as $row) {
+                $dados[$row['indicador']] = [
+                    'valor' => (float) $row['valor'],
+                    'texto' => $row['texto'],
+                ];
+            }
+            
+            Cache::set($cacheKey, $dados, self::CACHE_TTL);
+            return $dados;
+        } catch (\Throwable $e) {
+            Logger::warning("Erro ao buscar dados do Brasil: " . $e->getMessage());
+            return [];
+        }
+    }
+    
     public function syncBrasilDados(): bool
     {
         try {
