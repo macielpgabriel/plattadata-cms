@@ -399,8 +399,14 @@ final class LocationController
         $uf = strtoupper((string) ($params['uf'] ?? ''));
 
         try {
-            $this->ibgeService->fetchAndCacheStates();
-            Session::flash('success', "Dados do estado {$uf} sincronizados.");
+            $repo = new \App\Repositories\StateRepository();
+            $updated = $repo->syncStateStats($uf);
+            
+            if ($updated) {
+                Session::flash('success', "Dados do estado {$uf} sincronizados.");
+            } else {
+                Session::flash('error', "Não foi possível atualizar {$uf}.");
+            }
         } catch (\Throwable $e) {
             Session::flash('error', 'Erro: ' . $e->getMessage());
         }
