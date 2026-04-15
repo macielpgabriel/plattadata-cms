@@ -395,3 +395,39 @@ $metaDescription = $metaDescription ?? ($meta_description ?? null);
         Ver Estados
     </a>
 </div>
+
+<footer class="mt-5 py-4 bg-light border-top">
+    <div class="container">
+        <h6 class="mb-3 fw-bold">Fontes dos Dados</h6>
+        <div class="row g-3 small text-muted">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>IBGE</strong> - Instituto Brasileiro de Geografia e Estatística</p>
+                <p class="mb-1">Censo 2022, PIB 2020, Área Territorial</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>CNES</strong> - Cadastro Nacional de Estabelecimentos de Saúde</p>
+                <p class="mb-1">Hospitais, Médicos, Leitos (2023)</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>INEP</strong> - Instituto Nacional de Estudos e Pesquisas Educacionais</p>
+                <p class="mb-1">Escolas (2023)</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>DENATRAN</strong> - Departamento Nacional de Trânsito</p>
+                <p class="mb-1">Frota de Veículos (2023)</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>MDIC</strong> - Ministério do Desenvolvimento, Indústria e Comércio</p>
+                <p class="mb-1">Comércio Exterior (2023)</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>ANAC</strong> - Agência Nacional de Aviação Civil</p>
+                <p class="mb-1">Aeroportos (2023)</p>
+            </div>
+        </div>
+        <hr>
+        <p class="text-center text-muted small mb-0">
+            Dados atualizados em <?= date('d/m/Y') ?>. 
+        </p>
+    </div>
+</footer>

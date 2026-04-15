@@ -480,16 +480,25 @@ final class IbgeService
         
         try {
             $pdo = Database::connection();
-            $stmt = $pdo->query("SELECT indicador, valor, texto FROM brasil_info");
+            $stmt = $pdo->query("SELECT indicador, valor, texto, fuente, ano FROM brasil_info");
             $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             
             $dados = [];
+            $fontes = [];
             foreach ($results as $row) {
                 $dados[$row['indicador']] = [
                     'valor' => (float) $row['valor'],
                     'texto' => $row['texto'],
                 ];
+                if ($row['fuente'] && $row['ano']) {
+                    $fontes[$row['fuente']] = $row['ano'];
+                }
             }
+            
+            $dados['_meta'] = [
+                'fontes' => $fontes,
+                'updated_at' => date('Y-m-d'),
+            ];
             
             Cache::set($cacheKey, $dados, self::CACHE_TTL);
             return $dados;
