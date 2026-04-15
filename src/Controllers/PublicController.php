@@ -75,7 +75,10 @@ final class PublicController
 
     public function publicSearch(): void
     {
+        Logger::info('publicSearch called', ['post' => $_POST ?? []]);
+        
         if (!(new SetupService())->isDatabaseReady()) {
+            Logger::info('Database not ready, redirecting to /install');
             redirect('/install');
         }
 
@@ -85,6 +88,7 @@ final class PublicController
         }
 
         if (!Csrf::validate($_POST['_token'] ?? null)) {
+            Logger::info('CSRF validation failed');
             Session::flash('error', 'Sessao expirada. Tente novamente.');
             redirect('/');
         }
@@ -94,26 +98,34 @@ final class PublicController
         $max = max(1, min($configuredLimit, 300));
         $limit = (new RateLimiterService())->hit('cnpj_search_public', 'ip:' . $ip, $max, 60);
         if (!(bool) ($limit['success'] ?? true)) {
+            Logger::info('Rate limit exceeded', ['limit' => $limit]);
             $retry = (int) ($limit['retry_after'] ?? 60);
             Session::flash('error', 'Muitas consultas em pouco tempo. Aguarde ' . $retry . ' segundos e tente novamente.');
             redirect('/');
         }
 
         $cnpj = $this->cnpjService->sanitize((string) ($_POST['cnpj'] ?? ''));
+        Logger::info('CNPJ sanitized', ['cnpj' => $cnpj]);
+        
         if (!$this->cnpjService->validate($cnpj)) {
+            Logger::info('CNPJ validation failed', ['cnpj' => $cnpj]);
             Session::flash('error', 'CNPJ invalido.');
             redirect('/');
         }
 
         try {
-            $this->cnpjService->findOrFetch($cnpj);
+            $company = $this->cnpjService->findOrFetch($cnpj);
+            Logger::info('findOrFetch returned', ['company_id' => $company['id'] ?? null, 'source' => $company['source'] ?? 'unknown']);
         } catch (RuntimeException $exception) {
+            Logger::error('findOrFetch exception', ['error' => $exception->getMessage()]);
             Session::flash('error', $exception->getMessage());
             redirect('/');
         }
 
         Session::flash('success', 'Consulta concluida com sucesso.');
-        redirect('/empresas/' . $cnpj);
+        $redirectUrl = '/empresas/' . $cnpj;
+        Logger::info('Redirecting to', ['url' => $redirectUrl]);
+        redirect($redirectUrl);
     }
 
     private function clientIp(): string

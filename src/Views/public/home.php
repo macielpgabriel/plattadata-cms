@@ -90,6 +90,14 @@ document.getElementById('cnpjSearchForm').addEventListener('submit', function(e)
     .then(response => {
         if (response.redirected) {
             window.location.href = response.url;
+        } else if (!response.ok) {
+            return response.text().then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const errorMsg = tempDiv.querySelector('.alert-danger')?.textContent || 'Erro na consulta';
+                alert(errorMsg);
+                throw new Error(response.statusText);
+            });
         } else {
             return response.text();
         }
@@ -105,7 +113,9 @@ document.getElementById('cnpjSearchForm').addEventListener('submit', function(e)
         btn.disabled = false;
         btnText.innerHTML = '<i class="bi bi-search me-1"></i>Buscar';
         feedback.style.display = 'none';
-        alert('Erro ao buscar CNPJ. Tente novamente.');
+        if (err.message !== 'Failed to fetch') {
+            alert('Erro ao buscar CNPJ. Tente novamente.');
+        }
     });
 });
 
