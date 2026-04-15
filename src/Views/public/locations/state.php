@@ -415,7 +415,7 @@ $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state[
                                 <tr>
                                     <td class="ps-4 fw-bold text-body"><?= htmlspecialchars($municipality['name']) ?></td>
                                     <td class="text-muted small"><?= htmlspecialchars($municipality['mesoregion'] ?? '-') ?></td>
-                                    <td class="fw-medium"><?= $municipality['population'] ? number_format((float)$municipality['population'], 0, ',', '.') : '<span class="text-muted italic small opacity-50">Sincronizando...</span>' ?></td>
+                                    <td class="fw-medium"><?= isset($municipality['population']) && $municipality['population'] ? number_format((float)$municipality['population'], 0, ',', '.') : '<span class="text-muted italic small opacity-50">Sincronizando...</span>' ?></td>
                                     <td class="text-end pe-4">
                                         <?php 
                                         $citySlug = !empty($municipality['slug']) ? $municipality['slug'] : slugify($municipality['name']);
