@@ -73,12 +73,12 @@ final class PublicController
         ]);
     }
 
-    public function publicSearch(): void
+public function publicSearch(): void
     {
-        Logger::info('publicSearch called', ['post' => $_POST ?? []]);
+        error_log('DEBUG: publicSearch called - POST: ' . json_encode($_POST ?? []));
         
         if (!(new SetupService())->isDatabaseReady()) {
-            Logger::info('Database not ready, redirecting to /install');
+            error_log('DEBUG: Database not ready, redirecting to /install');
             redirect('/install');
         }
 
@@ -88,7 +88,7 @@ final class PublicController
         }
 
         if (!Csrf::validate($_POST['_token'] ?? null)) {
-            Logger::info('CSRF validation failed');
+            error_log('DEBUG: CSRF validation failed');
             Session::flash('error', 'Sessao expirada. Tente novamente.');
             redirect('/');
         }
@@ -98,33 +98,33 @@ final class PublicController
         $max = max(1, min($configuredLimit, 300));
         $limit = (new RateLimiterService())->hit('cnpj_search_public', 'ip:' . $ip, $max, 60);
         if (!(bool) ($limit['success'] ?? true)) {
-            Logger::info('Rate limit exceeded', ['limit' => $limit]);
+            error_log('DEBUG: Rate limit exceeded, limit: ' . json_encode($limit));
             $retry = (int) ($limit['retry_after'] ?? 60);
-            Session::flash('error', 'Muitas consultas em pouco tempo. Aguarde ' . $retry . ' segundos e tente novamente.');
+            Session::flash('error', 'Muitas consultas em poco tempo. Aguarde ' . $retry . ' segundos e tente novamente.');
             redirect('/');
         }
 
         $cnpj = $this->cnpjService->sanitize((string) ($_POST['cnpj'] ?? ''));
-        Logger::info('CNPJ sanitized', ['cnpj' => $cnpj]);
+        error_log('DEBUG: CNPJ sanitized: ' . $cnpj);
         
         if (!$this->cnpjService->validate($cnpj)) {
-            Logger::info('CNPJ validation failed', ['cnpj' => $cnpj]);
+            error_log('DEBUG: CNPJ validation failed: ' . $cnpj);
             Session::flash('error', 'CNPJ invalido.');
             redirect('/');
         }
 
         try {
             $company = $this->cnpjService->findOrFetch($cnpj);
-            Logger::info('findOrFetch returned', ['company_id' => $company['id'] ?? null, 'source' => $company['source'] ?? 'unknown']);
+            error_log('DEBUG: findOrFetch returned, company_id: ' . ($company['id'] ?? 'null') . ', source: ' . ($company['source'] ?? 'unknown'));
         } catch (RuntimeException $exception) {
-            Logger::error('findOrFetch exception', ['error' => $exception->getMessage()]);
+            error_log('DEBUG: findOrFetch exception: ' . $exception->getMessage());
             Session::flash('error', $exception->getMessage());
             redirect('/');
         }
 
         Session::flash('success', 'Consulta concluida com sucesso.');
         $redirectUrl = '/empresas/' . $cnpj;
-        Logger::info('Redirecting to', ['url' => $redirectUrl]);
+        error_log('DEBUG: Redirecting to: ' . $redirectUrl);
         redirect($redirectUrl);
     }
 
