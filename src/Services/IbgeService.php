@@ -424,12 +424,12 @@ final class IbgeService
     
     public function getPopulacaoBrasil(): int
     {
-        return 215000000;
+        return 203080400;
     }
     
     public function getPibBrasil(): float
     {
-        return 2100000000000.00;
+        return 9983000000000;
     }
     
     public function estimateMunicipalityTaxData(int $ibgeCode, string $name, string $uf): array

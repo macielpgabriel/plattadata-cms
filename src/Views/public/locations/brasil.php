@@ -51,7 +51,7 @@ $metaDescription = $metaDescription ?? ($meta_description ?? null);
         <div class="col-6 col-md-2">
             <div class="p-3 rounded-3 border tema-card text-center">
                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">População 2022</small>
-                <span class="h4 fw-bold mb-0 text-brand"><?= number_format((int)($dadosBrasil['populacao_2022'] ?? 0), 0, ',', '.') ?></span>
+                <span class="h4 fw-bold mb-0 text-brand"><?= number_format($populacao ?? 0, 0, ',', '.') ?></span>
             </div>
         </div>
         <div class="col-6 col-md-2">
@@ -69,19 +69,19 @@ $metaDescription = $metaDescription ?? ($meta_description ?? null);
         <div class="col-6 col-md-2">
             <div class="p-3 rounded-3 border tema-card text-center">
                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">PIB</small>
-                <span class="h4 fw-bold mb-0 text-success">US$ <?= !empty($dadosBrasil['pib']) ? number_format($dadosBrasil['pib'] / 1e9, 0, ',', '.') . ' bi' : '2,2 tri' ?></span>
+                <span class="h4 fw-bold mb-0 text-success">R$ <?= !empty($pib) ? number_format($pib / 1e9, 0, ',', '.') . ' bi' : '-' ?></span>
             </div>
         </div>
         <div class="col-6 col-md-2">
             <div class="p-3 rounded-3 border tema-card text-center">
                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">PIB per capita</small>
-                <span class="h4 fw-bold mb-0 text-brand">US$ <?= number_format((int)($dadosBrasil['pib_per_capita'] ?? 10000), 0, ',', '.') ?></span>
+                <span class="h4 fw-bold mb-0 text-brand">R$ <?= number_format($pib / 203080400, 0, ',', '.') ?></span>
             </div>
         </div>
         <div class="col-6 col-md-2">
             <div class="p-3 rounded-3 border tema-card text-center">
                 <small class="text-uppercase text-muted d-block mb-1 small fw-bold label-metric">Área km²</small>
-                <span class="h4 fw-bold mb-0 text-brand"><?= number_format((float)($dadosBrasil['area_km2'] ?? 0) / 1000, 0, ',', '.') ?> mil</span>
+                <span class="h4 fw-bold mb-0 text-brand"><?= number_format(8515767.0 / 1000, 0, ',', '.') ?> mil</span>
             </div>
         </div>
     </div>
