@@ -434,36 +434,34 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <dt class="col-5 col-sm-5">Porte</dt>
                     <dd class="col-7 col-sm-7">
                         <?php 
-                        $porteRaw = $company['company_size'] ?? '';
-                        
-                        // Se o valor no banco for considerado inválido/vazio, tentamos buscar em todas as fontes possíveis
+                        $porteCandidates = [
+                            $company['company_size'] ?? '',
+                            $extendedData['porte'] ?? '',
+                            $rawData['porte'] ?? '',
+                            $rawData['descricao_porte'] ?? '',
+                            $rawData['porte_descricao'] ?? '',
+                            $rawData['estabelecimento']['porte']['descricao'] ?? '',
+                            $rawData['estabelecimento']['porte'] ?? '',
+                            $rawData['porte_prefecture'] ?? ''
+                        ];
+                        $porteVal = '-';
                         $invalidValues = ['', '0', '00', '-', 'null', 'NULL'];
-                        if (in_array(trim((string)$porteRaw), $invalidValues, true)) {
-                            $porteRaw = $extendedData['porte'] ?? 
-                                       $rawData['porte'] ?? 
-                                       $rawData['descricao_porte'] ?? 
-                                       $rawData['porte_descricao'] ?? 
-                                       ($rawData['estabelecimento']['porte']['descricao'] ?? 
-                                       ($rawData['estabelecimento']['porte'] ?? $rawData['porte_prefecture'] ?? ''));
-                        }
-                        
-                        if (is_array($porteRaw)) { 
-                            $porteRaw = $porteRaw['descricao'] ?? $porteRaw['text'] ?? $porteRaw['description'] ?? $porteRaw['id'] ?? ''; 
-                        }
-                        
-                        $porteVal = trim((string) $porteRaw);
-                        
                         $porteMap = [
                             '01' => 'Micro Empresa (ME)', '1' => 'Micro Empresa (ME)',
                             '03' => 'Empresa de Pequeno Porte (EPP)', '3' => 'Empresa de Pequeno Porte (EPP)',
                             '05' => 'Demais (Grande Porte)', '5' => 'Demais (Grande Porte)'
                         ];
-                        
-                        if (isset($porteMap[$porteVal])) {
-                            $porteVal = $porteMap[$porteVal];
+                        foreach ($porteCandidates as $candidate) {
+                            if (is_array($candidate)) {
+                                $candidate = $candidate['descricao'] ?? $candidate['text'] ?? $candidate['description'] ?? $candidate['id'] ?? '';
+                            }
+                            $c = trim((string)$candidate);
+                            if (!in_array($c, $invalidValues, true)) {
+                                $porteVal = $porteMap[$c] ?? $c;
+                                break;
+                            }
                         }
-
-                        echo e(!in_array($porteVal, $invalidValues, true) ? $porteVal : '-');
+                        echo e((string)$porteVal);
                         ?>
                     </dd>
                     <dt class="col-5 col-sm-5">Natureza Juridica</dt>
