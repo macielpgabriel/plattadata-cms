@@ -55,7 +55,7 @@ final class SetupService
         return $this->lastConnectionError;
     }
 
-    public function runInitialSetup(): void
+     public function runInitialSetup(): void
     {
         $this->databaseService->createDatabaseAndUserIfConfigured();
         $pdo = $this->databaseService->connectApplicationDatabase();
@@ -112,6 +112,9 @@ final class SetupService
         $this->ensureRemovalCancelledStatus($pdo);
         $this->ensureVehicleFleetTypesSchema($pdo);
         $this->ensureInitialAdminInDatabase($pdo);
+
+        // Valida que tabelas críticas foram criadas
+        $this->validateCriticalTables($pdo);
 
         $this->writeSetupLock();
     }
@@ -183,32 +186,76 @@ final class SetupService
 
     private function runSchemaIfNeeded(PDO $pdo): void
     {
+        // Verifica se a tabela 'companies' já existe
+        $companiesExists = false;
         try {
             $stmt = $pdo->query("SHOW TABLES LIKE 'companies'");
-            $exists = $stmt->fetch();
-            if ($exists) {
+            $companiesExists = (bool) $stmt->fetch();
+            if ($companiesExists) {
+                Logger::info('Setup: Tabela companies já existe, pulando execução de schema.sql');
                 return;
             }
         } catch (PDOException $exception) {
-            Logger::warning('Setup: ' . $exception->getMessage());
-            Logger::warning('Schema check failed: ' . $exception->getMessage());
-            return;
+            Logger::warning('Setup: Erro ao verificar existência de tabela companies: ' . $exception->getMessage());
+            // Continua mesmo com erro na verificação
         }
 
+        // Valida que o arquivo schema.sql existe
         $schemaFile = base_path('database/schema.sql');
         if (!is_file($schemaFile)) {
+            Logger::error('Setup: Arquivo database/schema.sql não encontrado em: ' . $schemaFile);
             return;
         }
 
+        // Lê o arquivo
         $sql = (string) file_get_contents($schemaFile);
-        $statements = $this->schemaService->splitSqlStatements($sql);
+        if (empty($sql)) {
+            Logger::error('Setup: Arquivo database/schema.sql está vazio');
+            return;
+        }
 
-        try {
-            foreach ($statements as $statement) {
+        Logger::info('Setup: Iniciando execução de database/schema.sql (tabela companies não existe)');
+
+        // Divide em statements individuais
+        $statements = $this->schemaService->splitSqlStatements($sql);
+        if (empty($statements)) {
+            Logger::warning('Setup: Nenhum statement SQL encontrado em schema.sql');
+            return;
+        }
+
+        Logger::info('Setup: Encontrados ' . count($statements) . ' statements SQL para executar');
+
+        // Executa cada statement
+        $executedCount = 0;
+        $failedCount = 0;
+        foreach ($statements as $index => $statement) {
+            if (trim($statement) === '') {
+                continue;
+            }
+
+            try {
                 $pdo->exec($statement);
+                $executedCount++;
+            } catch (PDOException $exception) {
+                $failedCount++;
+                Logger::warning('Setup: Falha ao executar statement SQL #' . ($index + 1) . ': ' . $exception->getMessage());
+                // Continua executando os demais statements
+            }
+        }
+
+        Logger::info('Setup: Execução de schema.sql concluída. Executados: ' . $executedCount . ', Falhados: ' . $failedCount);
+
+        // Valida que a tabela companies foi criada
+        try {
+            $stmt = $pdo->query("SHOW TABLES LIKE 'companies'");
+            $companiesNowExists = (bool) $stmt->fetch();
+            if (!$companiesNowExists) {
+                Logger::error('Setup: CRÍTICO - Tabela companies não foi criada após execução de schema.sql');
+            } else {
+                Logger::info('Setup: Tabela companies criada com sucesso');
             }
         } catch (PDOException $exception) {
-            Logger::warning('Setup: ' . $exception->getMessage());
+            Logger::error('Setup: Erro ao validar criação de tabela companies: ' . $exception->getMessage());
         }
     }
 
@@ -1336,6 +1383,38 @@ final class SetupService
         }
 
         return $value;
+    }
+
+    private function validateCriticalTables(PDO $pdo): void
+    {
+        $criticalTables = [
+            'users' => 'Tabela de usuários',
+            'companies' => 'Tabela de empresas',
+            'site_settings' => 'Tabela de configurações',
+        ];
+
+        $missingTables = [];
+        foreach ($criticalTables as $tableName => $description) {
+            try {
+                $stmt = $pdo->query("SHOW TABLES LIKE '" . addslashes($tableName) . "'");
+                $exists = (bool) $stmt->fetch();
+                if (!$exists) {
+                    $missingTables[] = $tableName . ' (' . $description . ')';
+                    Logger::error('Setup: CRÍTICO - Tabela crítica não encontrada: ' . $tableName);
+                } else {
+                    Logger::info('Setup: Validação OK - Tabela ' . $tableName . ' existe');
+                }
+            } catch (PDOException $exception) {
+                Logger::error('Setup: Erro ao validar tabela ' . $tableName . ': ' . $exception->getMessage());
+                $missingTables[] = $tableName;
+            }
+        }
+
+        if (!empty($missingTables)) {
+            Logger::error('Setup: FALHA NA VALIDAÇÃO - Tabelas críticas ausentes: ' . implode(', ', $missingTables));
+        } else {
+            Logger::info('Setup: VALIDAÇÃO COMPLETA - Todas as tabelas críticas foram criadas com sucesso');
+        }
     }
 
     private function log(string $message): void
