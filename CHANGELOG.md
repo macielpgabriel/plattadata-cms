@@ -4,6 +4,19 @@ Este arquivo documenta todas as alterações significativas do CMS Platadata. As
 
 ---
 
+## [1.0.1] - 2026-04-14
+
+### 🔧 Correções
+
+- **SetupService**: Melhorada validação na criação de tabelas do banco de dados
+  - Adicionada verificação pós-execução do schema.sql
+  - Logs detalhados para diagnóstico
+  - Tratamento robusto de erros
+- **Documentação**: Removido arquivo src/radme.md vazio
+- **Documentação**: Atualização geral da documentação
+
+---
+
 ## [1.0.0] - 2026-04-12
 
 ### 🔴 Versão Major - Release Inicial
