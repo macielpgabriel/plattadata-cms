@@ -41,10 +41,9 @@ $uniqueIps = isset($dash['unique_ips']) ? (int) $dash['unique_ips'] : 0;
 <div class="row g-3 mb-4 fade-in">
     <?php foreach ($alerts as $alert): ?>
     <div class="col-12">
-        <div class="alert alert-<?= $alert['type'] ?> alert-dismissible fade show py-2">
+        <div class="alert alert-<?= $alert['type'] ?> py-2 mb-0">
             <i class="bi <?= $alert['icon'] ?> me-2"></i>
             <strong><?= e($alert['title']) ?></strong> - <?= e($alert['message']) ?>
-            <button type="button" class="btn-close py-0" data-bs-dismiss="alert"></button>
         </div>
     </div>
     <?php endforeach; ?>
