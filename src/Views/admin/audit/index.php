@@ -10,11 +10,11 @@ $updates = $actionStats['update'] ?? 0;
 $deletes = $actionStats['delete'] ?? 0;
 $accesses = $actionStats['access'] ?? 0;
 
-$dash = $dashboard ?? [];
-$today = $dash['today'] ?? 0;
-$last7 = $dash['last_7_days'] ?? 0;
-$activeUsers = $dash['active_users'] ?? 0;
-$uniqueIps = $dash['unique_ips'] ?? 0;
+$dash = is_array($dashboard) ? $dashboard : [];
+$today = isset($dash['today']) ? (int) $dash['today'] : 0;
+$last7 = isset($dash['last_7_days']) ? (int) $dash['last_7_days'] : 0;
+$activeUsers = isset($dash['active_users']) ? (int) $dash['active_users'] : 0;
+$uniqueIps = isset($dash['unique_ips']) ? (int) $dash['unique_ips'] : 0;
 ?>
 
 <div class="section-header fade-in mb-4">
