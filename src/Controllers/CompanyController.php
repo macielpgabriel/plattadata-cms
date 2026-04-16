@@ -217,7 +217,7 @@ final class CompanyController
         $user = Auth::user();
         if (!empty($company['id']) && !empty($user['id'])) {
             $this->companies->logSearch((int) $company['id'], (int) $user['id'], (string) ($company['source'] ?? 'unknown'), $this->clientIp());
-            AuditLogService::logAccess((int) $user['id'], 'company:' . $cnpj);
+            AuditLogService::log((int) $user['id'], 'access', 'company', (int) $company['id'], null, ['cnpj' => $cnpj]);
         }
 
         if (!empty($company['id']) && !$existedBefore) {
@@ -285,7 +285,20 @@ final class CompanyController
 
         if (!empty($company['id']) && !empty($user['id'])) {
             $this->companies->logSearch((int) $company['id'], (int) $user['id'], 'refresh', $this->clientIp());
-            AuditLogService::logUpdate((int) $user['id'], 'company', (int) $company['id'], $oldCompanyData, $company);
+
+            $oldData = [
+                'legal_name' => $oldCompanyData['legal_name'] ?? null,
+                'trade_name' => $oldCompanyData['trade_name'] ?? null,
+                'status' => $oldCompanyData['status'] ?? null,
+                'last_synced_at' => $oldCompanyData['last_synced_at'] ?? null,
+            ];
+            $newData = [
+                'legal_name' => $company['legal_name'] ?? null,
+                'trade_name' => $company['trade_name'] ?? null,
+                'status' => $company['status'] ?? null,
+                'last_synced_at' => $company['last_synced_at'] ?? null,
+            ];
+            AuditLogService::logUpdate((int) $user['id'], 'company', (int) $company['id'], $oldData, $newData);
         }
 
         $adminEmail = (string) config('mail.admin_email', '');
@@ -326,7 +339,7 @@ final class CompanyController
 
             $user = Auth::user();
             if (!empty($user['id'])) {
-                AuditLogService::logAccess((int) $user['id'], 'company:' . $cnpj);
+                AuditLogService::log((int) $user['id'], 'access', 'company', (int) $company['id'], null, ['cnpj' => $cnpj]);
             }
         }
 

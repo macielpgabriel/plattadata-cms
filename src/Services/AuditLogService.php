@@ -53,16 +53,25 @@ final class AuditLogService
 
     public static function logCreate(int $userId, string $entityType, int $entityId, array $data): bool
     {
+        if (empty($userId) || empty($entityId)) {
+            return false;
+        }
         return self::log($userId, 'create', $entityType, $entityId, null, $data);
     }
 
     public static function logUpdate(int $userId, string $entityType, int $entityId, array $oldData, array $newData): bool
     {
+        if (empty($userId) || empty($entityId)) {
+            return false;
+        }
         return self::log($userId, 'update', $entityType, $entityId, $oldData, $newData);
     }
 
     public static function logDelete(int $userId, string $entityType, int $entityId, array $data): bool
     {
+        if (empty($userId) || empty($entityId)) {
+            return false;
+        }
         return self::log($userId, 'delete', $entityType, $entityId, $data, null);
     }
 
