@@ -19,8 +19,8 @@ final class CompanyChangeMonitorService
     public static function checkAndRecordChanges(int $companyId, array $oldData, array $newData): void
     {
         foreach (self::TRACKED_FIELDS as $field) {
-            $oldValue = $oldData[$field] ?? null;
-            $newValue = $newData[$field] ?? null;
+            $oldValue = isset($oldData[$field]) ? (string) $oldData[$field] : null;
+            $newValue = isset($newData[$field]) ? (string) $newData[$field] : null;
 
             if ($oldValue !== $newValue) {
                 self::recordChange($companyId, $field, $oldValue, $newValue);
