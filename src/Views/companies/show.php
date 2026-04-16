@@ -387,6 +387,15 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <dt class="col-5 col-sm-4">Insc. Municipal</dt>
                     <dd class="col-7 col-sm-8"><?= e($company['municipal_registration']) ?></dd>
                     <?php endif; ?>
+                    <?php if (!empty($company['region_type'])): ?>
+                    <dt class="col-5 col-sm-4">Regiao</dt>
+                    <dd class="col-7 col-sm-8">
+                        <?php 
+                        $regionLabels = ['metropolitana' => 'Metropolitana', 'interior' => 'Interior', 'capital' => 'Capital', 'rural' => 'Rural'];
+                        echo $regionLabels[$company['region_type']] ?? e($company['region_type']);
+                        ?>
+                    </dd>
+                    <?php endif; ?>
                     <?php if (!empty($rawData['situacao_especial'])): ?>
                     <dt class="col-5 col-sm-4">Situacao Especial</dt>
                     <dd class="col-7 col-sm-8 text-muted"><?= e($rawData['situacao_especial']) ?></dd>
