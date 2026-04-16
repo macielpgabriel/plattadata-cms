@@ -93,12 +93,69 @@ final class AuditLogService
         return self::log($userId, 'access', 'resource', null, null, ['resource' => $resource]);
     }
 
-    public static function getRecentLogs(int $limit = 50, ?string $action = null, ?int $userId = null, ?string $entityType = null, ?string $startDate = null, ?string $endDate = null): array
+    public static function getRecentLogs(int $limit = 50, ?string $action = null, ?int $userId = null, ?string $entityType = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null): array
     {
         try {
             $db = Database::connection();
 
-            $sql = "SELECT * FROM " . self::TABLE . " WHERE 1=1";
+            $sql = "
+                SELECT al.*, u.name as user_name, u.email as user_email
+                FROM " . self::TABLE . " al
+                LEFT JOIN users u ON al.user_id = u.id
+                WHERE 1=1";
+            $params = [];
+
+            if ($action) {
+                $sql .= " AND al.action = :action";
+                $params['action'] = $action;
+            }
+
+            if ($userId) {
+                $sql .= " AND al.user_id = :user_id";
+                $params['user_id'] = $userId;
+            }
+
+            if ($entityType) {
+                $sql .= " AND al.entity_type = :entity_type";
+                $params['entity_type'] = $entityType;
+            }
+
+            if ($startDate) {
+                $sql .= " AND al.created_at >= :start_date";
+                $params['start_date'] = $startDate . ' 00:00:00';
+            }
+
+            if ($endDate) {
+                $sql .= " AND al.created_at <= :end_date";
+                $params['end_date'] = $endDate . ' 23:59:59';
+            }
+
+            if ($search) {
+                $sql .= " AND (al.old_values LIKE :search OR al.new_values LIKE :search OR al.changes LIKE :search)";
+                $params['search'] = '%' . $search . '%';
+            }
+
+            $sql .= " ORDER BY al.created_at DESC LIMIT :limit";
+            $params['limit'] = $limit;
+
+            $stmt = $db->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, \PDO::PARAM_STR);
+            }
+            $stmt->execute();
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public static function countLogs(?string $action = null, ?int $userId = null, ?string $entityType = null, ?string $startDate = null, ?string $endDate = null, ?string $search = null): int
+    {
+        try {
+            $db = Database::connection();
+
+            $sql = "SELECT COUNT(*) FROM " . self::TABLE . " WHERE 1=1";
             $params = [];
 
             if ($action) {
@@ -126,42 +183,9 @@ final class AuditLogService
                 $params['end_date'] = $endDate . ' 23:59:59';
             }
 
-            $sql .= " ORDER BY created_at DESC LIMIT :limit";
-            $params['limit'] = $limit;
-
-            $stmt = $db->prepare($sql);
-            foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value, \PDO::PARAM_INT);
-            }
-            $stmt->execute();
-
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
-
-    public static function countLogs(?string $action = null, ?int $userId = null, ?string $entityType = null): int
-    {
-        try {
-            $db = Database::connection();
-
-            $sql = "SELECT COUNT(*) FROM " . self::TABLE . " WHERE 1=1";
-            $params = [];
-
-            if ($action) {
-                $sql .= " AND action = :action";
-                $params['action'] = $action;
-            }
-
-            if ($userId) {
-                $sql .= " AND user_id = :user_id";
-                $params['user_id'] = $userId;
-            }
-
-            if ($entityType) {
-                $sql .= " AND entity_type = :entity_type";
-                $params['entity_type'] = $entityType;
+            if ($search) {
+                $sql .= " AND (old_values LIKE :search OR new_values LIKE :search OR changes LIKE :search)";
+                $params['search'] = '%' . $search . '%';
             }
 
             $stmt = $db->prepare($sql);
@@ -169,6 +193,22 @@ final class AuditLogService
             return (int) $stmt->fetchColumn();
         } catch (\Exception $e) {
             return 0;
+        }
+    }
+
+    public static function getUsersWithActivity(): array
+    {
+        try {
+            $db = Database::connection();
+            $stmt = $db->query("
+                SELECT DISTINCT u.id, u.name, u.email
+                FROM " . self::TABLE . " al
+                JOIN users u ON al.user_id = u.id
+                ORDER BY u.name
+            ");
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
         }
     }
 

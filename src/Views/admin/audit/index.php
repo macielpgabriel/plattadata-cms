@@ -3,6 +3,12 @@ use App\Core\Auth;
 
 $user = Auth::user();
 $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
+
+$actionStats = $stats['by_action'] ?? [];
+$creates = $actionStats['create'] ?? 0;
+$updates = $actionStats['update'] ?? 0;
+$deletes = $actionStats['delete'] ?? 0;
+$accesses = $actionStats['access'] ?? 0;
 ?>
 
 <div class="section-header fade-in mb-4">
@@ -13,7 +19,7 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
         </div>
         <div class="d-flex gap-2">
             <?php if ($canExport): ?>
-                <a href="/admin/auditoria/exportar<?=http_build_query(array_filter(['action' => $action, 'entity' => $entityType, 'start' => $startDate, 'end' => $endDate]))?>" class="btn btn-sm btn-outline-primary shadow-sm">
+                <a href="/admin/auditoria/exportar<?= http_build_query(array_filter(['action' => $action, 'entity' => $entityType, 'user' => $userId, 'start' => $startDate, 'end' => $endDate, 'quick' => $quickFilter, 'q' => $search])) ?>" class="btn btn-sm btn-outline-primary shadow-sm">
                     <i class="bi bi-download me-1"></i> Exportar CSV
                 </a>
             <?php endif; ?>
@@ -25,7 +31,7 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
 </div>
 
 <div class="row g-3 mb-4 fade-in">
-    <div class="col-6 col-md-4">
+    <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center py-3">
                 <div class="text-brand mb-2"><i class="bi bi-list-task fs-2"></i></div>
@@ -34,21 +40,30 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4">
+    <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center py-3">
-                <div class="text-primary mb-2"><i class="bi bi-clock-history fs-2"></i></div>
-                <div class="mb-0 fw-bold fs-3"><?= number_format($perPage ?? 50, 0, ',', '.') ?></div>
-                <small class="text-muted">Por Página</small>
+                <div class="text-success mb-2"><i class="bi bi-plus-circle fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($creates, 0, ',', '.') ?></div>
+                <small class="text-muted">Criações</small>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-4">
+    <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center py-3">
-                <div class="text-success mb-2"><i class="bi bi-calendar-check fs-2"></i></div>
-                <div class="mb-0 fw-bold fs-3"><?= number_format($totalPages, 0, ',', '.') ?></div>
-                <small class="text-muted">Páginas</small>
+                <div class="text-primary mb-2"><i class="bi bi-pencil fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($updates, 0, ',', '.') ?></div>
+                <small class="text-muted">Atualizações</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-warning mb-2"><i class="bi bi-eye fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($accesses, 0, ',', '.') ?></div>
+                <small class="text-muted">Acessos</small>
             </div>
         </div>
     </div>
@@ -56,8 +71,22 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
 
 <div class="card border-0 shadow-sm fade-in">
     <div class="card-header bg-transparent py-3">
-        <form method="get" action="/admin/auditoria" class="row g-3">
-            <div class="col-auto">
+        <form method="get" action="/admin/auditoria" class="row g-2 g-md-3 align-items-end">
+            <div class="col-12 col-md-auto">
+                <label class="form-label small text-muted mb-1">Buscar</label>
+                <input type="text" name="q" class="form-control form-control-sm" value="<?= e($search) ?>" placeholder="Pesquisar em valores...">
+            </div>
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">Filtro rápido</label>
+                <select name="quick" class="form-select form-select-sm">
+                    <option value="">Todos os períodos</option>
+                    <?php foreach ($quickFilters as $key => $label): ?>
+                        <option value="<?= e($key) ?>" <?= $quickFilter === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">Ação</label>
                 <select name="action" class="form-select form-select-sm">
                     <option value="">Todas as ações</option>
                     <?php foreach ($actions as $a): ?>
@@ -65,7 +94,8 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-auto">
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">Entidade</label>
                 <select name="entity" class="form-select form-select-sm">
                     <option value="">Todas as entidades</option>
                     <?php foreach ($entityTypes as $e): ?>
@@ -73,19 +103,33 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-auto">
-                <input type="date" name="start" class="form-control form-control-sm" value="<?= e($startDate) ?>" placeholder="Data inicial">
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">Usuário</label>
+                <select name="user" class="form-select form-select-sm">
+                    <option value="">Todos os usuários</option>
+                    <?php foreach ($users as $u): ?>
+                        <option value="<?= $u['id'] ?>" <?= $userId == $u['id'] ? 'selected' : '' ?>><?= e($u['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-            <div class="col-auto">
-                <input type="date" name="end" class="form-control form-control-sm" value="<?= e($endDate) ?>" placeholder="Data final">
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">De</label>
+                <input type="date" name="start" class="form-control form-control-sm" value="<?= e($startDate) ?>">
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="bi bi-funnel me-1"></i> Filtrar
-                </button>
-                <a href="/admin/auditoria" class="btn btn-sm btn-outline-secondary">
-                    Limpar
-                </a>
+            <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">Até</label>
+                <input type="date" name="end" class="form-control form-control-sm" value="<?= e($endDate) ?>">
+            </div>
+            <div class="col-12 col-md-auto">
+                <label class="d-none d-md-block">&nbsp;</label>
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-funnel me-1"></i> Filtrar
+                    </button>
+                    <a href="/admin/auditoria" class="btn btn-sm btn-outline-secondary">
+                        Limpar
+                    </a>
+                </div>
             </div>
         </form>
     </div>
@@ -116,7 +160,14 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
                         <?php foreach ($logs as $log): ?>
                             <tr>
                                 <td class="px-3"><small class="text-muted"><?= $log['id'] ?></small></td>
-                                <td><?= $log['user_id'] ?: '<span class="text-muted">-</span>' ?></td>
+                                <td>
+                                    <?php if (!empty($log['user_name'])): ?>
+                                        <span class="fw-medium"><?= e($log['user_name']) ?></span>
+                                        <small class="text-muted d-block" style="font-size: 0.7rem;"><?= e($log['user_email'] ?? '') ?></small>
+                                    <?php else: ?>
+                                        <span class="text-muted"><?= $log['user_id'] ?: '-' ?></span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php
                                     $actionColors = [
@@ -149,6 +200,20 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <h6>Usuário</h6>
+                                                    <p class="mb-0"><?= e($log['user_name'] ?? ($log['user_id'] ?: 'Sistema')) ?></p>
+                                                    <?php if (!empty($log['user_email'])): ?>
+                                                        <small class="text-muted"><?= e($log['user_email']) ?></small>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6>IP</h6>
+                                                    <p class="mb-0"><?= e($log['ip_address'] ?? '-') ?></p>
+                                                    <small class="text-muted"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></small>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <h6>Valores Anteriores</h6>
@@ -165,12 +230,6 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
                                                     <pre class="bg-light p-2 rounded small"><?= e(json_encode(json_decode($log['changes'], true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) ?></pre>
                                                 </div>
                                             <?php endif; ?>
-                                            <div class="mt-3">
-                                                <small class="text-muted">
-                                                    IP: <?= e($log['ip_address'] ?? '-') ?> |
-                                                    Data: <?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?>
-                                                </small>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -197,5 +256,4 @@ $canExport = in_array($user['role'] ?? '', ['admin', 'moderator'], true);
             </nav>
         </div>
     <?php endif; ?>
-</div>
 </div>
