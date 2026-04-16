@@ -43,6 +43,7 @@ final class RetentionService
         $this->deleteOlderThan('email_logs', 'created_at', (int) ($rules['email_logs'] ?? 365));
         $this->deleteOlderThan('request_rate_limits', 'updated_at', (int) ($rules['request_rate_limits'] ?? 7));
         $this->deleteOlderThan('lgpd_audit_logs', 'created_at', (int) ($rules['lgpd_audit_logs'] ?? 365));
+        $this->deleteOlderThan('audit_logs', 'created_at', (int) ($rules['audit_logs'] ?? 730));
     }
 
     private function deleteOlderThan(string $table, string $dateColumn, int $days): void
