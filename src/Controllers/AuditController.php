@@ -24,6 +24,7 @@ final class AuditController
         $action = $_GET['action'] ?? '';
         $entityType = $_GET['entity'] ?? '';
         $userId = !empty($_GET['user']) ? (int) $_GET['user'] : null;
+        $ipAddress = $_GET['ip'] ?? '';
         $startDate = $_GET['start'] ?? '';
         $endDate = $_GET['end'] ?? '';
         $quickFilter = $_GET['quick'] ?? '';
@@ -41,9 +42,11 @@ final class AuditController
             $entityType ?: null,
             $startDate ?: null,
             $endDate ?: null,
-            $search ?: null
+            $search ?: null,
+            $ipAddress ?: null
         );
 
+        $allLogs = AuditLogService::enrichCompanyNames($allLogs);
         $logs = array_slice($allLogs, $offset, $perPage);
 
         $total = AuditLogService::countLogs(
@@ -59,6 +62,9 @@ final class AuditController
         $actions = AuditLogService::getDistinctActions();
         $entityTypes = AuditLogService::getDistinctEntityTypes();
         $users = AuditLogService::getUsersWithActivity();
+        $ips = AuditLogService::getDistinctIps();
+        $dashboard = AuditLogService::getDashboardStats();
+        $alerts = AuditLogService::getAlerts();
 
         $params = $_GET;
         unset($params['page']);
@@ -74,6 +80,7 @@ final class AuditController
             'action' => $action,
             'entityType' => $entityType,
             'userId' => $userId,
+            'ipAddress' => $ipAddress,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'quickFilter' => $quickFilter,
@@ -81,8 +88,11 @@ final class AuditController
             'actions' => $actions,
             'entityTypes' => $entityTypes,
             'users' => $users,
+            'ips' => $ips,
             'queryParams' => $params,
             'stats' => $stats,
+            'dashboard' => $dashboard,
+            'alerts' => $alerts,
             'quickFilters' => self::QUICK_FILTERS,
             'metaRobots' => 'noindex,nofollow',
         ]);

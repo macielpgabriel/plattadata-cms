@@ -9,6 +9,12 @@ $creates = $actionStats['create'] ?? 0;
 $updates = $actionStats['update'] ?? 0;
 $deletes = $actionStats['delete'] ?? 0;
 $accesses = $actionStats['access'] ?? 0;
+
+$dash = $dashboard ?? [];
+$today = $dash['today'] ?? 0;
+$last7 = $dash['last_7_days'] ?? 0;
+$activeUsers = $dash['active_users'] ?? 0;
+$uniqueIps = $dash['unique_ips'] ?? 0;
 ?>
 
 <div class="section-header fade-in mb-4">
@@ -19,7 +25,7 @@ $accesses = $actionStats['access'] ?? 0;
         </div>
         <div class="d-flex gap-2">
             <?php if ($canExport): ?>
-                <a href="/admin/auditoria/exportar<?= http_build_query(array_filter(['action' => $action, 'entity' => $entityType, 'user' => $userId, 'start' => $startDate, 'end' => $endDate, 'quick' => $quickFilter, 'q' => $search])) ?>" class="btn btn-sm btn-outline-primary shadow-sm">
+                <a href="/admin/auditoria/exportar<?= http_build_query(array_filter(['action' => $action, 'entity' => $entityType, 'user' => $userId, 'ip' => $ipAddress, 'start' => $startDate, 'end' => $endDate, 'quick' => $quickFilter, 'q' => $search])) ?>" class="btn btn-sm btn-outline-primary shadow-sm">
                     <i class="bi bi-download me-1"></i> Exportar CSV
                 </a>
             <?php endif; ?>
@@ -30,6 +36,62 @@ $accesses = $actionStats['access'] ?? 0;
     </div>
 </div>
 
+<!-- Alertas -->
+<?php if (!empty($alerts)): ?>
+<div class="row g-3 mb-4 fade-in">
+    <?php foreach ($alerts as $alert): ?>
+    <div class="col-12">
+        <div class="alert alert-<?= $alert['type'] ?> alert-dismissible fade show py-2">
+            <i class="bi <?= $alert['icon'] ?> me-2"></i>
+            <strong><?= e($alert['title']) ?></strong> - <?= e($alert['message']) ?>
+            <button type="button" class="btn-close py-0" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<!-- Dashboard -->
+<div class="row g-3 mb-4 fade-in">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-brand mb-2"><i class="bi bi-calendar-day fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($today, 0, ',', '.') ?></div>
+                <small class="text-muted">Hoje</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-primary mb-2"><i class="bi bi-calendar-range fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($last7, 0, ',', '.') ?></div>
+                <small class="text-muted">Últimos 7 dias</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-success mb-2"><i class="bi bi-people fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($activeUsers, 0, ',', '.') ?></div>
+                <small class="text-muted">Usuários Ativos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-info mb-2"><i class="bi bi-router fs-2"></i></div>
+                <div class="mb-0 fw-bold fs-3"><?= number_format($uniqueIps, 0, ',', '.') ?></div>
+                <small class="text-muted">IPs Únicos</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas da página -->
 <div class="row g-3 mb-4 fade-in">
     <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm h-100">
@@ -113,6 +175,15 @@ $accesses = $actionStats['access'] ?? 0;
                 </select>
             </div>
             <div class="col-6 col-md-auto">
+                <label class="form-label small text-muted mb-1">IP</label>
+                <select name="ip" class="form-select form-select-sm">
+                    <option value="">Todos os IPs</option>
+                    <?php foreach ($ips as $ip): ?>
+                        <option value="<?= e($ip) ?>" <?= $ipAddress === $ip ? 'selected' : '' ?>><?= e($ip) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-6 col-md-auto">
                 <label class="form-label small text-muted mb-1">De</label>
                 <input type="date" name="start" class="form-control form-control-sm" value="<?= e($startDate) ?>">
             </div>
@@ -142,7 +213,6 @@ $accesses = $actionStats['access'] ?? 0;
                         <th>Usuário</th>
                         <th>Ação</th>
                         <th>Entidade</th>
-                        <th>Entidade ID</th>
                         <th>Data</th>
                         <th>IP</th>
                         <th></th>
@@ -151,7 +221,7 @@ $accesses = $actionStats['access'] ?? 0;
                 <tbody>
                     <?php if (empty($logs)): ?>
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
                                 Nenhum registro encontrado
                             </td>
@@ -182,8 +252,17 @@ $accesses = $actionStats['access'] ?? 0;
                                     ?>
                                     <span class="badge text-bg-<?= $color ?>"><?= e($log['action']) ?></span>
                                 </td>
-                                <td><?= e($log['entity_type']) ?></td>
-                                <td><?= $log['entity_id'] ?: '<span class="text-muted">-</span>' ?></td>
+                                <td>
+                                    <?php if (!empty($log['company_name'])): ?>
+                                        <span class="fw-medium"><?= e($log['company_name']) ?></span>
+                                        <small class="text-muted d-block" style="font-size: 0.7rem;">CNPJ: <?= e($log['company_cnpj'] ?? '') ?></small>
+                                    <?php else: ?>
+                                        <?= e($log['entity_type']) ?>
+                                        <?php if (!empty($log['entity_id'])): ?>
+                                            <small class="text-muted">(<?= $log['entity_id'] ?>)</small>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td><small><?= date('d/m/Y H:i', strtotime($log['created_at'])) ?></small></td>
                                 <td><small class="text-muted"><?= e($log['ip_address'] ?? '-') ?></small></td>
                                 <td>
