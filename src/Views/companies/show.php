@@ -73,6 +73,11 @@ $extendedData = $enrichedData['extended_data'] ?? [];
     </div>
 <?php else: ?>
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+    <?php if (!empty($company['logo_url'])): ?>
+    <div class="flex-shrink-0">
+        <img src="<?= e($company['logo_url']) ?>" alt="Logo" class="rounded" style="max-height: 60px; max-width: 120px; object-fit: contain;">
+    </div>
+    <?php endif; ?>
     <div class="flex-grow-1">
         <h1 class="h4 h-md-3 mb-1"><?= e($company['legal_name'] ?? 'Empresa') ?></h1>
         <div class="text-muted small d-flex align-items-center flex-wrap" style="gap: 0.25rem;">
