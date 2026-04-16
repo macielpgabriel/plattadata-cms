@@ -29,6 +29,7 @@ use App\Services\CompanyEnrichmentService;
 use App\Services\SearchAnalyticsService;
 use App\Services\CompanyChangeMonitorService;
 use App\Services\ComplianceService;
+use App\Services\AuditLogService;
 use App\Repositories\MunicipalityRepository;
 use App\Services\MarketIntelligenceService;
 use App\Services\IbgeService;
@@ -206,6 +207,7 @@ final class CompanyController
         }
 
         try {
+            $existedBefore = $this->companies->findByCnpj($cnpj, true) !== null;
             $company = $this->cnpjService->findOrFetch($cnpj);
         } catch (RuntimeException $exception) {
             Session::flash('error', $exception->getMessage());
@@ -215,6 +217,11 @@ final class CompanyController
         $user = Auth::user();
         if (!empty($company['id']) && !empty($user['id'])) {
             $this->companies->logSearch((int) $company['id'], (int) $user['id'], (string) ($company['source'] ?? 'unknown'), $this->clientIp());
+            AuditLogService::logAccess((int) $user['id'], 'company:' . $cnpj);
+        }
+
+        if (!empty($company['id']) && !$existedBefore) {
+            AuditLogService::logCreate((int) ($user['id'] ?? 0), 'company', (int) $company['id'], $company);
         }
 
         $source = ($company['source'] ?? '') === 'api' ? 'API externa' : 'cache local';
@@ -231,6 +238,7 @@ final class CompanyController
             redirect('/empresas/busca');
         }
 
+        $oldCompanyData = $company;
         $lastSync = strtotime($company['last_synced_at'] ?? '2000-01-01');
         $daysSinceSync = (time() - $lastSync) / 86400;
         $isStaff = Auth::can(['admin', 'editor']);
@@ -277,6 +285,7 @@ final class CompanyController
 
         if (!empty($company['id']) && !empty($user['id'])) {
             $this->companies->logSearch((int) $company['id'], (int) $user['id'], 'refresh', $this->clientIp());
+            AuditLogService::logUpdate((int) $user['id'], 'company', (int) $company['id'], $oldCompanyData, $company);
         }
 
         $adminEmail = (string) config('mail.admin_email', '');
@@ -314,6 +323,11 @@ final class CompanyController
 
         if (!empty($company['id'])) {
             $this->companies->incrementViews((int)$company['id']);
+
+            $user = Auth::user();
+            if (!empty($user['id'])) {
+                AuditLogService::logAccess((int) $user['id'], 'company:' . $cnpj);
+            }
         }
 
         if (!empty($company['is_hidden'])) {
@@ -576,7 +590,13 @@ final class CompanyController
         }
 
         $cnpj = $this->cnpjService->sanitize((string) ($params['cnpj'] ?? ''));
+        $company = $this->companies->findByCnpj($cnpj);
+        $user = Auth::user();
+
         if ($this->companies->deleteByCnpj($cnpj)) {
+            if (!empty($company['id']) && !empty($user['id'])) {
+                AuditLogService::logDelete((int) $user['id'], 'company', (int) $company['id'], $company);
+            }
             Session::flash('success', 'Empresa excluida com sucesso.');
         } else {
             Session::flash('error', 'Nao foi possivel excluir a empresa.');

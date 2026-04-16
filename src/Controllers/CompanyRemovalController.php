@@ -13,6 +13,7 @@ use App\Services\GoogleDriveService;
 use App\Services\GoogleDriveServiceOAuth;
 use App\Services\MailService;
 use App\Services\ValidationService;
+use App\Services\AuditLogService;
 use Exception;
 
 final class CompanyRemovalController
@@ -367,6 +368,9 @@ HTML
             $update->execute(['id' => $id, 'user' => $user['id']]);
 
             $db->commit();
+
+            AuditLogService::logUpdate((int) $user['id'], 'company', (int) $request['company_id'], ['is_hidden' => 0], ['is_hidden' => 1]);
+
             Session::flash('success', 'Empresa removida com sucesso.');
         } catch (Exception $e) {
             $db->rollBack();
@@ -399,6 +403,9 @@ HTML
             $update->execute(['id' => $id, 'user' => $user['id']]);
 
             $db->commit();
+
+            AuditLogService::logUpdate((int) $user['id'], 'company', (int) $request['company_id'], ['is_hidden' => 1], ['is_hidden' => 0]);
+
             Session::flash('success', 'Empresa restaurada e solicitacao cancelada com sucesso.');
         } catch (Exception $e) {
             $db->rollBack();
