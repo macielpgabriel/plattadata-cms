@@ -365,6 +365,18 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <dt class="col-5 col-sm-4">Tipo</dt>
                     <dd class="col-7 col-sm-8"><?= e(ucfirst($rawData['tipo_estabelecimento'] ?? $rawData['matriz_filial'] ?? '-')) ?></dd>
                     <?php endif; ?>
+                    <?php if (!empty($company['employees_estimate'])): ?>
+                    <dt class="col-5 col-sm-4">Funcionarios</dt>
+                    <dd class="col-7 col-sm-8"><?= e($company['employees_estimate']) ?></dd>
+                    <?php endif; ?>
+                    <?php if (!empty($company['state_registration'])): ?>
+                    <dt class="col-5 col-sm-4">Insc. Estadual</dt>
+                    <dd class="col-7 col-sm-8"><?= e($company['state_registration']) ?></dd>
+                    <?php endif; ?>
+                    <?php if (!empty($company['municipal_registration'])): ?>
+                    <dt class="col-5 col-sm-4">Insc. Municipal</dt>
+                    <dd class="col-7 col-sm-8"><?= e($company['municipal_registration']) ?></dd>
+                    <?php endif; ?>
                     <?php if (!empty($rawData['situacao_especial'])): ?>
                     <dt class="col-5 col-sm-4">Situacao Especial</dt>
                     <dd class="col-7 col-sm-8 text-muted"><?= e($rawData['situacao_especial']) ?></dd>
@@ -476,6 +488,13 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     </dd>
                     <dt class="col-5 col-sm-5">Natureza Juridica</dt>
                     <dd class="col-7 col-sm-7 text-muted"><?= e($company['legal_nature'] ?? $rawData['natureza_juridica'] ?? $rawData['tipo_de_sociedade'] ?? '-') ?></dd>
+                    <?php if (!empty($company['revenue_estimate'])): ?>
+                    <dt class="col-5 col-sm-5">Receita Estimada</dt>
+                    <dd class="col-7 col-sm-7">
+                        <span class="fw-bold">R$ <?= number_format((float) $company['revenue_estimate'], 2, ',', '.') ?></span>
+                        <small class="text-muted d-block" style="font-size: 0.7rem;">Valor anual estimado</small>
+                    </dd>
+                    <?php endif; ?>
                     <dt class="col-5 col-sm-5">Simples Nacional</dt>
                     <dd class="col-7 col-sm-7">
                         <?php
