@@ -66,6 +66,9 @@ $canSearch = Auth::can(['admin', 'editor']);
                     <th class="d-table-cell d-md-none">Dados</th>
                     <th>Razao social</th>
                     <th class="d-none d-lg-table-cell">Nome fantasia</th>
+                    <th class="d-none d-md-table-cell">CNAE</th>
+                    <th class="d-none d-md-table-cell">Porte</th>
+                    <th class="d-none d-md-table-cell">Receita</th>
                     <th class="text-nowrap d-none d-sm-table-cell">Cidade/UF</th>
                     <th class="d-none d-md-table-cell">Situacao</th>
                     <th></th>
@@ -74,7 +77,7 @@ $canSearch = Auth::can(['admin', 'editor']);
                 <tbody>
                 <?php if (empty($items)): ?>
                     <tr>
-                        <td colspan="7" class="text-muted text-center py-4">
+                        <td colspan="10" class="text-muted text-center py-4">
                             <i class="bi bi-search fs-3 d-block mb-2"></i>
                             Nenhum resultado encontrado.
                         </td>
@@ -97,6 +100,9 @@ $canSearch = Auth::can(['admin', 'editor']);
                             </td>
                             <td class="d-none d-md-table-cell"><?= e($item['legal_name']) ?></td>
                             <td class="d-none d-lg-table-cell"><?= e($item['trade_name'] ?: '-') ?></td>
+                            <td class="d-none d-md-table-cell"><?= !empty($item['cnae_main_code']) ? e($item['cnae_main_code']) : '-' ?></td>
+                            <td class="d-none d-md-table-cell"><?= !empty($item['company_size']) ? e($item['company_size']) : '-' ?></td>
+                            <td class="d-none d-md-table-cell"><?= !empty($item['revenue_estimate']) ? 'R$ ' . number_format((float) $item['revenue_estimate'], 0, ',', '.') : '-' ?></td>
                             <td class="text-nowrap d-none d-sm-table-cell"><?= e(($item['city'] ?: '-') . '/' . ($item['state'] ?: '-')) ?></td>
                             <td class="d-none d-md-table-cell">
                                 <?php if (!empty($item['status'])): ?>
