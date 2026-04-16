@@ -333,7 +333,12 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                         <?php endif; ?>
                     </dd>
                     <dt class="col-5 col-sm-4">E-mail</dt>
-                    <dd class="col-7 col-sm-8 text-break"><?= e($company['email'] ?: '-') ?></dd>
+                    <dd class="col-7 col-sm-8 text-break">
+                        <?= e($company['email'] ?: '-') ?>
+                        <?php if (!empty($company['email_verified'])): ?>
+                            <span class="badge bg-success ms-1" title="E-mail verificado"><i class="bi bi-check-circle"></i></span>
+                        <?php endif; ?>
+                    </dd>
                     <dt class="col-5 col-sm-4">Telefone</dt>
                     <dd class="col-7 col-sm-8">
                         <?php 
@@ -365,6 +370,9 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                             <a href="<?= e($company['website']) ?>" target="_blank" rel="noopener" class="text-decoration-none">
                                 <?= e($company['website']) ?> <i class="bi bi-box-arrow-up-right small"></i>
                             </a>
+                            <?php if (!empty($company['website_verified'])): ?>
+                                <span class="badge bg-success ms-1" title="Website verificado"><i class="bi bi-check-circle"></i></span>
+                            <?php endif; ?>
                         <?php else: ?>
                             <span class="text-muted">-</span>
                         <?php endif; ?>
