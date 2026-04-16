@@ -45,8 +45,73 @@ final class CompanyChangeMonitorService
                 'old_value' => $oldValue,
                 'new_value' => $newValue,
             ]);
+            
+            self::notifySubscribers($companyId, $field, $oldValue, $newValue);
         } catch (\Exception $e) {
             Logger::error('Erro ao registrar mudança: ' . $e->getMessage());
+        }
+    }
+    
+    private static function notifySubscribers(int $companyId, string $field, ?string $oldValue, ?string $newValue): void
+    {
+        try {
+            $db = Database::connection();
+            
+            $companyStmt = $db->prepare("SELECT cnpj, legal_name FROM companies WHERE id = :id");
+            $companyStmt->execute(['id' => $companyId]);
+            $company = $companyStmt->fetch();
+            
+            if (!$company) return;
+            
+            $subsStmt = $db->prepare("
+                SELECT user_id, notify_email, notify_whatsapp, whatsapp_phone 
+                FROM company_change_subscriptions 
+                WHERE company_cnpj = :cnpj AND (notify_email = 1 OR notify_whatsapp = 1)
+            ");
+            $subsStmt->execute(['cnpj' => $company['cnpj']]);
+            $subscribers = $subsStmt->fetchAll();
+            
+            if (empty($subscribers)) return;
+            
+            $changeLabel = match($field) {
+                'status' => 'situação cadastral',
+                'legal_name' => 'razão social',
+                'trade_name' => 'nome fantasia',
+                'city', 'state' => 'localização',
+                'street', 'address_number', 'district', 'postal_code' => 'endereço',
+                'phone' => 'telefone',
+                'email' => 'e-mail',
+                'website' => 'website',
+                'capital_social' => 'capital social',
+                'cnae_main_code' => 'CNAE',
+                default => $field,
+            };
+            
+            $subject = "Mudança detectada: {$company['legal_name']}";
+            $body = "Detectamos uma mudança na empresa {$company['legal_name']} (CNPJ: {$company['cnpj']}):\n\n";
+            $body .= "Campo: {$changeLabel}\n";
+            $body .= "De: " . ($oldValue ?: '(vazio)') . "\n";
+            $body .= "Para: " . ($newValue ?: '(vazio)') . "\n";
+            $body .= "\nAcesse para ver mais detalhes: " . config('app.url') . '/empresas/' . $company['cnpj'];
+            
+            foreach ($subscribers as $sub) {
+                if ($sub['notify_email']) {
+                    $userStmt = $db->prepare("SELECT email FROM users WHERE id = :id");
+                    $userStmt->execute(['id' => $sub['user_id']]);
+                    $user = $userStmt->fetch();
+                    
+                    if (!empty($user['email'])) {
+                        @mail(
+                            $user['email'],
+                            $subject,
+                            $body,
+                            "From: " . config('app.email_from', 'naoreply@plattadata.com')
+                        );
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Logger::error('Erro ao notificar subscribers: ' . $e->getMessage());
         }
     }
 
