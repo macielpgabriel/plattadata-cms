@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Core\Database;
+use App\Services\MarketAnalysisService;
 use PDO;
 use PDOException;
 
@@ -570,6 +571,16 @@ final class CompanyRepository
                 $this->insertSourceAttempts($cnpj, $companyId, $sourceContext['attempts'] ?? []);
             } else {
                 $this->insertSourceAttempts($cnpj, null, $sourceContext['attempts'] ?? []);
+            }
+
+            $cnaeCode = $this->nullable($this->limit((string) $this->firstPayloadValue($payload, [
+                'cnae_fiscal',
+                'cnae_main_code',
+                'atividade_principal.0.codigo',
+                'atividade_principal.0.code',
+            ]), 16));
+            if (!empty($cnaeCode)) {
+                MarketAnalysisService::updateCnaeStatistics($cnaeCode);
             }
 
             $connection->commit();
