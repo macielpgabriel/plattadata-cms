@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Database;
+use App\Services\OpenCnpjService;
 
 final class CompanyEnrichmentService
 {
@@ -453,13 +454,20 @@ final class CompanyEnrichmentService
 
     private function getContactData(array $company): array
     {
+        $enriched = $company;
+        
+        if (empty($company['phone']) || empty($company['email']) || empty($company['website'])) {
+            $openCnpj = new OpenCnpjService();
+            $enriched = $openCnpj->enrichFromOpenCnpj($company);
+        }
+        
         return [
-            'email' => $company['email'] ?? null,
-            'email_verified' => (bool) ($company['email_verified'] ?? false),
-            'phone' => $company['phone'] ?? null,
-            'whatsapp_business_id' => $company['whatsapp_business_id'] ?? null,
-            'website' => $company['website'] ?? null,
-            'website_verified' => (bool) ($company['website_verified'] ?? false),
+            'email' => $enriched['email'] ?? null,
+            'email_verified' => (bool) ($enriched['email_verified'] ?? false),
+            'phone' => $enriched['phone'] ?? null,
+            'whatsapp_business_id' => $enriched['whatsapp_business_id'] ?? null,
+            'website' => $enriched['website'] ?? null,
+            'website_verified' => (bool) ($enriched['website_verified'] ?? false),
         ];
     }
 
