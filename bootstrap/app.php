@@ -94,8 +94,61 @@ if ((bool) config('app.lgpd.retention.enabled', true)) {
 // IP Blocklist
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 if (\App\Services\IpBlocklistService::isBlocked($clientIp)) {
+    $blockedList = \App\Services\IpBlocklistService::getBlockedList();
+    $blocked = array_filter($blockedList, fn($item) => $item['ip'] === $clientIp);
+    $blocked = array_values($blocked)[0] ?? null;
+
     http_response_code(403);
-    echo "Acesso bloqueado.";
+    header('Content-Type: text/html; charset=utf-8');
+    $expiresAt = $blocked['expires_at'] ?? null;
+    ?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Bloqueado</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { text-align: center; padding: 2rem; max-width: 500px; }
+        h1 { color: #e74c3c; margin-bottom: 1rem; }
+        .timer { font-size: 2.5rem; font-weight: bold; color: #f39c12; margin: 1rem 0; }
+        .message { color: #aaa; line-height: 1.6; }
+        .refresh-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-top: 1rem; }
+        .refresh-btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Acesso Bloqueado</h1>
+        <?php if ($blocked && $blocked['reason']): ?>
+            <p class="message"><?= htmlspecialchars($blocked['reason']) ?></p>
+        <?php endif; ?>
+        <?php if ($expiresAt): ?>
+            <p class="message">Tente novamente em:</p>
+            <div class="timer" data-expires="<?= $expiresAt ?>">--:--</div>
+            <button class="refresh-btn" onclick="location.reload()">Atualizar</button>
+            <script>
+                function updateTimer() {
+                    const el = document.querySelector('.timer');
+                    const expires = new Date(el.dataset.expires).getTime();
+                    const now = Date.now();
+                    const diff = Math.max(0, Math.floor((expires - now) / 1000));
+                    const mins = Math.floor(diff / 60);
+                    const secs = diff % 60;
+                    el.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    if (diff <= 0) location.reload();
+                }
+                setInterval(updateTimer, 1000);
+                updateTimer();
+            </script>
+        <?php else: ?>
+            <p class="message">Seu acesso foi bloqueado permanentemente.</p>
+        <?php endif; ?>
+    </div>
+</body>
+</html>
+    <?php
     exit;
 }
 
