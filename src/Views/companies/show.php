@@ -359,6 +359,16 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                             <?= e($company['phone'] ?: $rawData['ddd_telefone_1'] ?: ($rawData['telefone'] ?? '-')) ?>
                         <?php endif; ?>
                     </dd>
+                    <dt class="col-5 col-sm-4">Website</dt>
+                    <dd class="col-7 col-sm-8">
+                        <?php if (!empty($company['website'])): ?>
+                            <a href="<?= e($company['website']) ?>" target="_blank" rel="noopener" class="text-decoration-none">
+                                <?= e($company['website']) ?> <i class="bi bi-box-arrow-up-right small"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="text-muted">-</span>
+                        <?php endif; ?>
+                    </dd>
                     <dt class="col-5 col-sm-4">Abertura</dt>
                     <dd class="col-7 col-sm-8"><?= e(format_date($company['opened_at'] ?? $rawData['data_inicio_atividade'] ?? $rawData['opened_at'] ?? null)) ?></dd>
                     <?php if (!empty($rawData['tipo_estabelecimento']) || !empty($rawData['matriz_filial'])): ?>
