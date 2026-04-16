@@ -24,6 +24,7 @@ use App\Controllers\GoogleAuthController;
 use App\Controllers\FavoriteController;
 use App\Controllers\IntegrationsController;
 use App\Controllers\AnalyticsController;
+use App\Controllers\AuditController;
 use App\Controllers\DebugController;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
