@@ -93,11 +93,11 @@ final class AuditLogService
         return self::log($userId, 'access', 'resource', null, null, ['resource' => $resource]);
     }
 
-    public static function getRecentLogs(int $limit = 50, ?string $action = null, ?int $userId = null): array
+    public static function getRecentLogs(int $limit = 50, ?string $action = null, ?int $userId = null, ?string $entityType = null, ?string $startDate = null, ?string $endDate = null): array
     {
         try {
             $db = Database::connection();
-            
+
             $sql = "SELECT * FROM " . self::TABLE . " WHERE 1=1";
             $params = [];
 
@@ -111,6 +111,21 @@ final class AuditLogService
                 $params['user_id'] = $userId;
             }
 
+            if ($entityType) {
+                $sql .= " AND entity_type = :entity_type";
+                $params['entity_type'] = $entityType;
+            }
+
+            if ($startDate) {
+                $sql .= " AND created_at >= :start_date";
+                $params['start_date'] = $startDate . ' 00:00:00';
+            }
+
+            if ($endDate) {
+                $sql .= " AND created_at <= :end_date";
+                $params['end_date'] = $endDate . ' 23:59:59';
+            }
+
             $sql .= " ORDER BY created_at DESC LIMIT :limit";
             $params['limit'] = $limit;
 
@@ -121,6 +136,59 @@ final class AuditLogService
             $stmt->execute();
 
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public static function countLogs(?string $action = null, ?int $userId = null, ?string $entityType = null): int
+    {
+        try {
+            $db = Database::connection();
+
+            $sql = "SELECT COUNT(*) FROM " . self::TABLE . " WHERE 1=1";
+            $params = [];
+
+            if ($action) {
+                $sql .= " AND action = :action";
+                $params['action'] = $action;
+            }
+
+            if ($userId) {
+                $sql .= " AND user_id = :user_id";
+                $params['user_id'] = $userId;
+            }
+
+            if ($entityType) {
+                $sql .= " AND entity_type = :entity_type";
+                $params['entity_type'] = $entityType;
+            }
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            return (int) $stmt->fetchColumn();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    public static function getDistinctActions(): array
+    {
+        try {
+            $db = Database::connection();
+            $stmt = $db->query("SELECT DISTINCT action FROM " . self::TABLE . " ORDER BY action");
+            return array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'action');
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public static function getDistinctEntityTypes(): array
+    {
+        try {
+            $db = Database::connection();
+            $stmt = $db->query("SELECT DISTINCT entity_type FROM " . self::TABLE . " ORDER BY entity_type");
+            return array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'entity_type');
         } catch (\Exception $e) {
             return [];
         }

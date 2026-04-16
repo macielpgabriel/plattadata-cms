@@ -184,6 +184,10 @@ $router->post('/empresas/remover/verificar', [CompanyRemovalController::class, '
 $router->get('/empresas/remover/documento', [CompanyRemovalController::class, 'showDocumentForm']);
 $router->post('/empresas/remover/documento', [CompanyRemovalController::class, 'uploadDocument']);
 
+// Administração de Auditoria
+$router->get('/admin/auditoria', [AuditController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin/auditoria/exportar', [AuditController::class, 'export'], [AuthMiddleware::class, AdminMiddleware::class]);
+
 // Administração de Remoções
 $router->get('/admin/remocoes', [CompanyRemovalController::class, 'adminList'], [AuthMiddleware::class, StaffMiddleware::class]);
 $router->get('/admin/remocoes/documento/{file}', [CompanyRemovalController::class, 'downloadDocument'], [AuthMiddleware::class, StaffMiddleware::class]);

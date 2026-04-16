@@ -241,6 +241,9 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <li><a class="dropdown-item" href="/admin/remocoes">
                                     <i class="bi bi-shield-check me-2 text-muted"></i>Remocoes Pendentes
                                 </a></li>
+                                <li><a class="dropdown-item" href="/admin/auditoria">
+                                    <i class="bi bi-journal-text me-2 text-muted"></i>Auditoria
+                                </a></li>
                                 <?php if ($user['role'] === 'admin'): ?>
                                 <li><a class="dropdown-item" href="/admin/analytics">
                                     <i class="bi bi-graph-up me-2 text-muted"></i>Analytics
