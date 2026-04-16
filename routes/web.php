@@ -129,6 +129,9 @@ $router->post('/favoritos/grupos/criar', [FavoriteController::class, 'createGrou
 $router->post('/favoritos/grupos/{id}/editar', [FavoriteController::class, 'updateGroup'], [AuthMiddleware::class]);
 $router->post('/favoritos/grupos/{id}/excluir', [FavoriteController::class, 'deleteGroup'], [AuthMiddleware::class]);
 
+// Rotas de monitoramento de mudancas
+$router->post('/changes/{cnpj}/subscribe', [CompanyController::class, 'subscribeToChanges'], [AuthMiddleware::class]);
+
 // Rotas de Localidades
 $router->get('/brasil', [LocationController::class, 'brasil']);
 $router->get('/localidades', [LocationController::class, 'states']);

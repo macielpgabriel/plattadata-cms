@@ -580,6 +580,7 @@ final class CompanyController
             'taxData' => $taxData,
             'stats' => $stats,
             'isFavorite' => $isFavorite,
+            'notifyChange' => Auth::user() ? \App\Services\CompanyChangeMonitorService::getSubscription(Auth::user()['id'], $cnpj) : null,
             'coordinates' => null,
             'weather' => $weather,
             'weatherIbgeCode' => $ibgeCode,
@@ -592,6 +593,37 @@ final class CompanyController
             'metaTitle' => ($company['legal_name'] ?? 'Empresa') . ' - CNPJ ' . $cnpj . ' | Plattadata',
             'metaDescription' => $metaDescription,
         ]);
+    }
+
+    public function subscribeToChanges(array $params): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Nao autorizado']);
+            return;
+        }
+
+        $cnpj = $this->cnpjService->sanitize((string) ($params['cnpj'] ?? ''));
+        $company = $this->companies->findByCnpj($cnpj);
+        
+        if (!$company) {
+            echo json_encode(['error' => 'Empresa nao encontrada']);
+            return;
+        }
+
+        $currentSubscription = \App\Services\CompanyChangeMonitorService::getSubscription($user['id'], $cnpj);
+        
+        if ($currentSubscription) {
+            \App\Services\CompanyChangeMonitorService::unsubscribe($user['id'], $cnpj);
+            $status = 'unsubscribed';
+        } else {
+            \App\Services\CompanyChangeMonitorService::subscribe($user['id'], $cnpj, true, false);
+            $status = 'subscribed';
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode(['status' => $status]);
     }
 
     public function delete(array $params): void

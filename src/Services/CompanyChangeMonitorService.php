@@ -169,6 +169,24 @@ final class CompanyChangeMonitorService
             return false;
         }
     }
+    
+    public static function getSubscription(int $userId, string $cnpj): ?array
+    {
+        try {
+            $db = Database::connection();
+            $stmt = $db->prepare("
+                SELECT * FROM company_change_subscriptions 
+                WHERE user_id = :user_id AND company_cnpj = :cnpj LIMIT 1
+            ");
+            $stmt->execute([
+                'user_id' => $userId,
+                'cnpj' => preg_replace('/\D/', '', $cnpj),
+            ]);
+            return $stmt->fetch() ?: null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 
     public static function getRecentChanges(string $cnpj, int $days = 30): array
     {

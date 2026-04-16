@@ -196,6 +196,40 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                     <span class="d-none d-sm-inline ms-1" x-text="isFav ? 'Favoritado' : 'Favoritar'"></span>
                 </button>
             </div>
+            <?php if (Auth::check() && Auth::user()['id']): ?>
+            <div x-data="{ 
+                notifyChange: <?= !empty($notifyChange) ? 'true' : 'false' ?>,
+                loadingNotify: false,
+                toggleNotify() {
+                    if (this.loadingNotify) return;
+                    this.loadingNotify = true;
+                    fetch('/changes/<?= e($cnpj) ?>/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: '_token=<?= e(Csrf::token()) ?>'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.notifyChange = !this.notifyChange;
+                        if (typeof showToast === 'function') {
+                            showToast('success', this.notifyChange ? 'Notificar' : 'Parar', 
+                                this.notifyChange ? 'Notificacoes ativadas' : 'Notificacoes desativadas');
+                        }
+                        this.loadingNotify = false;
+                    })
+                    .catch(() => { this.loadingNotify = false; });
+                }
+            }" class="d-inline-block">
+                <button type="button" 
+                        class="btn btn-sm" 
+                        :class="notifyChange ? 'btn-info' : 'btn-outline-info'"
+                        @click="toggleNotify()"
+                        :disabled="loadingNotify">
+                    <i class="bi" :class="notifyChange ? 'bi-bell-fill' : 'bi-bell'"></i>
+                    <span class="d-none d-sm-inline ms-1" x-text="notifyChange ? 'Notificando' : 'Notificar'"></span>
+                </button>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
 
         <a href="/empresas/<?= e($cnpj) ?>/remover" class="btn btn-sm btn-outline-danger">
