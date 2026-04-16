@@ -174,7 +174,8 @@ CREATE TABLE IF NOT EXISTS company_changes (
     changed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company (company_id),
     INDEX idx_change_type (change_type),
-    INDEX idx_changed_at (changed_at)
+    INDEX idx_changed_at (changed_at),
+    CONSTRAINT fk_changes_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabela para订阅 de monitoramento

@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Core\Database;
 use App\Services\MarketAnalysisService;
+use App\Services\CompanyChangeMonitorService;
 use PDO;
 use PDOException;
 
@@ -566,6 +567,11 @@ final class CompanyRepository
             $company = $this->findByCnpj($cnpj) ?? [];
             if (!empty($company['id'])) {
                 $companyId = (int) $company['id'];
+                $oldData = $company;
+                $newData = array_merge($company, $payload);
+                if (!empty($sourceContext['check_changes'] ?? true)) {
+                    CompanyChangeMonitorService::checkAndRecordChanges($companyId, $oldData, $newData);
+                }
                 $this->insertSnapshot($companyId, $source, $payload);
                 $this->upsertEnrichment($companyId, $payload, $provider);
                 $this->insertSourceAttempts($cnpj, $companyId, $sourceContext['attempts'] ?? []);
