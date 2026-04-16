@@ -80,7 +80,7 @@ final class CompanyRepository
             ? 'MATCH(legal_name, trade_name, city) AGAINST(:term IN BOOLEAN MODE) DESC, updated_at DESC'
             : 'updated_at DESC';
 
-        $dataSql = 'SELECT id, cnpj, legal_name, trade_name, city, state, status, cnae_main_code, company_size, revenue_estimate, source_provider, last_synced_at, updated_at
+        $dataSql = 'SELECT id, cnpj, legal_name, trade_name, city, state, status, cnae_main_code, company_size, employees_estimate, capital_social, revenue_estimate, simples_opt_in, mei_opt_in, source_provider, last_synced_at, updated_at
             FROM companies' . $whereSql . ' ORDER BY ' . $orderBy . ' LIMIT :limit OFFSET :offset';
         
         $dataStmt = Database::connection()->prepare($dataSql);
