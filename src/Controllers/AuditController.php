@@ -156,21 +156,26 @@ final class AuditController
             $search ?: null
         );
 
+        $logs = AuditLogService::enrichCompanyNames($logs);
+
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="audit_logs_' . date('Y-m-d') . '.csv"');
 
         $output = fopen('php://output', 'w');
         fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
-        fputcsv($output, ['ID', 'Usuário ID', 'Usuário Nome', 'Ação', 'Entidade', 'Entidade ID', 'Valores Antigos', 'Valores Novos', 'Alterações', 'IP', 'Data'], ';');
+        fputcsv($output, ['ID', 'Usuário ID', 'Usuário Nome', 'Usuário Email', 'Ação', 'Entidade', 'Entidade ID', 'Nome Entidade', 'CNPJ', 'Valores Antigos', 'Valores Novos', 'Alterações', 'IP', 'Data'], ';');
 
         foreach ($logs as $log) {
             fputcsv($output, [
                 $log['id'],
                 $log['user_id'],
                 $log['user_name'] ?? '',
+                $log['user_email'] ?? '',
                 $log['action'],
                 $log['entity_type'],
                 $log['entity_id'],
+                $log['company_name'] ?? '',
+                $log['company_cnpj'] ?? '',
                 $log['old_values'],
                 $log['new_values'],
                 $log['changes'],
