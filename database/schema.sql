@@ -638,18 +638,6 @@ CREATE TABLE IF NOT EXISTS compliance_records (
     INDEX idx_check_type (check_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Company Scores
-CREATE TABLE IF NOT EXISTS company_scores (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id BIGINT UNSIGNED NOT NULL UNIQUE,
-    credit_score SMALLINT UNSIGNED,
-    market_score SMALLINT UNSIGNED,
-    compliance_score SMALLINT UNSIGNED,
-    overall_score SMALLINT UNSIGNED,
-    calculated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_company (company_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Partner History
 CREATE TABLE IF NOT EXISTS partner_history (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

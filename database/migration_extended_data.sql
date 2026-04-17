@@ -105,21 +105,6 @@ CREATE TABLE IF NOT EXISTS compliance_records (
     CONSTRAINT fk_compliance_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table: Company Score History (for predictive analysis)
-CREATE TABLE IF NOT EXISTS company_scores (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id BIGINT UNSIGNED NOT NULL,
-    score_type ENUM('credito', 'inatividade', 'compliance', 'geral') NOT NULL,
-    score_value DECIMAL(6,2) NOT NULL,
-    factors JSON NULL,
-    model_version VARCHAR(20) NULL,
-    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_score_company (company_id),
-    INDEX idx_score_type (score_type),
-    INDEX idx_score_calculated (calculated_at),
-    CONSTRAINT fk_score_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Table: CNAE Statistics (for market data)
 CREATE TABLE IF NOT EXISTS cnae_statistics (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
