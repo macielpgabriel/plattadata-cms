@@ -142,7 +142,7 @@ final class CompanyChangeMonitorService
                     notify_whatsapp = :notify_whatsapp2,
                     whatsapp_phone = :whatsapp2
             ");
-            $result = $stmt->execute([
+            return $stmt->execute([
                 'user_id' => $userId,
                 'cnpj' => $cnpjClean,
                 'notify_email' => $notifyEmail ? 1 : 0,
@@ -152,13 +152,8 @@ final class CompanyChangeMonitorService
                 'whatsapp' => $whatsappPhone,
                 'whatsapp2' => $whatsappPhone,
             ]);
-            
-            error_log("Subscription SQL executed for user=$userId, cnpj=$cnpjClean, result=" . ($result ? 'true' : 'false'));
-            
-            return $result;
         } catch (\Exception $e) {
             Logger::error('Erro ao criar subscription: ' . $e->getMessage());
-            error_log("Subscription exception: " . $e->getMessage());
             return false;
         }
     }
