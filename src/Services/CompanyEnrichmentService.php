@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Database;
+use App\Core\Logger;
 use App\Services\OpenCnpjService;
 
 final class CompanyEnrichmentService
@@ -252,6 +253,66 @@ final class CompanyEnrichmentService
             'competition_score' => 50,
             'source' => 'calculated',
         ];
+    }
+    
+    public static function updateCompetitors(int $companyId, ?string $cnae, ?string $city, ?string $state): int
+    {
+        if (empty($cnae) || empty($city) || empty($state)) {
+            return 0;
+        }
+        
+        $cnaeClean = preg_replace('/[^0-9]/', '', $cnae);
+        if (strlen($cnaeClean) < 4) {
+            return 0;
+        }
+        
+        $db = Database::connection();
+        
+        try {
+            $competitorsStmt = $db->prepare("
+                SELECT id, cnpj, legal_name, city, state
+                FROM companies 
+                WHERE id != :company_id 
+                    AND cnae_main_code LIKE :cnae_like
+                    AND city = :city 
+                    AND state = :state
+                    AND is_hidden = 0
+                    AND status != 'INATIVA'
+                ORDER BY RAND()
+                LIMIT 10
+            ");
+            $competitorsStmt->execute([
+                'company_id' => $companyId,
+                'cnae_like' => $cnaeClean . '%',
+                'city' => $city,
+                'state' => $state,
+            ]);
+            $competitors = $competitorsStmt->fetchAll();
+            
+            $deleted = $db->exec("DELETE FROM company_competitors WHERE company_id = " . (int) $companyId);
+            
+            $inserted = 0;
+            foreach ($competitors as $comp) {
+                try {
+                    $stmt = $db->prepare("
+                        INSERT INTO company_competitors (company_id, competitor_cnpj, competitor_name, similarity_score)
+                        VALUES (:company_id, :cnpj, :name, 80)
+                    ");
+                    $stmt->execute([
+                        'company_id' => $companyId,
+                        'cnpj' => $comp['cnpj'],
+                        'name' => $comp['legal_name'],
+                    ]);
+                    $inserted++;
+                } catch (\Exception $e) {
+                }
+            }
+            
+            return $inserted;
+        } catch (\Exception $e) {
+            Logger::error('Error updating competitors: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     private function calculateMarketTrend(?string $cnae): string

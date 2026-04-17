@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Core\Database;
 use App\Services\MarketAnalysisService;
 use App\Services\CompanyChangeMonitorService;
+use App\Services\CompanyEnrichmentService;
 use PDO;
 use PDOException;
 
@@ -575,6 +576,21 @@ final class CompanyRepository
                 $this->insertSnapshot($companyId, $source, $payload);
                 $this->upsertEnrichment($companyId, $payload, $provider);
                 $this->insertSourceAttempts($cnpj, $companyId, $sourceContext['attempts'] ?? []);
+                
+                $cnaeCode = $this->nullable($this->limit((string) $this->firstPayloadValue($payload, [
+                    'cnae_fiscal',
+                    'cnae_main_code',
+                    'atividade_principal.0.codigo',
+                    'atividade_principal.0.code',
+                ]), 16));
+                $city = $newData['city'] ?? null;
+                $state = $newData['state'] ?? null;
+                if (!empty($cnaeCode) && !empty($city) && !empty($state)) {
+                    try {
+                        CompanyEnrichmentService::updateCompetitors($companyId, $cnaeCode, $city, $state);
+                    } catch (\Throwable $e) {
+                    }
+                }
             } else {
                 $this->insertSourceAttempts($cnpj, null, $sourceContext['attempts'] ?? []);
             }
