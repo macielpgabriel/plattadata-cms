@@ -14,6 +14,7 @@ use App\Services\GoogleDriveServiceOAuth;
 use App\Services\MailService;
 use App\Services\ValidationService;
 use App\Services\AuditLogService;
+use App\Services\RateLimiterService;
 use Exception;
 
 final class CompanyRemovalController
@@ -244,6 +245,13 @@ if ($verificationType === 'email') {
 
         if (!$id || !$code) {
             redirect('/');
+        }
+
+        $rateLimiter = new RateLimiterService('removal_verify');
+        if (!RateLimiterService::check('verification_code', $id, 10, 60)) {
+            Session::flash('error', 'Muitas tentativas. Tente novamente em 1 minuto.');
+            redirect("/empresas/remover/verificar?id=$id");
+            return;
         }
 
         $db = Database::connection();
