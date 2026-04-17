@@ -1130,7 +1130,7 @@ $mentionData = $mentionData ?? [];
                     </a>
                     <?php endif; ?>
                     <?php if (!empty($mentionData['google_alerts']['url'])): ?>
-                    <a href="<?= e($mentionData['google_alerts']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-dark">
+                    <a href="<?= e($mentionData['google_alerts']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-newspaper me-1"></i>Google News
                     </a>
                     <?php endif; ?>
