@@ -92,35 +92,19 @@ final class CompanyRemovalController
 
         $requestId = $db->lastInsertId();
 
-        if ($verificationType === 'email') {
+if ($verificationType === 'email') {
             $mailService = new MailService();
-            $subject = "Código de verificação para remoção de empresa - " . $company['legal_name'];
-            $body = str_replace('CODIGO', $verificationCode, str_replace(
-                'EMPRESA',
-                $company['legal_name'],
-                <<<'HTML'
-<div style="text-align: center;">
-    <div style="width: 60px; height: 60px; background: #fee2e2; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-        <svg style="width: 30px; height: 30px; color: #dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-        </svg>
-    </div>
-    <h2 style="color: #111827; margin: 0 0 15px; font-size: 20px;">Verificação de Remoção</h2>
-    <p style="color: #6b7280; margin: 0 0 20px;">Olá! Você solicitou a remoção da empresa EMPRESA do nosso site.</p>
-</div>
-<div style="background: #f3f4f6; border-radius: 8px; padding: 25px; margin: 25px 0; text-align: center;">
-    <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Seu código de verificação:</p>
-    <p style="margin: 0; font-size: 32px; font-weight: bold; color: #111827; letter-spacing: 8px;">CODIGO</p>
-</div>
-<p style="color: #6b7280; text-align: center; font-size: 14px;">Por favor, insira este código na página de verificação.</p>
-<div style="background: #fef2f2; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center; border-left: 4px solid #dc2626;">
-    <p style="margin: 0; color: #92400e; font-size: 14px;">Se não foi você, ignore este e-mail.</p>
-</div>
-HTML
-            ));
-
-            $mailService->send($company['email'], $subject, $body);
-
+            $subject = "Codigo de verificacao para remocao de empresa - " . $company['legal_name'];
+            $template = file_get_contents(base_path('templates/emails/removal_verify.html'));
+            $template = str_replace('DATA', date('d/m/Y H:i'), $template);
+            $template = str_replace('EMPRESA', $company['legal_name'], $template);
+            $body = str_replace('CODIGO', $verificationCode, $template);
+            
+            $targetEmail = $company['email'] ?? $requesterEmail;
+            error_log("Sending removal verification to: $targetEmail for CNPJ: $cnpj");
+            $mailResult = $mailService->send($targetEmail, $subject, $body);
+            error_log("Mail result: " . ($mailResult ? 'success' : 'failed'));
+            
             redirect("/empresas/remover/verificar?id=$requestId");
         } else {
             // Caso não tenha e-mail, redireciona para upload de documento
