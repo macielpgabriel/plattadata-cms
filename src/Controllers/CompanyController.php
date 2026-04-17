@@ -33,6 +33,7 @@ use App\Services\AuditLogService;
 use App\Repositories\MunicipalityRepository;
 use App\Services\MarketIntelligenceService;
 use App\Services\IbgeService;
+use App\Services\MentionAlertService;
 use App\Controllers\Company\CompanySearchService;
 use App\Controllers\Company\CompanyShowService;
 use RuntimeException;
@@ -586,6 +587,7 @@ final class CompanyController
             'weatherIbgeCode' => $ibgeCode,
             'enrichedData' => $enrichedData,
             'competitors' => !empty($company['id']) ? CompanyEnrichmentService::getCompetitors((int) $company['id']) : [],
+            'mentionData' => !empty($company['legal_name']) ? (new MentionAlertService())->checkMentions($company['legal_name'], $cnpj) : [],
             'usdRate' => $usdRate,
             'capitalUsd' => $capitalUsd,
             'flash' => Session::flash('success'),

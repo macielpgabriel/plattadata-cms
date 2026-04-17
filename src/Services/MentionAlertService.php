@@ -27,8 +27,7 @@ final class MentionAlertService
     {
         return [
             'found' => true,
-            'url' => 'https://www.google.com/alerts#',
-            'suggestion' => 'Configure Google Alerts para: "' . $companyName . '"',
+            'url' => 'https://news.google.com/rss/search?q=' . urlencode($companyName . ' brasil'),
         ];
     }
 
@@ -46,6 +45,10 @@ final class MentionAlertService
             'instagram' => [
                 'available' => true,
                 'url' => 'https://www.instagram.com/explore/searches/?q=' . urlencode($companyName),
+            ],
+            'facebook' => [
+                'available' => true,
+                'url' => 'https://www.facebook.com/search/pages/?q=' . urlencode($companyName),
             ],
         ];
     }

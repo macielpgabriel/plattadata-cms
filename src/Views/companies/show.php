@@ -39,6 +39,7 @@ $socialData = $enrichedData['social_data'] ?? [];
 $predictiveData = $enrichedData['predictive_data'] ?? [];
 $extendedData = $enrichedData['extended_data'] ?? [];
 $competitorsList = $competitors ?? [];
+$mentionData = $mentionData ?? [];
 ?>
 
 <!-- Breadcrumb -->
@@ -1093,6 +1094,46 @@ $competitorsList = $competitors ?? [];
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($mentionData['social_mentions'])): ?>
+    <div class="col-12">
+        <div class="card mb-4 fade-in">
+            <div class="card-body">
+                <h2 class="h5 mb-3 border-bottom pb-2">
+                    <i class="bi bi-megaphone me-1 text-muted"></i>Mencoes na Web
+                    <small class="text-muted float-end fw-normal" style="font-size: 0.75rem;">Verifique em cada plataforma</small>
+                </h2>
+                <div class="d-flex flex-wrap gap-2">
+                    <?php if (!empty($mentionData['social_mentions']['twitter'])): ?>
+                    <a href="<?= e($mentionData['social_mentions']['twitter']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-twitter me-1"></i>Twitter
+                    </a>
+                    <?php endif; ?>
+                    <?php if (!empty($mentionData['social_mentions']['linkedin'])): ?>
+                    <a href="<?= e($mentionData['social_mentions']['linkedin']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-linkedin me-1"></i>LinkedIn
+                    </a>
+                    <?php endif; ?>
+                    <?php if (!empty($mentionData['social_mentions']['instagram'])): ?>
+                    <a href="<?= e($mentionData['social_mentions']['instagram']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-instagram me-1"></i>Instagram
+                    </a>
+                    <?php endif; ?>
+                    <?php if (!empty($mentionData['social_mentions']['facebook'])): ?>
+                    <a href="<?= e($mentionData['social_mentions']['facebook']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-facebook me-1"></i>Facebook
+                    </a>
+                    <?php endif; ?>
+                    <?php if (!empty($mentionData['google_alerts']['url'])): ?>
+                    <a href="<?= e($mentionData['google_alerts']['url']) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-dark">
+                        <i class="bi bi-newspaper me-1"></i>Google News
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
