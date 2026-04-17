@@ -73,6 +73,12 @@ final class MentionAlertService
                 ON DUPLICATE KEY UPDATE mention_data = VALUES(mention_data), checked_at = NOW()
             ");
             $stmt->execute([$cnpj, $companyName, json_encode($results)]);
+            
+            $historyStmt = $db->prepare("
+                INSERT INTO company_mentions_history (cnpj, company_name, mention_data, checked_at)
+                VALUES (?, ?, ?, NOW())
+            ");
+            $historyStmt->execute([$cnpj, $companyName, json_encode($results)]);
         } catch (\Exception $e) {
             // Silent fail
         }
