@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Auth;
+use App\Core\Cache;
 use App\Core\Csrf;
 use App\Core\Database;
 use App\Core\Session;
@@ -247,9 +248,19 @@ if ($verificationType === 'email') {
             redirect('/');
         }
 
-        $rateLimiter = new RateLimiterService('removal_verify');
+        // Rate limit: 10 tentativas por minuto
         if (!RateLimiterService::check('verification_code', $id, 10, 60)) {
             Session::flash('error', 'Muitas tentativas. Tente novamente em 1 minuto.');
+            redirect("/empresas/remover/verificar?id=$id");
+            return;
+        }
+
+        // Bloqueio temporario apos 5 erros (15 minutos)
+        $lockoutKey = "removal_lockout_$id";
+        $lockout = Cache::get($lockoutKey);
+        if ($lockout && $lockout > time()) {
+            $remaining = ceil(($lockout - time()) / 60);
+            Session::flash('error', "Conta temporariamente bloqueada. Tente novamente em $remaining minutos.");
             redirect("/empresas/remover/verificar?id=$id");
             return;
         }
@@ -260,12 +271,26 @@ if ($verificationType === 'email') {
         $request = $stmt->fetch();
 
         if ($request) {
+            // Limpa contagem de erros
+            Cache::forget("removal_errors_$id");
+            
             $update = $db->prepare('UPDATE company_removal_requests SET status = "verified", verified_at = NOW() WHERE id = :id');
             $update->execute(['id' => $id]);
             Session::flash('success', 'E-mail verificado com sucesso. Sua solicitação será analisada por um administrador.');
             redirect('/');
         } else {
-            Session::flash('error', 'Código inválido ou solicitação não encontrada.');
+            // Incrementa contador de erros
+            $errors = (int) (Cache::get("removal_errors_$id") ?? 0) + 1;
+            Cache::set("removal_errors_$id", $errors, 300); // 5 minutos
+            
+            // Bloqueio temporario apos 5 erros
+            if ($errors >= 5) {
+                Cache::set($lockoutKey, time() + 900, 900); // 15 minutos
+                Cache::forget("removal_errors_$id");
+                Session::flash('error', 'Muitas tentativas incorretas. Bloqueado por 15 minutos.');
+            } else {
+                Session::flash('error', "Código inválido. Você tem " . (5 - $errors) . " tentativas restantes.");
+            }
             redirect("/empresas/remover/verificar?id=$id");
         }
     }
