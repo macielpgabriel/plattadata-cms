@@ -130,6 +130,8 @@ final class CompanyChangeMonitorService
 
     public static function subscribe(int $userId, string $cnpj, bool $notifyEmail = true, bool $notifyWhatsapp = false, ?string $whatsappPhone = null): bool
     {
+        $cnpjClean = preg_replace('/\D/', '', $cnpj);
+        
         try {
             $db = Database::connection();
             $stmt = $db->prepare("
@@ -140,9 +142,9 @@ final class CompanyChangeMonitorService
                     notify_whatsapp = :notify_whatsapp2,
                     whatsapp_phone = :whatsapp2
             ");
-            return $stmt->execute([
+            $result = $stmt->execute([
                 'user_id' => $userId,
-                'cnpj' => preg_replace('/\D/', '', $cnpj),
+                'cnpj' => $cnpjClean,
                 'notify_email' => $notifyEmail ? 1 : 0,
                 'notify_email2' => $notifyEmail ? 1 : 0,
                 'notify_whatsapp' => $notifyWhatsapp ? 1 : 0,
@@ -150,8 +152,13 @@ final class CompanyChangeMonitorService
                 'whatsapp' => $whatsappPhone,
                 'whatsapp2' => $whatsappPhone,
             ]);
+            
+            error_log("Subscription SQL executed for user=$userId, cnpj=$cnpjClean, result=" . ($result ? 'true' : 'false'));
+            
+            return $result;
         } catch (\Exception $e) {
             Logger::error('Erro ao criar subscription: ' . $e->getMessage());
+            error_log("Subscription exception: " . $e->getMessage());
             return false;
         }
     }

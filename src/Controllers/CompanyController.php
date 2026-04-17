@@ -605,9 +605,11 @@ final class CompanyController
         }
 
         $cnpj = $this->cnpjService->sanitize((string) ($params['cnpj'] ?? ''));
+        
         $company = $this->companies->findByCnpj($cnpj);
         
         if (!$company) {
+            http_response_code(404);
             echo json_encode(['error' => 'Empresa nao encontrada']);
             return;
         }
@@ -618,8 +620,15 @@ final class CompanyController
             \App\Services\CompanyChangeMonitorService::unsubscribe($user['id'], $cnpj);
             $status = 'unsubscribed';
         } else {
-            \App\Services\CompanyChangeMonitorService::subscribe($user['id'], $cnpj, true, false);
-            $status = 'subscribed';
+            try {
+                \App\Services\CompanyChangeMonitorService::subscribe($user['id'], $cnpj, true, false);
+                $status = 'subscribed';
+            } catch (\Throwable $e) {
+                error_log("Subscribe error: " . $e->getMessage());
+                http_response_code(500);
+                echo json_encode(['error' => $e->getMessage()]);
+                return;
+            }
         }
         
         header('Content-Type: application/json');
