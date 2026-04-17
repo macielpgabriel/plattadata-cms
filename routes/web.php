@@ -179,6 +179,7 @@ $router->get('/admin/logs/recent', [ObservabilityController::class, 'getRecentLo
 $router->get('/admin/jobs', [ObservabilityController::class, 'jobsIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/jobs/retry', [ObservabilityController::class, 'retryJob'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/jobs/delete', [ObservabilityController::class, 'deleteJob'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/company-scores/populate', [ObservabilityController::class, 'populateCompanyScores'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 // Rotas de Remoção de Empresa
 $router->get('/empresas/{cnpj}/remover', [CompanyRemovalController::class, 'showRequestForm']);
