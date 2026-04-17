@@ -109,7 +109,7 @@ if (isset($structuredData) && is_array($structuredData)) {
                 <i class="bi bi-building me-1"></i><?= e($appName) ?>
             </a>
             <div class="d-flex d-lg-none align-items-center gap-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary theme-toggle-btn" aria-label="Alternar tema">
+                <button type="button" class="btn btn-sm btn-outline-secondary theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
                     <i class="bi bi-moon-fill"></i><span class="ms-1">Tema</span>
                 </button>
                 <button class="navbar-toggler border-0 shadow-none p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Menu">
@@ -120,7 +120,7 @@ if (isset($structuredData) && is_array($structuredData)) {
                 <ul class="navbar-nav ms-auto mt-3 mt-lg-0 align-items-lg-center gap-1 gap-lg-0">
                     <!-- Toggle Tema -->
                     <li class="nav-item d-none d-lg-block">
-                        <button type="button" class="btn btn-sm btn-outline-secondary nav-link theme-toggle-btn" aria-label="Alternar tema">
+                        <button type="button" class="btn btn-sm btn-outline-secondary nav-link theme-toggle-btn" aria-label="Alternar tema" onclick="toggleTheme()">
                             <i class="bi bi-moon-fill"></i><span class="ms-1 d-none d-xl-inline">Tema</span>
                         </button>
                     </li>
@@ -595,7 +595,7 @@ if (isset($structuredData) && is_array($structuredData)) {
                             <i class="bi bi-file-text me-1"></i>Termos
                         </a>
                     </div>
-                    <button class="btn btn-sm btn-outline-secondary theme-toggle-btn">
+                    <button class="btn btn-sm btn-outline-secondary theme-toggle-btn" onclick="toggleTheme()">
                         <i class="bi bi-palette me-1"></i>Tema
                     </button>
                 </div>
