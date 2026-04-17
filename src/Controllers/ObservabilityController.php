@@ -769,15 +769,4 @@ final class ObservabilityController
             'logs' => $logs
         ]);
     }
-    
-    public function populateCompanyScores(): void
-    {
-        $service = new \App\Services\CompanyEnrichmentService();
-        $result = $service->populateCompanyScores();
-        
-        Response::json([
-            'success' => true,
-            'result' => $result
-        ]);
-    }
 }

@@ -15,3 +15,13 @@ Stack trace:
 #0 Command line code(3): App\Core\Database::connection()
 #1 {main}
   thrown in /home/gabriel/Documentos/plattadata-cms/src/Core/Database.php on line 46
+[17-Apr-2026 02:36:04 America/Sao_Paulo] PHP Deprecated:  ini_set(): session.sid_length INI setting is deprecated in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 17
+[17-Apr-2026 02:36:04 America/Sao_Paulo] PHP Deprecated:  ini_set(): session.sid_bits_per_character INI setting is deprecated in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 18
+[17-Apr-2026 02:36:04 America/Sao_Paulo] [REQUEST] POST /admin/company-scores/populate
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Deprecated:  ini_set(): session.sid_length INI setting is deprecated in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 17
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 18
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Warning:  session_name(): Session name cannot be changed after headers have already been sent in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 20
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Warning:  session_set_cookie_params(): Session cookie parameters cannot be changed after headers have already been sent in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 21
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 30
+[17-Apr-2026 02:37:34 America/Sao_Paulo] PHP Warning:  session_regenerate_id(): Session ID cannot be regenerated when there is no active session in /home/gabriel/Documentos/plattadata-cms/src/Core/Session.php on line 33
+[17-Apr-2026 02:37:34 America/Sao_Paulo] [2026-04-17T02:37:34-03:00] Uncaught Exception: Database connection failed: could not find driver in /home/gabriel/Documentos/plattadata-cms/src/Core/Database.php:46

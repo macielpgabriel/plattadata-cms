@@ -679,150 +679,43 @@ final class CompanyEnrichmentService
                 $data['recommended_porte'] ?? null,
                 $cnpj,
             ]);
-
-            if ($result) {
-                $company = $db->query("SELECT id, cnpj, credit_score, status, simples_opt_in, mei_opt_in, capital_social, cnae_main_code FROM companies WHERE cnpj = " . $db->quote($cnpj))->fetch();
-                if ($company) {
-                    $this->updateCompanyScore($company);
-                }
-            }
             
-return $result;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function updateCompanyScore(array $company): bool
-    {
-        $db = Database::connection();
-        
-        try {
-            $creditScore = (int) ($company['credit_score'] ?? 50);
-            $marketScore = $this->calculateMarketScore($company);
-            $complianceScore = $this->calculateComplianceScore($company);
-            $overallScore = (int) round(($creditScore + $marketScore + $complianceScore) / 3);
-
-            $stmt = $db->prepare("
-                INSERT INTO company_scores (company_id, credit_score, market_score, compliance_score, overall_score, calculated_at)
-                VALUES (?, ?, ?, ?, ?, NOW())
-                ON DUPLICATE KEY UPDATE 
-                    credit_score = VALUES(credit_score),
-                    market_score = VALUES(market_score),
-                    compliance_score = VALUES(compliance_score),
-                    overall_score = VALUES(overall_score),
-                    calculated_at = NOW()
-            ");
-
             return $stmt->execute([
-                $company['id'],
-                $creditScore,
-                $marketScore,
-                $complianceScore,
-                $overallScore,
+                $data['credit_score'] ?? 50,
+                $data['inactivity_probability'] ?? 20.0,
+                $data['growth_potential'] ?? 'medio',
+                $data['recommended_porte'] ?? null,
+                $cnpj,
             ]);
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function populateCompanyScores(): array
+    public function updateSocialData(string $cnpj, array $data): bool
     {
         $db = Database::connection();
         
         try {
-            $companies = $db->query("
-                SELECT id, cnpj, credit_score, status, simples_opt_in, mei_opt_in, 
-                       capital_social, opened_at, cnae_main_code
-                FROM companies
-                WHERE credit_score IS NOT NULL
-            ")->fetchAll();
-
-            $inserted = 0;
-            $updated = 0;
-
-            foreach ($companies as $company) {
-                $creditScore = (int) ($company['credit_score'] ?? 50);
-                $marketScore = $this->calculateMarketScore($company);
-                $complianceScore = $this->calculateComplianceScore($company);
-                $overallScore = (int) round(($creditScore + $marketScore + $complianceScore) / 3);
-
-                $stmt = $db->prepare("
-                    INSERT INTO company_scores (company_id, credit_score, market_score, compliance_score, overall_score, calculated_at)
-                    VALUES (?, ?, ?, ?, ?, NOW())
-                    ON DUPLICATE KEY UPDATE 
-                        credit_score = VALUES(credit_score),
-                        market_score = VALUES(market_score),
-                        compliance_score = VALUES(compliance_score),
-                        overall_score = VALUES(overall_score),
-                        calculated_at = NOW()
-                ");
-
-                $result = $stmt->execute([
-                    $company['id'],
-                    $creditScore,
-                    $marketScore,
-                    $complianceScore,
-                    $overallScore,
-                ]);
-
-                if ($result) {
-                    if ($db->lastInsertId()) {
-                        $inserted++;
-                    } else {
-                        $updated++;
-                    }
-                }
-            }
-
-            return ['inserted' => $inserted, 'updated' => $updated, 'total' => count($companies)];
+            $stmt = $db->prepare("
+                UPDATE companies SET 
+                    social_media = ?,
+                    photos = ?,
+                    google_place_id = ?,
+                    ratings = ?,
+                    updated_at = NOW()
+                WHERE cnpj = ?
+            ");
+            
+            return $stmt->execute([
+                json_encode($data['social'] ?? []),
+                json_encode($data['photos'] ?? []),
+                $data['google_place_id'] ?? null,
+                json_encode($data['ratings'] ?? []),
+                $cnpj,
+            ]);
         } catch (\Exception $e) {
-            Logger::error('Erro ao popular company_scores: ' . $e->getMessage());
-            return ['error' => $e->getMessage()];
+            return false;
         }
-    }
-
-    private function calculateMarketScore(array $company): int
-    {
-        $score = 50;
-        
-        $capital = (float) ($company['capital_social'] ?? 0);
-        if ($capital > 1000000) $score += 20;
-        elseif ($capital > 100000) $score += 15;
-        elseif ($capital > 50000) $score += 10;
-        
-        $cnaeCode = $company['cnae_main_code'] ?? '';
-        if (!empty($cnaeCode) && strlen($cnaeCode) >= 2) {
-            $section = substr($cnaeCode, 0, 1);
-            $highValueSections = ['C', 'D', 'E', 'F', 'J', 'K'];
-            if (in_array($section, $highValueSections)) {
-                $score += 10;
-            }
-        }
-        
-        return min(100, max(0, $score));
-    }
-
-    private function calculateComplianceScore(array $company): int
-    {
-        $score = 70;
-        
-        $status = $company['status'] ?? '';
-        if ($status === 'ativa') {
-            $score += 15;
-        } elseif ($status === 'inativa') {
-            $score -= 20;
-        }
-        
-        $simplesOptIn = $company['simples_opt_in'] ?? false;
-        $meiOptIn = $company['mei_opt_in'] ?? false;
-        
-        if ($simplesOptIn && !$meiOptIn) {
-            $score += 10;
-        } elseif ($meiOptIn) {
-            $score -= 5;
-        }
-        
-        return min(100, max(0, $score));
     }
 }
