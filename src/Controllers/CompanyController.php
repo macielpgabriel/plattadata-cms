@@ -585,6 +585,7 @@ final class CompanyController
             'weather' => $weather,
             'weatherIbgeCode' => $ibgeCode,
             'enrichedData' => $enrichedData,
+            'competitors' => !empty($company['id']) ? CompanyEnrichmentService::getCompetitors((int) $company['id']) : [],
             'usdRate' => $usdRate,
             'capitalUsd' => $capitalUsd,
             'flash' => Session::flash('success'),

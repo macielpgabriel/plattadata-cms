@@ -38,6 +38,7 @@ $complianceData = $enrichedData['compliance_data'] ?? [];
 $socialData = $enrichedData['social_data'] ?? [];
 $predictiveData = $enrichedData['predictive_data'] ?? [];
 $extendedData = $enrichedData['extended_data'] ?? [];
+$competitorsList = $competitors ?? [];
 ?>
 
 <!-- Breadcrumb -->
@@ -1056,6 +1057,42 @@ $extendedData = $enrichedData['extended_data'] ?? [];
                         </div>
                     </div>
                     <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($competitorsList) && count($competitorsList) > 0): ?>
+    <div class="col-12">
+        <div class="card mb-4 fade-in">
+            <div class="card-body">
+                <h2 class="h5 mb-3 border-bottom pb-2">
+                    <i class="bi bi-diagram-3 me-1 text-muted"></i>Concorrentes na Regiao
+                </h2>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="small text-muted">
+                            <tr>
+                                <th>CNPJ</th>
+                                <th>Empresa</th>
+                                <th class="text-end">Similaridade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($competitorsList as $comp): ?>
+                            <tr>
+                                <td class="font-monospace"><?= e($comp['competitor_cnpj']) ?></td>
+                                <td><a href="/empresas/<?= e($comp['competitor_cnpj']) ?>" class="text-decoration-none"><?= e($comp['competitor_name']) ?></a></td>
+                                <td class="text-end">
+                                    <span class="badge bg-<?= ($comp['similarity_score'] ?? 80) > 70 ? 'success' : 'secondary' ?>">
+                                        <?= $comp['similarity_score'] ?? 80 ?>%
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

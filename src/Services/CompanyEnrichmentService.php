@@ -314,6 +314,25 @@ final class CompanyEnrichmentService
             return 0;
         }
     }
+    
+    public static function getCompetitors(int $companyId): array
+    {
+        $db = Database::connection();
+        
+        try {
+            $stmt = $db->prepare("
+                SELECT cc.competitor_cnpj, cc.competitor_name, cc.similarity_score
+                FROM company_competitors cc
+                WHERE cc.company_id = :company_id
+                ORDER BY cc.similarity_score DESC
+                LIMIT 10
+            ");
+            $stmt->execute(['company_id' => $companyId]);
+            return $stmt->fetchAll();
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 
     private function calculateMarketTrend(?string $cnae): string
     {
