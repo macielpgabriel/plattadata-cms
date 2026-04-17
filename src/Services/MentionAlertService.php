@@ -79,6 +79,19 @@ final class MentionAlertService
                 VALUES (?, ?, ?, NOW())
             ");
             $historyStmt->execute([$cnpj, $companyName, json_encode($results)]);
+            
+            $db->exec("
+                DELETE FROM company_mentions_history 
+                WHERE cnpj = '$cnpj' 
+                AND id NOT IN (
+                    SELECT id FROM (
+                        SELECT id FROM company_mentions_history 
+                        WHERE cnpj = '$cnpj' 
+                        ORDER BY checked_at DESC 
+                        LIMIT 30
+                    ) AS keep
+                )
+            ");
         } catch (\Exception $e) {
             // Silent fail
         }
