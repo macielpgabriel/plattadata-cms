@@ -31,18 +31,7 @@ final class SimplesNacionalService
             'simples_since' => $data['data_opcao_pelo_simples'] ?? null,
             'mei_opt_in' => $data['opcao_pelo_mei'] ?? null,
             'mei_since' => $data['data_opcao_pelo_mei'] ?? null,
-            'state_registrations' => [],
         ];
-
-        if (isset($data['inscricoes_estaduais']) && is_array($data['inscricoes_estaduais'])) {
-            foreach ($data['inscricoes_estaduais'] as $ie) {
-                $taxData['state_registrations'][] = [
-                    'uf' => $ie['uf'] ?? '',
-                    'ie' => $ie['inscricao_estadual'] ?? '',
-                    'active' => ($ie['ativo'] ?? $ie['situacao'] ?? '') === true || ($ie['ativo'] ?? $ie['situacao'] ?? '') === 'ATIVO',
-                ];
-            }
-        }
 
         $this->repository->upsert($companyId, $cnpj, $taxData, 'BrasilAPI (Sync)');
 
@@ -78,18 +67,7 @@ final class SimplesNacionalService
             'simples_since' => $data['data_opcao_pelo_simples'] ?? null,
             'mei_opt_in' => $data['opcao_pelo_mei'] ?? null,
             'mei_since' => $data['data_opcao_pelo_mei'] ?? null,
-            'state_registrations' => [],
         ];
-
-        if (isset($data['inscricoes_estaduais']) && is_array($data['inscricoes_estaduais'])) {
-            foreach ($data['inscricoes_estaduais'] as $ie) {
-                $taxData['state_registrations'][] = [
-                    'uf' => $ie['uf'] ?? '',
-                    'ie' => $ie['inscricao_estadual'] ?? '',
-                    'active' => ($ie['ativo'] ?? $ie['situacao'] ?? '') === true || ($ie['ativo'] ?? $ie['situacao'] ?? '') === 'ATIVO',
-                ];
-            }
-        }
 
         $this->repository->upsert($companyId, $cnpj, $taxData, 'BrasilAPI');
 
