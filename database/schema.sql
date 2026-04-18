@@ -132,17 +132,6 @@ CREATE TABLE IF NOT EXISTS company_partners (
     CONSTRAINT fk_partners_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS company_secondary_cnaes (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id BIGINT UNSIGNED NOT NULL,
-    cnae_code VARCHAR(16) NOT NULL,
-    cnae_description VARCHAR(255) NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_company_cnae (company_id, cnae_code),
-    INDEX idx_secondary_cnaes_company (company_id),
-    CONSTRAINT fk_secondary_cnaes_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS companies (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     cnpj VARCHAR(14) NOT NULL UNIQUE,

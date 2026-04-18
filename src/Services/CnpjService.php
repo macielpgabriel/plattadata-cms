@@ -161,16 +161,6 @@ final class CnpjService
                 }
             }
         }
-
-        if (!empty($payload['cnaes_secundarios']) && is_array($payload['cnaes_secundarios'])) {
-            $db->prepare("DELETE FROM company_secondary_cnaes WHERE company_id = ?")->execute([$companyId]);
-            $stmt = $db->prepare("INSERT INTO company_secondary_cnaes (company_id, cnae_code, description) VALUES (?, ?, ?)");
-            foreach ($payload['cnaes_secundarios'] as $sec) {
-                if (!empty($sec['codigo'])) {
-                    $stmt->execute([$companyId, $sec['codigo'], $sec['descricao'] ?? null]);
-                }
-            }
-        }
     }
 
     public function sanitize(string $cnpj): string
