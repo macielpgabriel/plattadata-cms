@@ -616,17 +616,6 @@ CREATE TABLE IF NOT EXISTS company_competitors (
     INDEX idx_competitor (competitor_cnpj)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Compliance Records
-CREATE TABLE IF NOT EXISTS compliance_records (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id BIGINT UNSIGNED NOT NULL,
-    check_type VARCHAR(50) NOT NULL,
-    result JSON NOT NULL,
-    checked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_company (company_id),
-    INDEX idx_check_type (check_type)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Partner History
 CREATE TABLE IF NOT EXISTS partner_history (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

@@ -87,24 +87,6 @@ CREATE TABLE IF NOT EXISTS company_competitors (
     CONSTRAINT fk_competitor_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table: Company Compliance Records
-CREATE TABLE IF NOT EXISTS compliance_records (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id BIGINT UNSIGNED NOT NULL,
-    certificate_type ENUM('federal', 'estadual', 'municipal', 'trabalhista', 'previdenciaria') NOT NULL,
-    certificate_status ENUM('regular', 'irregular', 'pendente', 'vencida') NOT NULL,
-    certificate_number VARCHAR(100) NULL,
-    issued_at DATE NULL,
-    expires_at DATE NULL,
-    source VARCHAR(50) NOT NULL,
-    details JSON NULL,
-    fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_compliance_company (company_id),
-    INDEX idx_compliance_type (certificate_type),
-    INDEX idx_compliance_status (certificate_status),
-    CONSTRAINT fk_compliance_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Table: CNAE Statistics (for market data)
 CREATE TABLE IF NOT EXISTS cnae_statistics (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
