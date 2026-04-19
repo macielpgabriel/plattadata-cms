@@ -81,6 +81,11 @@ final class ArrecadacaoRepository
 
     public function buscar(int $ano): array
     {
+        return $this->buscarPorAno($ano);
+    }
+
+    public function buscarPorAno(int $ano): array
+    {
         $pdo = Database::connection();
         
         $stmt = $pdo->prepare("

@@ -54,6 +54,7 @@ $router->get('/politica-de-privacidade', [PublicController::class, 'privacyPolic
 $router->get('/termos-de-servico', [PublicController::class, 'termsOfService']);
 $router->get('/indicadores-economicos', [EconomicController::class, 'index']);
 $router->post('/api/economic/sync-rates', [EconomicController::class, 'syncRates']);
+$router->post('/api/impostometro/sync', [ImpostometroController::class, 'sync']);
 $router->get('/impostometro', [ImpostometroController::class, 'index']);
 $router->get('/api/impostometro', [ImpostometroController::class, 'api']);
 $router->get('/ranking', [ComparisonController::class, 'rankings']);

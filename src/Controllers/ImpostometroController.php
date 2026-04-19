@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\View;
+use App\Core\Response;
 use App\Services\ImpostometroService;
 use App\Services\IbgeService;
 
@@ -81,5 +82,25 @@ final class ImpostometroController
             ],
             'atualizado_em' => date('d/m/Y H:i:s'),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    public function sync(): void
+    {
+        try {
+            $service = new ImpostometroService();
+            $data = $service->getArrecadacaoFederal();
+            
+            Response::json([
+                'success' => true,
+                'message' => 'Dados do impostômetro sincronizados',
+                'total_arrecadado' => $data['total_arrecadado'] ?? 0,
+                'from_database' => $data['from_database'] ?? false,
+            ]);
+        } catch (\Throwable $e) {
+            Response::json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -21,15 +21,25 @@ final class ImpostometroService
 
     public function getArrecadacaoFederal(): array
     {
+        $anoAtual = (int) date('Y');
+        $mesAtual = (int) date('n');
         $cacheKey = 'impostometro_real_' . date('Y-m');
+
+        $fromDatabase = false;
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
+        $dbData = $this->repository->buscarPorAno($anoAtual);
+        if (!empty($dbData) && $this->temDadosValidos($dbData, $mesAtual)) {
+            $data = $this->montarDadosApartirDoBanco($dbData, $anoAtual, $mesAtual);
+            $data['from_database'] = true;
+            Cache::set($cacheKey, $data, self::CACHE_TTL);
+            return $data;
+        }
+
         $rfService = new ReceitaFederalService();
-        $anoAtual = (int) date('Y');
-        $mesAtual = (int) date('n');
         
         $dados = [];
         $totalGeral = 0;
@@ -45,6 +55,15 @@ final class ImpostometroService
             $fallback = $this->getDadosFallback($anoAtual, $mesAtual);
             Cache::set($cacheKey, $fallback, self::CACHE_TTL);
             return $fallback;
+        }
+
+        foreach ($dados as $mes => $valor) {
+            $this->repository->salvarMes($anoAtual, $mes, [
+                'total' => $valor,
+                'rfb' => $valor * 0.7,
+                'outros' => $valor * 0.3,
+                'oficial' => 1,
+            ]);
         }
 
         $dadosDetalhados = [];
@@ -532,6 +551,51 @@ final class ImpostometroService
                 'moeda' => 'USD',
                 'bandeira' => 'US',
             ],
+        ];
+    }
+
+    private function temDadosValidos(array $dbData, int $mesAtual): bool
+    {
+        foreach ($dbData as $row) {
+            $mes = (int) $row['mes'];
+            if ($mes <= $mesAtual && ($row['total'] ?? 0) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function montarDadosApartirDoBanco(array $dbData, int $anoAtual, int $mesAtual): array
+    {
+        $dados = [];
+        $totalGeral = 0;
+
+        foreach ($dbData as $row) {
+            $mes = (int) $row['mes'];
+            if ($mes <= $mesAtual) {
+                $valor = (float) ($row['total'] ?? 0);
+                $dados[$mes] = $valor;
+                $totalGeral += $valor;
+            }
+        }
+
+        $dadosDetalhados = [];
+        foreach ($dados as $mes => $valor) {
+            $dadosDetalhados[$mes] = ['total' => $valor];
+        }
+
+        return [
+            'total_arrecadado' => $totalGeral,
+            'fonte' => 'Receita Federal (BD)',
+            'oficial' => true,
+            'meses' => $dados,
+            'historico_mensal' => $this->gerarHistorico($anoAtual, $dadosDetalhados, (float) $totalGeral),
+            'categorias' => $this->formatarCategorias(
+                $totalGeral * 0.32, $totalGeral * 0.18, $totalGeral * 0.20, $totalGeral * 0.08,
+                $totalGeral * 0.05, $totalGeral * 0.04, $totalGeral * 0.03, $totalGeral * 0.10
+            ),
+            'total_formatado' => $this->formatarValor($totalGeral),
+            'ultima_att' => date('d/m/Y H:i:s'),
         ];
     }
 }
