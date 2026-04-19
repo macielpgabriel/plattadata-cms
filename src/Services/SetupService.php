@@ -85,26 +85,9 @@ final class SetupService
         $this->ensureSiteSettingsTable($pdo);
         $this->ensureDefaultSiteSettings($pdo);
         $this->companySchemaService->ensureAdvancedCompanySchema($pdo);
-        $this->ensureLocationAndTaxSchema($pdo);
-        $this->ensureGdpSectorsSchema($pdo);
         $this->ensureRemovalSystemSchema($pdo);
         $this->ensureFavoritesSchema($pdo);
-        $this->ensureQsaAndCnaeSchema($pdo);
-        $this->ensureQueueSchema($pdo);
-        $this->ensureBlacklistSchema($pdo);
-        $this->ensureNotificationsSchema($pdo);
-        $this->ensurePasswordResetSchema($pdo);
-        $this->ensureUserExtensionsSchema($pdo);
-        $this->ensureEmailVerificationSchema($pdo);
         $this->ensureImpostometroArrecadacaoSchema($pdo);
-        $this->ensureSearchOptimizationSchema($pdo);
-        $this->ensureRemovalCancelledStatus($pdo);
-        $this->ensureIpBlocklistSchema($pdo);
-        $this->ensureEnrichmentSchema($pdo);
-        $this->ensureCacheTables($pdo);
-        $this->ensureFavoriteGroupsSchema($pdo);
-        $this->ensureApiKeysSchema($pdo);
-        $this->ensureExtendedDataSchema($pdo);
         $this->ensureMentionAlertsSchema($pdo);
 
         // AGORA verifica o lock - apenas após criar todas as tabelas críticas
@@ -116,21 +99,9 @@ final class SetupService
         $this->ensureSiteSettingsTable($pdo);
         $this->ensureDefaultSiteSettings($pdo);
         $this->companySchemaService->ensureAdvancedCompanySchema($pdo);
-        $this->ensureLocationAndTaxSchema($pdo);
-        $this->ensureGdpSectorsSchema($pdo);
         $this->ensureRemovalSystemSchema($pdo);
         $this->ensureFavoritesSchema($pdo);
-        $this->ensureQsaAndCnaeSchema($pdo);
-        $this->ensureQueueSchema($pdo);
-        $this->ensureEmailVerificationSchema($pdo);
-        $this->ensureBlacklistSchema($pdo);
-        $this->ensureNotificationsSchema($pdo);
-        $this->ensurePasswordResetSchema($pdo);
-        $this->ensureUserExtensionsSchema($pdo);
         $this->ensureImpostometroArrecadacaoSchema($pdo);
-        $this->ensureSearchOptimizationSchema($pdo);
-        $this->ensureRemovalCancelledStatus($pdo);
-        $this->ensureVehicleFleetTypesSchema($pdo);
         $this->ensureInitialAdminInDatabase($pdo);
 
         // Valida que tabelas críticas foram criadas
