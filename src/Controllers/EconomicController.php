@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Core\Cache;
+use App\Core\Response;
 use App\Services\BcbService;
 use App\Repositories\ExchangeRateRepository;
 
@@ -141,5 +142,24 @@ $schemaData = [
     {
         $indicators = $bcb->getIndicatorsFromDatabase();
         return $indicators ?: [];
+    }
+
+    public function syncRates(): void
+    {
+        try {
+            $bcb = new BcbService();
+            $count = $bcb->fetchAndSaveAllRates();
+            
+            Response::json([
+                'success' => true,
+                'message' => "Taxas atualizadas: {$count} registros",
+                'count' => $count,
+            ]);
+        } catch (\Throwable $e) {
+            Response::json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
