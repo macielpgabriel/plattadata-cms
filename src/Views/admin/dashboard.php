@@ -458,79 +458,6 @@ $jobsTotal = $jobsTotal ?? 0;
                     </div>
                 </div>
                 
-                <!-- JOBS -->
-                <div class="tab-pane fade" id="jobs">
-                    <div class="section-header">
-                        <h4 class="mb-1"><i class="bi bi-clock-history me-2"></i>Jobs / Fila</h4>
-                        <p class="mb-0 opacity-75 small">Tarefas em processamento</p>
-                    </div>
-                    
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0">Filtrar por Status</h6>
-                                <div class="d-flex gap-2">
-                                    <a href="/admin#jobs" class="btn btn-sm <?= $jobsStatus === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Todos</a>
-                                    <a href="/admin?tab=jobs&status=pending" class="btn btn-sm <?= $jobsStatus === 'pending' ? 'btn-warning' : 'btn-outline-warning' ?>">Pendentes</a>
-                                    <a href="/admin?tab=jobs&status=failed" class="btn btn-sm <?= $jobsStatus === 'failed' ? 'btn-danger' : 'btn-outline-danger' ?>">Falhos</a>
-                                </div>
-                            </div>
-                            
-                            <?php if (empty($jobs)): ?>
-                                <div class="text-center py-5">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                                    <p class="text-muted mt-3">Nenhum job encontrado.</p>
-                                </div>
-                            <?php else: ?>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-hover mb-0">
-                                        <thead><tr><th>Handler</th><th>Status</th><th>Tentativas</th><th>Criado</th><th>Acoes</th></tr></thead>
-                                        <tbody>
-                                            <?php foreach ($jobs as $job): ?>
-                                                <tr>
-                                                    <td><small><?= e($job['handler']) ?></small></td>
-                                                    <td><span class="badge bg-<?= $job['status'] === 'completed' ? 'success' : ($job['status'] === 'failed' ? 'danger' : ($job['status'] === 'pending' ? 'warning' : 'info')) ?>"><?= strtoupper($job['status']) ?></span></td>
-                                                    <td><?= e($job['attempts']) ?></td>
-                                                    <td><small><?= format_datetime($job['created_at']) ?></small></td>
-                                                    <td>
-                                                        <?php if ($job['status'] === 'failed'): ?>
-                                                            <button type="button" onclick="submitJobAction('retry', <?= (int)$job['id'] ?>)" class="btn btn-sm btn-outline-warning" title="Tentar novamente">
-                                                                <i class="bi bi-arrow-repeat"></i>
-                                                            </button>
-                                                        <?php endif; ?>
-                                                        <button type="button" onclick="if(confirm('Excluir este job?')) submitJobAction('delete', <?= (int)$job['id'] ?>)" class="btn btn-sm btn-outline-danger" title="Excluir">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                
-                                <?php if ($jobsTotalPages > 1): ?>
-                                <nav class="mt-3">
-                                    <ul class="pagination pagination-sm justify-content-center mb-0">
-                                        <li class="page-item <?= $jobsPage <= 1 ? 'disabled' : '' ?>">
-                                            <a class="page-link" href="/admin?tab=jobs&status=<?= e($jobsStatus) ?>&page=<?= $jobsPage - 1 ?>">Anterior</a>
-                                        </li>
-                                        <?php for ($i = max(1, $jobsPage - 2); $i <= min($jobsTotalPages, $jobsPage + 2); $i++): ?>
-                                            <li class="page-item <?= $i === $jobsPage ? 'active' : '' ?>">
-                                                <a class="page-link" href="/admin?tab=jobs&status=<?= e($jobsStatus) ?>&page=<?= $i ?>"><?= $i ?></a>
-                                            </li>
-                                        <?php endfor; ?>
-                                        <li class="page-item <?= $jobsPage >= $jobsTotalPages ? 'disabled' : '' ?>">
-                                            <a class="page-link" href="/admin?tab=jobs&status=<?= e($jobsStatus) ?>&page=<?= $jobsPage + 1 ?>">Proximo</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                                <p class="text-muted small text-center mt-2 mb-0">Total: <?= $jobsTotal ?> jobs</p>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- API TESTER -->
                 <div class="tab-pane fade" id="api-tester">
                     <div class="section-header">
@@ -856,22 +783,8 @@ function updateSaveButton() {
     }
 }
 
-function submitJobAction(action, id) {
-    const form = document.getElementById('jobActionForm');
-    const idInput = document.getElementById('jobActionId');
-    form.action = '/admin/jobs/' + action;
-    idInput.value = id;
-    form.submit();
-}
-</script>
-
 <form method="post" action="/admin/logs/clear" id="clearLogsForm" style="display:none;">
     <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-</form>
-
-<form method="post" action="" id="jobActionForm" style="display:none;">
-    <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-    <input type="hidden" name="id" value="" id="jobActionId">
 </form>
 
 <form method="post" action="/admin/drive-upload" id="driveUploadForm" enctype="multipart/form-data" style="display:none;">

@@ -258,9 +258,6 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <li><a class="dropdown-item" href="/admin/observabilidade">
                                     <i class="bi bi-activity me-2 text-muted"></i>Observabilidade
                                 </a></li>
-                                <li><a class="dropdown-item" href="/admin/jobs">
-                                    <i class="bi bi-clock-history me-2 text-muted"></i>Jobs / Fila
-                                </a></li>
                                 <li><a class="dropdown-item" href="/admin/backup/baixar">
                                     <i class="bi bi-cloud-arrow-up me-2 text-muted"></i>Backup
                                 </a></li>
@@ -543,10 +540,6 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <a href="/admin/observabilidade" class="list-group-item list-group-item-action d-flex align-items-center py-2">
                                     <i class="bi bi-activity me-3 text-muted"></i>
                                     <span>Observabilidade</span>
-                                </a>
-                                <a href="/admin/jobs" class="list-group-item list-group-item-action d-flex align-items-center py-2">
-                                    <i class="bi bi-clock-history me-3 text-muted"></i>
-                                    <span>Jobs / Fila</span>
                                 </a>
                                 <a href="/admin/api-tester" class="list-group-item list-group-item-action d-flex align-items-center py-2">
                                     <i class="bi bi-braces me-3 text-muted"></i>

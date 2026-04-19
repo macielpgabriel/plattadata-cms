@@ -96,9 +96,6 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
                     <a href="/admin/api-tester" class="btn btn-outline-secondary btn-sm text-start">
                         <i class="bi bi-terminal me-1"></i> API Tester
                     </a>
-                    <a href="/admin/jobs" class="btn btn-outline-secondary btn-sm text-start">
-                        <i class="bi bi-list-task me-1"></i> Jobs em fila
-                    </a>
                     <a href="/admin/configuracoes" class="btn btn-outline-secondary btn-sm text-start">
                         <i class="bi bi-gear me-1"></i> Configurações
                     </a>

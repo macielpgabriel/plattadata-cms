@@ -452,15 +452,6 @@ MAIL_SMTP_ENCRYPTION=tls</pre>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4">
-                            <a href="/admin/jobs" class="card border-0 shadow-sm quick-action-card h-100">
-                                <div class="card-body text-center py-4">
-                                    <i class="bi bi-clock-history text-warning fs-2 mb-3"></i>
-                                    <h6>Jobs</h6>
-                                    <small class="text-muted">Fila de tarefas</small>
-                                </div>
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>

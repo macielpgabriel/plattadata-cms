@@ -47,7 +47,6 @@ $sidebarLink = function($tabId, $icon, $label, $isTab = true) use ($isDashboard)
         </a>
 
         <div class="admin-section-title">Sistema & Dev</div>
-        <?= $sidebarLink('jobs', 'clock-history', 'Jobs / Fila') ?>
         <?= $sidebarLink('api-tester', 'braces', 'Testador de API') ?>
         <?= $sidebarLink('seguranca', 'shield-lock', 'Seguranca') ?>
         

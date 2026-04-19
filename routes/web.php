@@ -178,9 +178,6 @@ $router->post('/admin/phpstan/run', [ObservabilityController::class, 'runPhpstan
 $router->get('/admin/phpstan/github', [ObservabilityController::class, 'getPhpstanFromGithub'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/security/events', [ObservabilityController::class, 'getSecurityEvents'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/logs/recent', [ObservabilityController::class, 'getRecentLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/jobs', [ObservabilityController::class, 'jobsIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/jobs/retry', [ObservabilityController::class, 'retryJob'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/jobs/delete', [ObservabilityController::class, 'deleteJob'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 // Rotas de Remoção de Empresa
 $router->get('/empresas/{cnpj}/remover', [CompanyRemovalController::class, 'showRequestForm']);

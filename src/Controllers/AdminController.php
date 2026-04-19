@@ -29,41 +29,11 @@ final class AdminController
         $settings = (new SiteSettingRepository())->allAssoc();
         $db = Database::connection();
 
-        // Jobs data
-        $jobsStatus = $_GET['status'] ?? '';
-        $jobsPage = max(1, (int) ($_GET['page'] ?? 1));
-        $perPage = 20;
-        $offset = ($jobsPage - 1) * $perPage;
-
-        $where = '';
-        $params = [];
-        if (in_array($jobsStatus, ['pending', 'processing', 'completed', 'failed'], true)) {
-            $where = 'WHERE status = ?';
-            $params[] = $jobsStatus;
-        }
-
-        $countStmt = $db->prepare("SELECT COUNT(*) FROM jobs $where");
-        $countStmt->execute($params);
-        $jobsTotal = (int) $countStmt->fetchColumn();
-        $jobsTotalPages = max(1, (int) ceil($jobsTotal / $perPage));
-
-        $sql = "SELECT * FROM jobs $where ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        $params[] = $perPage;
-        $params[] = $offset;
-        $stmt = $db->prepare($sql);
-        $stmt->execute($params);
-        $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
-
         View::render('admin/dashboard', [
             'title' => 'Admin',
             'health' => $health,
             'metrics' => $metrics,
             'settings' => $settings,
-            'jobs' => $jobs,
-            'jobsStatus' => $jobsStatus,
-            'jobsPage' => $jobsPage,
-            'jobsTotalPages' => $jobsTotalPages,
-            'jobsTotal' => $jobsTotal,
             'flash' => Session::flash('success'),
             'error' => Session::flash('error'),
             'metaRobots' => 'noindex,nofollow',

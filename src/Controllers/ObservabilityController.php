@@ -462,66 +462,6 @@ final class ObservabilityController
         echo "Done\n";
     }
 
-    public function jobsIndex(): void
-    {
-        $status = $_GET['status'] ?? '';
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $query = http_build_query(['tab' => 'jobs', 'status' => $status, 'page' => $page]);
-        redirect('/admin?' . $query);
-    }
-
-    public function retryJob(): void
-    {
-
-        $id = (int) ($_POST['id'] ?? 0);
-        if ($id <= 0) {
-            Session::flash('error', 'ID de job inválido.');
-            redirect('/admin');
-        }
-
-        $db = \App\Core\Database::connection();
-
-        try {
-            $stmt = $db->prepare("UPDATE jobs SET status = 'pending', attempts = 0, error_message = NULL WHERE id = ? AND status = 'failed'");
-            $stmt->execute([$id]);
-            if ($stmt->rowCount() > 0) {
-                Session::flash('success', 'Job reenviado para processamento.');
-            } else {
-                Session::flash('error', 'Job não encontrado ou não está com falha.');
-            }
-        } catch (\PDOException $e) {
-            Session::flash('error', 'Erro ao reenviar job: ' . $e->getMessage());
-        }
-
-        redirect('/admin#jobs');
-    }
-
-    public function deleteJob(): void
-    {
-
-        $id = (int) ($_POST['id'] ?? 0);
-        if ($id <= 0) {
-            Session::flash('error', 'ID de job inválido.');
-            redirect('/admin');
-        }
-
-        $db = \App\Core\Database::connection();
-
-        try {
-            $stmt = $db->prepare("DELETE FROM jobs WHERE id = ?");
-            $stmt->execute([$id]);
-            if ($stmt->rowCount() > 0) {
-                Session::flash('success', 'Job removido com sucesso.');
-            } else {
-                Session::flash('error', 'Job não encontrado.');
-            }
-        } catch (\PDOException $e) {
-            Session::flash('error', 'Erro ao remover job: ' . $e->getMessage());
-        }
-
-        redirect('/admin#jobs');
-    }
-
     public function runPhpstan(): void
     {
 
