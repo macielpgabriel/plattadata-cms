@@ -152,11 +152,14 @@ final class CnpjService
             foreach ($payload['qsa'] as $partner) {
                 $name = $partner['nome_socio'] ?? ($partner['nome'] ?? null);
                 if ($name) {
+                    $doc = $partner['cpf_cnpj_socio'] ?? null;
+                    $masked = $doc ? \App\Core\Encryption::mask($doc, 3) : null;
+                    
                     $stmt->execute([
                         $companyId,
                         mb_strtoupper((string)$name),
                         $partner['qualificacao_socio'] ?? ($partner['qualificacao'] ?? null),
-                        $partner['cpf_cnpj_socio'] ?? null
+                        $masked
                     ]);
                 }
             }
