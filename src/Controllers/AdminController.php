@@ -12,6 +12,7 @@ use App\Services\SetupService;
 use App\Services\ObservabilityService;
 use App\Services\GoogleDriveService;
 use App\Services\GoogleDriveServiceOAuth;
+use App\Services\IpBlocklistService;
 use App\Repositories\SiteSettingRepository;
 use App\Core\Cache;
 
@@ -111,5 +112,51 @@ final class AdminController
         }
 
         redirect('/admin/drive-upload');
+    }
+
+    public function listBlockedIPs(): void
+    {
+        $db = Database::connection();
+        $stmt = $db->query("SELECT ip, reason, created_at, expires_at FROM blocked_ips WHERE expires_at IS NULL OR expires_at > NOW() ORDER BY created_at DESC");
+        $blockedIPs = $stmt->fetchAll() ?: [];
+
+        $stmt = $db->query("SELECT ip, attempts, last_attempt FROM ip_failed_attempts ORDER BY last_attempt DESC LIMIT 50");
+        $failedAttempts = $stmt->fetchAll() ?: [];
+
+        View::render('admin/blocked-ips', [
+            'title' => 'IPs Bloqueados',
+            'blockedIPs' => $blockedIPs,
+            'failedAttempts' => $failedAttempts,
+            'metaRobots' => 'noindex,nofollow',
+        ]);
+    }
+
+    public function unblockIP(): void
+    {
+        $ip = trim($_POST['ip'] ?? '');
+
+        if ($ip === '') {
+            Session::flash('error', 'IP inválido.');
+            redirect('/admin/bloqueados');
+        }
+
+        IpBlocklistService::unblock($ip);
+
+        $db = Database::connection();
+        $stmt = $db->prepare("DELETE FROM ip_failed_attempts WHERE ip = ?");
+        $stmt->execute([$ip]);
+
+        Session::flash('success', "IP {$ip} desbloqueado.");
+        redirect('/admin/bloqueados');
+    }
+
+    public function unblockAllIPs(): void
+    {
+        $db = Database::connection();
+        $db->exec("DELETE FROM blocked_ips");
+        $db->exec("DELETE FROM ip_failed_attempts");
+
+        Session::flash('success', 'Todos os IPs desbloqueados.');
+        redirect('/admin/bloqueados');
     }
 }

@@ -1,3 +1,5 @@
+<?php include __DIR__ . '/layouts/auth.php'; ?>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
@@ -35,6 +37,9 @@
                                 <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
                                     <i class="bi bi-eye"></i>
                                 </button>
+                                <button class="btn btn-outline-primary" type="button" id="generatePassword" title="Gerar senha segura">
+                                    <i class="bi bi-key"></i>
+                                </button>
                             </div>
                             <div class="form-text x-small">Mínimo 12 caracteres, letras maiúsculas/minúsculas, número e caractere especial</div>
                         </div>
@@ -63,3 +68,70 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('generatePassword').addEventListener('click', generatePassword);
+
+function generatePassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    let password = '';
+    
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const special = '!@#$%&*';
+    
+    password += upper[Math.floor(Math.random() * upper.length)];
+    password += lower[Math.floor(Math.random() * lower.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += special[Math.floor(Math.random() * special.length)];
+    
+    const array = new Uint32Array(8);
+    crypto.getRandomValues(array);
+    for (let i = 0; i < 8; i++) {
+        password += chars[array[i] % chars.length];
+    }
+    
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    checkHIBP(password, function(isPwned) {
+        if (isPwned) {
+            generatePassword();
+            return;
+        }
+        
+        document.getElementById('password').value = password;
+        document.getElementById('password_confirmation').value = password;
+        
+        document.getElementById('password').type = 'text';
+        document.getElementById('password_confirmation').type = 'text';
+        
+        const btn = document.getElementById('generatePassword');
+        btn.classList.add('btn-success');
+        setTimeout(() => btn.classList.remove('btn-success'), 1500);
+    });
+}
+
+async function checkHIBP(password, callback) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
+    
+    const prefix = hashHex.substring(0, 5);
+    const suffix = hashHex.substring(5);
+    
+    try {
+        const response = await fetch('https://api.pwnedpasswords.com/range/' + prefix);
+        const text = await response.text();
+        
+        if (text.includes(suffix)) {
+            callback(true);
+            return;
+        }
+    } catch (e) {}
+    
+    callback(false);
+}
+</script>

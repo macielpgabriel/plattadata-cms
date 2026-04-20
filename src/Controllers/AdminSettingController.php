@@ -117,23 +117,44 @@ final class AdminSettingController
         redirect('/admin/configuracoes');
     }
 
+    private const ALLOWED_BACKUP_TABLES = [
+        'users', 'password_reset_tokens', 'user_favorites', 'favorite_groups',
+        'states', 'municipalities', 'companies', 'company_changes',
+        'company_change_subscriptions', 'company_partners', 'company_enrichments',
+        'company_source_payloads', 'company_snapshots', 'company_query_logs',
+        'lgpd_audit_logs', 'email_logs', 'site_settings', 'cnpj_blacklist',
+        'notification_logs', 'email_verification_tokens', 'cnae_activities',
+        'company_removal_requests', 'exchange_rates', 'economic_indicators',
+        'impostometro_data', 'impostometro_arrecadacao', 'compliance_cache',
+        'cnae_statistics', 'address_cache', 'municipality_cache',
+        'blocked_ips', 'ip_failed_attempts', 'api_keys', 'api_access_logs',
+        'company_mentions', 'company_mentions_history', 'mention_alert_subscriptions',
+        'company_competitors', 'partner_history', 'municipality_vehicle_types',
+        'audit_logs', ' brasil_info', 'ddd_cache', 'company_tax_data',
+    ];
+
     public function downloadBackup(): void
     {
         $db = \App\Core\Database::connection();
         $tables = [];
         $result = $db->query("SHOW TABLES");
         while ($row = $result->fetch(\PDO::FETCH_NUM)) {
-            $tables[] = $row[0];
+            $tableName = $row[0];
+            if (!in_array($tableName, self::ALLOWED_BACKUP_TABLES, true)) {
+                continue;
+            }
+            $tables[] = $tableName;
         }
 
         $sql = "-- Backup PlattaData CMS\n-- Gerado em: " . date('Y-m-d H:i:s') . "\n\n";
         $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
 
         foreach ($tables as $table) {
-            $res = $db->query("SHOW CREATE TABLE `$table`")->fetch(\PDO::FETCH_ASSOC);
+            $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+            $res = $db->query("SHOW CREATE TABLE `$safeTable`")->fetch(\PDO::FETCH_ASSOC);
             $sql .= "\n\n" . $res['Create Table'] . ";\n\n";
 
-            $rows = $db->query("SELECT * FROM `$table`")->fetchAll(\PDO::FETCH_ASSOC);
+            $rows = $db->query("SELECT * FROM `$safeTable`")->fetchAll(\PDO::FETCH_ASSOC);
             foreach ($rows as $row) {
                 $keys = array_keys($row);
                 $values = array_values($row);
@@ -142,7 +163,7 @@ final class AdminSettingController
                         return 'NULL';
                     return $db->quote((string) $v);
                 }, $values);
-                $sql .= "INSERT INTO `$table` (`" . implode('`, `', $keys) . "`) VALUES (" . implode(', ', $escapedValues) . ");\n";
+                $sql .= "INSERT INTO `$safeTable` (`" . implode('`, `', $keys) . "`) VALUES (" . implode(', ', $escapedValues) . ");\n";
             }
         }
 

@@ -26,15 +26,6 @@ final class Auth
             ];
         }
 
-        if ($repo->isLocked($user)) {
-            return [
-                'ok' => false,
-                'reason' => 'locked',
-                'locked_until' => $user['locked_until'] ?? null,
-                'user' => $user,
-            ];
-        }
-
         if (!password_verify($password, $user['password_hash'])) {
             $repo->registerFailedLogin((int) $user['id']);
 

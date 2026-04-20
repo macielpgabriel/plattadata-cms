@@ -173,6 +173,10 @@ $router->post('/admin/localidades/enrich', [ObservabilityController::class, 'syn
 $router->get('/admin/atividades/sync', [ObservabilityController::class, 'syncCnaeActivities'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/cnae/sync', [ObservabilityController::class, 'syncCnaeActivities'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/logs/clear', [ObservabilityController::class, 'clearLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
+
+$router->get('/admin/bloqueados', [AdminController::class, 'listBlockedIPs'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/bloqueados/desbloquear', [AdminController::class, 'unblockIP'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/bloqueados/desbloquear-todos', [AdminController::class, 'unblockAllIPs'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/logs/test', [ObservabilityController::class, 'testClearLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/phpstan/run', [ObservabilityController::class, 'runPhpstan'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/phpstan/github', [ObservabilityController::class, 'getPhpstanFromGithub'], [AuthMiddleware::class, AdminMiddleware::class]);
