@@ -79,6 +79,12 @@ final class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        
+        // Normalizar caminho: remover trailing slash exceto para root
+        if ($path !== '/' && str_ends_with($path, '/')) {
+            $path = rtrim($path, '/');
+        }
+        
         $routes = $this->routes[$method] ?? [];
         $startTime = microtime(true);
 
