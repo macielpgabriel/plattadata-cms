@@ -81,7 +81,8 @@ final class IpBlocklistService
             }
 
             if ($attempts >= $maxAttempts) {
-                self::block($ip, "Bloqueio automatico apos {$attempts} tentativas falhadas de login", 60);
+                $lockoutMinutes = (int) config('app.security.login_lockout_minutes', 15);
+                self::block($ip, "Bloqueio automatico apos {$attempts} tentativas falhadas de login", $lockoutMinutes);
                 self::clearFailedAttempts($ip);
                 Logger::warning("IP {$ip} bloqueado automaticamente apos {$attempts} tentativas", ['attempts' => $attempts]);
             }
