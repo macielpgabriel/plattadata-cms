@@ -262,8 +262,22 @@ final class Logger
         $now = time();
 
         foreach (glob($cachePath . '/*.cache') as $file) {
-            $data = @unserialize(file_get_contents($file));
-            if (!$data || $now > ($data['expires_at'] ?? 0)) {
+            try {
+                $content = file_get_contents($file);
+                if ($content === false) continue;
+                
+                $cached = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                if (!isset($cached['data'])) {
+                    @unlink($file);
+                    $count++;
+                } else {
+                    $data = json_decode($cached['data'], true, 512, JSON_THROW_ON_ERROR);
+                    if (!$data || $now > ($data['expires_at'] ?? 0)) {
+                        @unlink($file);
+                        $count++;
+                    }
+                }
+            } catch (\JsonException $e) {
                 @unlink($file);
                 $count++;
             }

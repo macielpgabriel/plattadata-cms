@@ -50,8 +50,12 @@ final class RedisCacheDriver implements CacheDriver
 
     public function set(string $key, mixed $value, int $ttl = 3600): bool
     {
-        $serialized = serialize($value);
-        return $this->redis->setex($this->prefix . $key, $ttl, $serialized);
+        try {
+            $serialized = json_encode($value, JSON_THROW_ON_ERROR);
+            return $this->redis->setex($this->prefix . $key, $ttl, $serialized);
+        } catch (\JsonException $e) {
+            return false;
+        }
     }
 
     public function get(string $key): mixed
@@ -60,7 +64,11 @@ final class RedisCacheDriver implements CacheDriver
         if ($value === false) {
             return null;
         }
-        return unserialize($value);
+        try {
+            return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            return null;
+        }
     }
 
     public function has(string $key): bool

@@ -141,6 +141,13 @@ if ($verificationType === 'email') {
         $allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
         $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
         $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        
+        // Verificar path traversal
+        $originalName = $file['name'];
+        if (strpos($originalName, '..') !== false || strpos($originalName, '/') !== false || strpos($originalName, '\\') !== false) {
+            Session::flash('error', 'Nome de arquivo inválido.');
+            redirect("/empresas/remover/documento?id=$id");
+        }
 
         if (!in_array($fileExtension, $allowedExtensions)) {
             Session::flash('error', 'Formato de arquivo não permitido. Use PDF, JPG ou PNG.');

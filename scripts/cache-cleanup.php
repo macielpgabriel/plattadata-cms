@@ -36,8 +36,18 @@ echo "   Tamanho total: " . number_format($totalSize / 1024, 2) . " KB\n\n";
 
 echo "3. Detalhes dos arquivos:\n";
 foreach ($files as $file) {
-    $data = @unserialize(file_get_contents($file));
-    $expiresAt = $data['expires_at'] ?? 0;
+    try {
+        $content = file_get_contents($file);
+        $cached = json_decode($content, true);
+        if (isset($cached['data'])) {
+            $data = json_decode($cached['data'], true);
+            $expiresAt = $data['expires_at'] ?? 0;
+        } else {
+            $expiresAt = 0;
+        }
+    } catch (\JsonException $e) {
+        $expiresAt = 0;
+    }
     $remaining = max(0, $expiresAt - time());
     $size = filesize($file);
     echo "   - " . basename($file) . " (" . number_format($size) . " bytes, expira em " . formatDuration($remaining) . ")\n";

@@ -9,6 +9,7 @@ use App\Core\CacheDriver;
 final class FileCacheDriver implements CacheDriver
 {
     private string $cachePath;
+    private string $hmacKey;
 
     public function __construct(?string $path = null)
     {
@@ -16,17 +17,37 @@ final class FileCacheDriver implements CacheDriver
         if (!is_dir($this->cachePath)) {
             mkdir($this->cachePath, 0755, true);
         }
+        $key = env('APP_KEY', 'default-cache-key-change-in-production');
+        $this->hmacKey = hash('sha256', $key, true);
+    }
+
+    private function sign(string $data): string
+    {
+        return hash_hmac('sha256', $data, $this->hmacKey);
+    }
+
+    private function verify(string $data, string $signature): bool
+    {
+        return hash_equals($this->sign($data), $signature);
     }
 
     public function set(string $key, mixed $value, int $ttl = 3600): bool
     {
         $file = $this->getFilePath($key);
-        $data = [
+        
+        $payload = json_encode([
             'expires_at' => time() + $ttl,
             'content' => $value
-        ];
+        ], JSON_THROW_ON_ERROR);
+        
+        $signature = $this->sign($payload);
+        
+        $data = json_encode([
+            'sig' => $signature,
+            'data' => $payload
+        ], JSON_THROW_ON_ERROR);
 
-        return file_put_contents($file, serialize($data), LOCK_EX) !== false;
+        return file_put_contents($file, $data, LOCK_EX) !== false;
     }
 
     public function get(string $key): mixed
@@ -42,13 +63,31 @@ final class FileCacheDriver implements CacheDriver
             return null;
         }
 
-        $data = unserialize($content);
-        if (!$data || time() > $data['expires_at']) {
+        try {
+            $cached = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            
+            if (!isset($cached['sig'], $cached['data'])) {
+                @unlink($file);
+                return null;
+            }
+            
+            if (!$this->verify($cached['data'], $cached['sig'])) {
+                @unlink($file);
+                return null;
+            }
+            
+            $data = json_decode($cached['data'], true, 512, JSON_THROW_ON_ERROR);
+            
+            if (!$data || time() > $data['expires_at']) {
+                @unlink($file);
+                return null;
+            }
+
+            return $data['content'];
+        } catch (\JsonException $e) {
             @unlink($file);
             return null;
         }
-
-        return $data['content'];
     }
 
     public function has(string $key): bool
@@ -93,8 +132,19 @@ final class FileCacheDriver implements CacheDriver
         foreach (glob($this->cachePath . DIRECTORY_SEPARATOR . '*.cache') as $file) {
             $content = file_get_contents($file);
             if ($content !== false) {
-                $data = unserialize($content);
-                if (!$data || time() > ($data['expires_at'] ?? 0)) {
+                try {
+                    $cached = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                    if (!isset($cached['sig'], $cached['data'])) {
+                        @unlink($file);
+                        $count++;
+                    } else {
+                        $data = json_decode($cached['data'], true, 512, JSON_THROW_ON_ERROR);
+                        if (!$data || time() > ($data['expires_at'] ?? 0)) {
+                            @unlink($file);
+                            $count++;
+                        }
+                    }
+                } catch (\JsonException $e) {
                     @unlink($file);
                     $count++;
                 }
