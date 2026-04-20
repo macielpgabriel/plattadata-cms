@@ -16,6 +16,7 @@ final class Router
 
     public function get(string $path, callable|array $handler, array $middlewares = []): void
     {
+        error_log("Router::get($path)");
         $this->addRoute('GET', $path, $handler, $middlewares);
     }
 
