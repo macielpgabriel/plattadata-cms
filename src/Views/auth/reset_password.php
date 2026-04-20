@@ -23,6 +23,9 @@
                                 <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
                                     <i class="bi bi-eye"></i>
                                 </button>
+                                <button class="btn btn-outline-primary" type="button" onclick="generatePassword()" title="Gerar senha segura">
+                                    <i class="bi bi-shuffle"></i>
+                                </button>
                             </div>
                             <div class="form-text">Mínimo 12 caracteres, letras maiúsculas/minúsculas, número e caractere especial</div>
                         </div>
@@ -50,3 +53,24 @@
         </div>
     </div>
 </div>
+
+<script>
+function generatePassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars[Math.floor(Math.random() * chars.length)];
+    }
+    document.getElementById('password').value = password;
+    document.getElementById('password_confirmation').value = password;
+    
+    // Mostrar campos após gerar
+    document.getElementById('password').type = 'text';
+    document.getElementById('password_confirmation').type = 'text';
+    
+    // Feedback visual
+    const btn = document.querySelector('.btn-outline-primary');
+    btn.classList.add('btn-success');
+    setTimeout(() => btn.classList.remove('btn-success'), 1000);
+}
+</script>
