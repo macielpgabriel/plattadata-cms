@@ -88,6 +88,13 @@ final class Router
                 }
 
                 $params = array_filter($matches, static fn ($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+                
+                // Extract single param values (not arrays)
+                foreach ($params as $key => $value) {
+                    if (is_array($value)) {
+                        $params[$key] = $value[0] ?? '';
+                    }
+                }
 
                 // Run global middlewares
                 foreach ($this->globalMiddlewares as $middlewareClass) {
