@@ -16,6 +16,7 @@ use App\Services\ValidationService;
 final class UserController
 {
     private ValidationService $validator;
+    private const PASSWORD_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
 
     public function __construct()
     {
@@ -55,7 +56,7 @@ final class UserController
         }
 
         if ($data['password'] === '') {
-            $data['password'] = bin2hex(random_bytes(6)); // 12 chars
+            $data['password'] = self::generateSecurePassword();
         }
 
         if (!array_key_exists($data['role'], config('roles'))) {
@@ -70,7 +71,9 @@ final class UserController
         }
 
         $data['two_factor_enabled'] = $data['role'] === 'admin' ? 1 : 0;
-        $data['password_hash'] = password_hash($data['password'], PASSWORD_ARGON2ID);
+        
+        $plainPassword = $data['password'];
+        $data['password_hash'] = password_hash($plainPassword, PASSWORD_ARGON2ID);
 
         $userId = (new UserRepository())->create($data);
         $adminEmail = (string) config('mail.admin_email', '');
@@ -78,11 +81,12 @@ final class UserController
             (new MailService())->send(
                 $adminEmail,
                 'Novo usuário criado no CMS',
-                str_replace(['ID', 'NOME', 'EMAIL', 'PERFIL'], [
+                str_replace(['ID', 'NOME', 'EMAIL', 'PERFIL', 'SENHA'], [
                     e((string) $userId),
                     e($data['name']),
                     e($data['email']),
-                    e($data['role'])
+                    e($data['role']),
+                    e($plainPassword)
                 ], <<<'HTML'
 <div style="text-align: center;">
     <div style="width: 60px; height: 60px; background: #d1fae5; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
@@ -97,7 +101,8 @@ final class UserController
     <p style="margin: 0 0 10px;"><strong style="color: #374151;">ID:</strong> ID</p>
     <p style="margin: 0 0 10px;"><strong style="color: #374151;">Nome:</strong> NOME</p>
     <p style="margin: 0 0 10px;"><strong style="color: #374151;">E-mail:</strong> EMAIL</p>
-    <p style="margin: 0;"><strong style="color: #374151;">Perfil:</strong> PERFIL</p>
+    <p style="margin: 0 0 10px;"><strong style="color: #374151;">Perfil:</strong> PERFIL</p>
+    <p style="margin: 0;"><strong style="color: #374151;">Senha Temporária:</strong> SENHA</p>
 </div>
 HTML
                 )
@@ -183,5 +188,18 @@ HTML
         (new UserRepository())->delete($id);
         Session::flash('success', 'Usuario excluido com sucesso.');
         redirect('/usuarios');
+    }
+
+    private static function generateSecurePassword(int $length = 12): string
+    {
+        $chars = self::PASSWORD_CHARS;
+        $charsLength = strlen($chars);
+        $password = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $chars[random_int(0, $charsLength - 1)];
+        }
+        
+        return $password;
     }
 }
