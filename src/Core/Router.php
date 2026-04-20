@@ -16,7 +16,6 @@ final class Router
 
     public function get(string $path, callable|array $handler, array $middlewares = []): void
     {
-        error_log("Router::get($path)");
         $this->addRoute('GET', $path, $handler, $middlewares);
     }
 
@@ -65,8 +64,6 @@ final class Router
     {
         $pattern = preg_replace('#\{([^/]+)\}#', '(?P<$1>[^/]+)', $path);
         $pattern = '#^' . $pattern . '$#';
-        
-        error_log("addRoute: $method $path -> $pattern");
 
         $this->routes[$method][] = [
             'path' => $path,
@@ -89,14 +86,6 @@ final class Router
         $startTime = microtime(true);
 
         try {
-            error_log(sprintf("[DISPATCH] %s %s - METODO: %s, rotas: %d", $method, $path, $method, count($routes)));
-            
-            // Debug: listar rotas disponíveis
-            if (str_starts_with($path, '/verificar')) {
-                foreach ($routes as $i => $route) {
-                    error_log(sprintf("[ROTA %d] pattern: %s", $i, $route['pattern']));
-                }
-            }
 
             foreach ($routes as $route) {
                 if (!preg_match($route['pattern'], $path, $matches)) {
@@ -150,7 +139,6 @@ final class Router
                 return;
             }
 
-            error_log(sprintf("[404] %s %s - Rota nao encontrada", $method, $path));
             Response::notFound();
         } catch (\Throwable $e) {
             // Se for uma requisição API ou AJAX, retorna JSON em vez de página HTML
