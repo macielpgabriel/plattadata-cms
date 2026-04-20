@@ -69,9 +69,29 @@ function togglePassword(fieldId, btn) {
 function generatePassword() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
     let password = '';
-    for (let i = 0; i < 12; i++) {
-        password += chars[Math.floor(Math.random() * chars.length)];
+    
+    // Gerar senha que atende todos os requisitos
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const special = '!@#$%&*';
+    
+    // Garantir pelo menos um de cada tipo
+    password += upper[Math.floor(Math.random() * upper.length)];
+    password += lower[Math.floor(Math.random() * lower.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += special[Math.floor(Math.random() * special.length)];
+    
+    // Preencher o resto com random seguro
+    const array = new Uint32Array(8);
+    crypto.getRandomValues(array);
+    for (let i = 0; i < 8; i++) {
+        password += chars[array[i] % chars.length];
     }
+    
+    // Embaralhar
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
     document.getElementById('password').value = password;
     document.getElementById('password_confirmation').value = password;
     
@@ -79,8 +99,9 @@ function generatePassword() {
     document.getElementById('password').type = 'text';
     document.getElementById('password_confirmation').type = 'text';
     
-    // Atualizar ícones
-    document.querySelector('[data-target="password"] i').className = 'bi bi-eye-slash';
-    document.querySelector('[data-target="password_confirmation"] i').className = 'bi bi-eye-slash';
+    // Feedback visual
+    const btn = document.querySelector('.btn-outline-primary');
+    btn.classList.add('btn-success');
+    setTimeout(() => btn.classList.remove('btn-success'), 1500);
 }
 </script>
