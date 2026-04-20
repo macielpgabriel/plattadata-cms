@@ -82,7 +82,14 @@ final class Router
         $startTime = microtime(true);
 
         try {
-            error_log(sprintf("[REQUEST] %s %s - rotas: %d", $method, $path, count($routes)));
+            error_log(sprintf("[DISPATCH] %s %s - METODO: %s, rotas: %d", $method, $path, $method, count($routes)));
+            
+            // Debug: listar rotas disponíveis
+            if (str_starts_with($path, '/verificar')) {
+                foreach ($routes as $i => $route) {
+                    error_log(sprintf("[ROTA %d] pattern: %s, path: %s", $i, $route['pattern'], $route['path']));
+                }
+            }
 
             foreach ($routes as $route) {
                 if (!preg_match($route['pattern'], $path, $matches)) {
