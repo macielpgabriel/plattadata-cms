@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plattadata-app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=development
+      - DB_HOST=db
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - plattadata-network
+
+  db:
+    image: mysql:8.0
+    container_name: plattadata-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: plattadata
+      MYSQL_USER: plattadata
+      MYSQL_PASSWORD: plattadata
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - plattadata-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: plattadata-redis
+    networks:
+      - plattadata-network
+
+networks:
+  plattadata-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
