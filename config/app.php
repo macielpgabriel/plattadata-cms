@@ -45,7 +45,6 @@ return [
                 'company_source_payloads' => (int) env('RETENTION_COMPANY_SOURCE_PAYLOADS_DAYS', '180'),
                 'company_snapshots' => (int) env('RETENTION_COMPANY_SNAPSHOTS_DAYS', '365'),
                 'email_logs' => (int) env('RETENTION_EMAIL_LOGS_DAYS', '365'),
-                'request_rate_limits' => (int) env('RETENTION_RATE_LIMITS_DAYS', '7'),
                 'lgpd_audit_logs' => (int) env('RETENTION_LGPD_AUDIT_LOGS_DAYS', '365'),
                 'audit_logs' => (int) env('RETENTION_AUDIT_LOGS_DAYS', '730'),
             ],
