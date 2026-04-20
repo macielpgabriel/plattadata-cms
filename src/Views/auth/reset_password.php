@@ -18,9 +18,9 @@
                         
                         <div class="mb-3">
                             <label for="password" class="form-label small fw-bold">Nova Senha</label>
-                            <div class="input-group">
+                            <div class="d-flex gap-1">
                                 <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required minlength="12" autofocus>
-                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)" title="Mostrar/Esconder">
                                     <i class="bi bi-eye"></i>
                                 </button>
                                 <button class="btn btn-outline-primary" type="button" onclick="generatePassword()" title="Gerar senha segura">
@@ -32,9 +32,9 @@
 
                         <div class="mb-4">
                             <label for="password_confirmation" class="form-label small fw-bold">Confirmar Senha</label>
-                            <div class="input-group">
+                            <div class="d-flex gap-1">
                                 <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" autocomplete="new-password" required minlength="12">
-                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password_confirmation">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_confirmation', this)" title="Mostrar/Esconder">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
@@ -55,6 +55,17 @@
 </div>
 
 <script>
+function togglePassword(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.querySelector('i').className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        btn.querySelector('i').className = 'bi bi-eye';
+    }
+}
+
 function generatePassword() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
     let password = '';
@@ -68,9 +79,8 @@ function generatePassword() {
     document.getElementById('password').type = 'text';
     document.getElementById('password_confirmation').type = 'text';
     
-    // Feedback visual
-    const btn = document.querySelector('.btn-outline-primary');
-    btn.classList.add('btn-success');
-    setTimeout(() => btn.classList.remove('btn-success'), 1000);
+    // Atualizar ícones
+    document.querySelector('[data-target="password"] i').className = 'bi bi-eye-slash';
+    document.querySelector('[data-target="password_confirmation"] i').className = 'bi bi-eye-slash';
 }
 </script>
