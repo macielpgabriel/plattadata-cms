@@ -92,16 +92,65 @@ function generatePassword() {
     // Embaralhar
     password = password.split('').sort(() => Math.random() - 0.5).join('');
     
-    document.getElementById('password').value = password;
-    document.getElementById('password_confirmation').value = password;
+    // Verificar HIBP antes de mostrar
+    checkHIBP(password, function(isPwned) {
+        if (isPwned) {
+            // Gerar novamente se foi encontrada em vazamento
+            generatePassword();
+            return;
+        }
+        
+        document.getElementById('password').value = password;
+        document.getElementById('password_confirmation').value = password;
+        
+        // Mostrar campos após gerar
+        document.getElementById('password').type = 'text';
+        document.getElementById('password_confirmation').type = 'text';
+        
+        // Feedback visual
+        const btn = document.querySelector('.btn-outline-primary');
+        btn.classList.add('btn-success');
+        setTimeout(() => btn.classList.remove('btn-success'), 1500);
+    });
+}
+
+async function checkHIBP(password, callback) {
+    // Usar k-anonymity: enviar apenas os 5 primeiros caracteres do SHA1
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
     
-    // Mostrar campos após gerar
-    document.getElementById('password').type = 'text';
-    document.getElementById('password_confirmation').type = 'text';
+    const prefix = hashHex.substring(0, 5);
+    const suffix = hashHex.substring(5);
     
-    // Feedback visual
-    const btn = document.querySelector('.btn-outline-primary');
-    btn.classList.add('btn-success');
-    setTimeout(() => btn.classList.remove('btn-success'), 1500);
+    try {
+        const response = await fetch('https://api.pwnedpasswords.com/range/' + prefix, {
+            headers: { 'User-Agent': 'Plattadata-CMS' }
+        });
+        
+        if (!response.ok) {
+            callback(false);
+            return;
+        }
+        
+        const text = await response.text();
+        const lines = text.split('\n');
+        
+        for (const line of lines) {
+            const [hashSuffix, count] = line.split(':');
+            if (hashSuffix.trim() === suffix) {
+                console.log('Senha encontrada em vazamentos: ' + count.trim() + 'x');
+                callback(true);
+                return;
+            }
+        }
+        
+        callback(false);
+    } catch (e) {
+        console.error('Erro ao verificar HIBP:', e);
+        callback(false);
+    }
 }
 </script>
