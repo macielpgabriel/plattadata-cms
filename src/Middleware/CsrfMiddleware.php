@@ -32,6 +32,11 @@ class CsrfMiddleware
                 return;
             }
 
+            // Exclude login page - user might have stale session from browser issues
+            if ($uri === '/login' || $uri === '/cadastro') {
+                return;
+            }
+
             $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
 
             if (!Csrf::validate($token)) {
