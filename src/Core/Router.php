@@ -87,7 +87,7 @@ final class Router
             // Debug: listar rotas disponíveis
             if (str_starts_with($path, '/verificar')) {
                 foreach ($routes as $i => $route) {
-                    error_log(sprintf("[ROTA %d] pattern: %s, path: %s", $i, $route['pattern'], $route['path']));
+                    error_log(sprintf("[ROTA %d] pattern: %s", $i, $route['pattern']));
                 }
             }
 
