@@ -16,3 +16,4 @@ $router->get('/api/v1/exchange-rates/{currency}/history', [InfoApiController::cl
 $router->post('/api/v1/weather/refresh', [WeatherApiController::class, 'refresh']);
 $router->get('/api/v1/health/drive', [InfoApiController::class, 'testDriveConnection']);
 $router->post('/api/v1/exchange-rates/refresh', [InfoApiController::class, 'refreshExchangeRates']);
+$router->get('/api/v1/cron', [\App\Controllers\ObservabilityController::class, 'runCron']);

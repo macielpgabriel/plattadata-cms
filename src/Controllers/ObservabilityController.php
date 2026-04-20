@@ -709,4 +709,22 @@ final class ObservabilityController
             'logs' => $logs
         ]);
     }
+    
+    public function runCron(): void
+    {
+        $hook = $_GET['hook'] ?? null;
+        
+        if ($hook) {
+            $result = \App\Core\Cron::run($hook);
+            Response::json($result);
+            return;
+        }
+        
+        $results = \App\Core\Cron::runDueTasks();
+        Response::json([
+            'success' => true,
+            'tasks_run' => count($results),
+            'results' => $results
+        ]);
+    }
 }
