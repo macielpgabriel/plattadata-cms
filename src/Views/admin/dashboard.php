@@ -993,7 +993,12 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+let _securityEventsLoading = false;
+
 function loadSecurityEvents() {
+    if (_securityEventsLoading) return;
+    _securityEventsLoading = true;
+    
     const containers = [document.getElementById('securityEvents'), document.getElementById('securityEventsOverview')];
     containers.forEach(container => {
         if (container) container.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Carregando...';
@@ -1002,13 +1007,14 @@ function loadSecurityEvents() {
     fetch('/admin/security/events')
         .then(res => res.json())
         .then(data => {
-                    containers.forEach(container => {
-                        if (!container) return;
-                        
-                        if (!data.success || data.count === 0) {
-                            container.innerHTML = '<div class="text-muted small py-4 text-center"><i class="bi bi-shield-check opacity-50 d-block fs-3 mb-2"></i>Nenhum alerta de seguranca.</div>';
-                            return;
-                        }
+            _securityEventsLoading = false;
+            containers.forEach(container => {
+                if (!container) return;
+                
+                if (!data.success || data.count === 0) {
+                    container.innerHTML = '<div class="text-muted small py-4 text-center"><i class="bi bi-shield-check opacity-50 d-block fs-3 mb-2"></i>Nenhum alerta de seguranca.</div>';
+                    return;
+                }
                         
                         let html = '<ul class="list-unstyled mb-0 small">';
                         data.events.slice(0, 10).forEach(event => {
