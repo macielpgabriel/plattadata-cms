@@ -129,10 +129,8 @@ HTML
         redirect('/cadastro');
     }
 
-    public function verify(): void
+    public function verify(string $token): void
     {
-        $token = trim((string) ($_GET['token'] ?? ''));
-        
         if ($token === '') {
             $data = [
                 'title' => 'E-mail Verificado',

@@ -217,8 +217,6 @@ final class UserRepository
 
     public function verifyEmailToken(string $token): ?array
     {
-        $hashedToken = hash('sha256', $token);
-
         $stmt = Database::connection()->prepare(
             'SELECT evt.*, u.id as user_id, u.email, u.name, u.email_verified_at
              FROM email_verification_tokens evt
@@ -228,7 +226,7 @@ final class UserRepository
                AND evt.verified_at IS NULL
              LIMIT 1'
         );
-        $stmt->execute(['token' => $hashedToken]);
+        $stmt->execute(['token' => hash('sha256', $token)]);
         $result = $stmt->fetch();
 
         return $result ?: null;
