@@ -64,6 +64,8 @@ final class Router
     {
         $pattern = preg_replace('#\{([^/]+)\}#', '(?P<$1>[^/]+)', $path);
         $pattern = '#^' . $pattern . '$#';
+        
+        error_log("addRoute: $method $path -> $pattern");
 
         $this->routes[$method][] = [
             'path' => $path,
@@ -80,7 +82,7 @@ final class Router
         $startTime = microtime(true);
 
         try {
-            error_log(sprintf("[REQUEST] %s %s", $method, $path));
+            error_log(sprintf("[REQUEST] %s %s - rotas: %d", $method, $path, count($routes)));
 
             foreach ($routes as $route) {
                 if (!preg_match($route['pattern'], $path, $matches)) {
@@ -114,7 +116,12 @@ final class Router
                     if (empty($params)) {
                         $controller->{$action}();
                     } else {
-                        $controller->{$action}($params);
+                        // Pass only string values, not arrays
+                        $scalarParams = [];
+                        foreach ($params as $k => $v) {
+                            $scalarParams[$k] = is_array($v) ? ($v[0] ?? '') : $v;
+                        }
+                        $controller->{$action}($scalarParams);
                     }
                     return;
                 }
