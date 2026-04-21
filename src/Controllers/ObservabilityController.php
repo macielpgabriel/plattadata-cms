@@ -727,4 +727,40 @@ final class ObservabilityController
             'results' => $results
         ]);
     }
+    
+    public function cronStatus(): void
+    {
+        $schedules = \App\Core\Cron::schedules();
+        $status = [];
+        $timestamp = time();
+        
+        foreach ($schedules as $hook => $interval) {
+            $lastRun = (int) \App\Core\Cache::get("cron_last_run_{$hook}", 0);
+            $nextRun = $lastRun + $interval;
+            $due = $timestamp >= $nextRun;
+            
+            $status[$hook] = [
+                'interval_seconds' => $interval,
+                'interval_human' => self::formatInterval($interval),
+                'last_run' => $lastRun ? date('Y-m-d H:i:s', $lastRun) : 'nunca',
+                'next_run' => date('Y-m-d H:i:s', $nextRun),
+                'due' => $due,
+            ];
+        }
+        
+        View::render('admin/cron', [
+            'title' => 'Tarefas Agendadas',
+            'schedules' => $schedules,
+            'status' => $status,
+            'metaRobots' => 'noindex,nofollow',
+        ]);
+    }
+    
+    private function formatInterval(int $seconds): string
+    {
+        if ($seconds < 60) return "{$seconds}s";
+        if ($seconds < 3600) return floor($seconds / 60) . " min";
+        if ($seconds < 86400) return floor($seconds / 3600) . "h";
+        return floor($seconds / 86400) . " dias";
+    }
 }
