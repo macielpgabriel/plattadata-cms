@@ -1,10 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 use App\Core\Session;
+use App\Core\Csrf;
 
 $flash = Session::flash('success');
 $error = Session::flash('error');
 
+$schedules = $schedules ?? [];
+$status = $status ?? [];
 ?>
 <?php include __DIR__ . '/layouts/app.php'; ?>
 
@@ -73,7 +76,7 @@ $error = Session::flash('error');
         <div class="card-body">
             <p>Para executar automaticamente, adicione ao crontab do servidor:</p>
             <div class="bg-dark text-light p-3 rounded">
-                <code>*/15 * * * * curl -s <?= e(config('app.url', '')) ?>/api/v1/cron > /dev/null 2>&1</code>
+                <code>*/15 * * * * curl -s <?= e(config('app.url', 'https://plattadata.com')) ?>/api/v1/cron > /dev/null 2>&1</code>
             </div>
             <p class="mt-3 text-muted small">
                 Execute a cada 15 minutos para verificar tarefas pendentes.
