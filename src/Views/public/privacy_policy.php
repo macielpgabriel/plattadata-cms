@@ -243,25 +243,6 @@
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
                                 <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">12</span>
-                                API para Desenvolvedores
-                            </h2>
-                            <p class="text-secondary ps-5 ms-2">
-                                Oferecemos API para integração por desenvolvedores. O uso da API inclui:
-                            </p>
-                            <ul class="text-secondary ps-5 ms-2">
-                                <li>Chave de API pessoal (armazenada de forma segura)</li>
-                                <li>Registro de todas as requisições (IP, timestamp, endpoint)</li>
-                                <li>Limite de requisições (rate limit)</li>
-                                <li>Histórico de uso da API</li>
-                            </ul>
-                            <p class="text-secondary ps-5 ms-2">
-                                A chave de API é de responsabilidade exclusiva do usuário e não deve ser compartilhada.
-                            </p>
-                        </section>
-
-                        <section class="mb-5">
-                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">13</span>
                                 Compartilhamento de Dados
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -274,7 +255,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">14</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">13</span>
                                 Retenção de Dados
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -290,7 +271,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">15</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">14</span>
                                 Seus Direitos (LGPD Art. 18)
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -312,7 +293,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">16</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">15</span>
                                 Encarregado de Dados (DPO)
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -325,7 +306,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">17</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">16</span>
                                 Contato
                             </h2>
                             <div class="ps-5 ms-2">

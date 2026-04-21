@@ -86,10 +86,6 @@ $router->post('/api/v1/webhook/favorite', [IntegrationsController::class, 'webho
 
 // Admin - Gerenciamento de Integrações
 $router->get('/admin/integracoes', [IntegrationsController::class, 'integrationsPage'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/integracoes/apikey/criar', [IntegrationsController::class, 'generateApiKey'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/integracoes/apikey/excluir', [IntegrationsController::class, 'deleteApiKey'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/integracoes/webhook/criar', [IntegrationsController::class, 'generateWebhookSecret'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/integracoes/webhook/excluir', [IntegrationsController::class, 'deleteWebhookSecret'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 // Admin - Analytics
 $router->get('/admin/analytics', [AnalyticsController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
