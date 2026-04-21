@@ -9,7 +9,7 @@ $error = Session::flash('error');
 $schedules = $schedules ?? [];
 $status = $status ?? [];
 ?>
-<?php include __DIR__ . '/layouts/app.php'; ?>
+<?php include __DIR__ . '/../layouts/app.php'; ?>
 
 <?php startblock('content'); ?>
 <div class="container-fluid py-4">

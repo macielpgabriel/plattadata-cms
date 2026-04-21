@@ -4,7 +4,7 @@ $flash = Session::flash('success');
 $error = Session::flash('error');
 
 ?>
-<?php include __DIR__ . '/layouts/app.php'; ?>
+<?php include __DIR__ . '/../layouts/app.php'; ?>
 
 <?php startblock('content'); ?>
 <div class="container-fluid py-4">
