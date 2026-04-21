@@ -1,12 +1,8 @@
-<?php startblock('title') ?>
-    Avaliações de <?= e($company['legal_name']) ?>
-<?php endblock() ?>
-
-<?php startblock('content') ?>
+<?php declare(strict_types=1); use App\Core\Auth; use App\Core\Csrf; ?>
 <div class="container py-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Início</a></li>
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
             <li class="breadcrumb-item"><a href="/empresas/<?= e($company['cnpj']) ?>"><?= e($company['legal_name']) ?></a></li>
             <li class="breadcrumb-item active" aria-current="page">Avaliações</li>
         </ol>
@@ -15,9 +11,7 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    <i class="bi bi-star"></i> Avaliações
-                </h2>
+                <h2 class="mb-0"><i class="bi bi-star"></i> Avaliações</h2>
                 <a href="/empresas/<?= e($company['cnpj']) ?>/avaliar" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Avaliar
                 </a>
@@ -25,8 +19,7 @@
 
             <?php if (empty($reviews)): ?>
                 <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i>
-                    Nenhuma avaliação ainda. Seja o primeiro a avaliar!
+                    <i class="bi bi-info-circle"></i> Nenhuma avaliação ainda. Seja o primeiro a avaliar!
                 </div>
             <?php else: ?>
                 <?php foreach ($reviews as $review): ?>
@@ -40,16 +33,18 @@
                                         <?php endfor; ?>
                                     </div>
                                     <div class="text-muted small">
-                                        <?= e($review['user_name']) ?> • <?= date('d/m/Y', strtotime($review['created_at'])) ?>
+                                        <?= e($review['user_name']) ?> &bull; <?= date('d/m/Y', strtotime($review['created_at'])) ?>
                                     </div>
                                 </div>
+                                <?php if (Auth::check()): ?>
                                 <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/reportar" class="d-inline">
-                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
                                     <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-link text-muted" title="Reportar">
                                         <i class="bi bi-flag"></i>
                                     </button>
                                 </form>
+                                <?php endif; ?>
                             </div>
 
                             <?php if (!empty($review['comment'])): ?>
@@ -88,4 +83,3 @@
         </div>
     </div>
 </div>
-<?php endblock() ?>
