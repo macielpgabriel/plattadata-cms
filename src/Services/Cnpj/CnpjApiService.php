@@ -12,15 +12,14 @@ final class CnpjApiService
     private int $timeout;
 
     private const PROVIDER_ENDPOINTS = [
-        'opencnpj'   => 'https://api.opencnpj.org/',
-        'receitaws'  => 'https://receitaws.com.br/v1/cnpj/',
         'brasilapi' => 'https://brasilapi.com.br/api/cnpj/v1/',
-        'cnpjws'     => 'https://api.cnpj.ws/v1/cnpj/',
+        'receitaws'  => 'https://receitaws.com.br/v1/cnpj/',
+        'opencnpj'   => 'https://api.opencnpj.org/',
     ];
 
     public function __construct()
     {
-        $chain = (string) config('app.cnpj.fallback_chain', 'opencnpj,receitaws,brasilapi');
+        $chain = (string) config('app.cnpj.fallback_chain', 'brasilapi,receitaws,opencnpj');
         $this->fallbackChain = array_values(array_unique(array_filter(array_map('trim', explode(',', $chain)))));
         $this->timeout = (int) config('app.cnpj.timeout', 10);
     }
@@ -219,13 +218,33 @@ final class CnpjApiService
 
     private function normalizeOpenCnpj(array $d): array
     {
+        $phones = $d['telefones'] ?? [];
+        $phone = is_array($phones) ? ($phones[0]['numero'] ?? null) : null;
+
         return [
             'cnpj' => $d['cnpj'] ?? null,
             'legal_name' => $d['razao_social'] ?? null,
             'trade_name' => $d['nome_fantasia'] ?? null,
-            'status' => $d['status'] ?? null,
-            'city' => $d['cidade'] ?? null,
-            'uf' => $d['estado'] ?? null,
+            'status' => $d['situacao_cadastral'] ?? null,
+            'city' => $d['municipio'] ?? ($d['cidade'] ?? null),
+            'uf' => $d['uf'] ?? ($d['estado'] ?? null),
+            'cep' => $d['cep'] ?? null,
+            'street' => ($d['tipo_logradouro'] ?? '') . ' ' . ($d['logradouro'] ?? ''),
+            'address_number' => $d['numero'] ?? null,
+            'district' => $d['bairro'] ?? null,
+            'address_complement' => $d['complemento'] ?? null,
+            'phone' => $phone,
+            'email' => $d['email'] ?? null,
+            'opened_at' => isset($d['data_inicio_atividade']) ? date('Y-m-d', strtotime($d['data_inicio_atividade'])) : null,
+            'company_size' => $d['porte_empresa'] ?? null,
+            'legal_nature' => $d['natureza_juridica'] ?? null,
+            'cnae_main_code' => $d['cnae_principal'] ?? null,
+            'capital_social' => $this->parseDecimal($d['capital_social'] ?? null),
+            'simples_opt_in' => ($d['opcao_simples'] ?? null) === 'S',
+            'mei_opt_in' => ($d['opcao_mei'] ?? null) === 'S',
+            'qsa' => $d['QSA'] ?? [],
+            'cnaes_secundarios' => normalize_cnaes_secundarios($d['cnaes_secundarios'] ?? null),
+            'updated_at' => date('Y-m-d H:i:s'),
         ];
     }
 
