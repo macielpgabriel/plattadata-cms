@@ -709,13 +709,15 @@ final class CompanyController
         
         $db = Database::connection();
         
-        $stmt = $db->prepare("SHOW COLUMNS FROM companies LIKE 'latitude'");
+        $stmt = $db->prepare("SHOW TABLES LIKE 'company_enrichments'");
         $stmt->execute();
-        $hasGeo = $stmt->fetch() !== false;
+        $hasEnrichments = $stmt->fetch() !== false;
         
-        if ($hasGeo) {
-            $sql = "SELECT cnpj, legal_name, trade_name, city, state, latitude, longitude 
-                     FROM companies WHERE is_hidden = 0 AND latitude IS NOT NULL AND longitude IS NOT NULL";
+        if ($hasEnrichments) {
+            $sql = "SELECT c.cnpj, c.legal_name, c.trade_name, c.city, c.state, e.latitude, e.longitude 
+                     FROM companies c 
+                     LEFT JOIN company_enrichments e ON c.id = e.company_id 
+                     WHERE c.is_hidden = 0 AND e.latitude IS NOT NULL AND e.longitude IS NOT NULL";
         } else {
             $sql = "SELECT cnpj, legal_name, trade_name, city, state 
                      FROM companies WHERE is_hidden = 0";
