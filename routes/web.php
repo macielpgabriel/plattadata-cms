@@ -14,6 +14,7 @@ use App\Controllers\PublicController;
 use App\Controllers\SeoController;
 use App\Controllers\UserController;
 use App\Controllers\CompanyRemovalController;
+use App\Controllers\CompanyDashboardController;
 use App\Controllers\LocationController;
 use App\Controllers\ActivityController;
 use App\Controllers\PartnerController;
@@ -199,6 +200,18 @@ $router->get('/empresas/remover/verificar', [CompanyRemovalController::class, 's
 $router->post('/empresas/remover/verificar', [CompanyRemovalController::class, 'verifyCode']);
 $router->get('/empresas/remover/documento', [CompanyRemovalController::class, 'showDocumentForm']);
 $router->post('/empresas/remover/documento', [CompanyRemovalController::class, 'uploadDocument']);
+
+// Dashboard Empresarial (validação de empresa)
+$router->get('/empresa/validar', [CompanyDashboardController::class, 'showRequestForm']);
+$router->get('/empresa/validar/{cnpj}', [CompanyDashboardController::class, 'showRequestForm']);
+$router->post('/empresa/validar/{cnpj}', [CompanyDashboardController::class, 'submitRequest']);
+$router->get('/empresa/validar/verificar', [CompanyDashboardController::class, 'showVerifyForm']);
+$router->post('/empresa/validar/verificar', [CompanyDashboardController::class, 'verifyCode']);
+$router->get('/empresa/validar/documento', [CompanyDashboardController::class, 'showDocumentForm']);
+$router->post('/empresa/validar/documento', [CompanyDashboardController::class, 'submitDocument']);
+$router->get('/empresa/validar/sucesso', [CompanyDashboardController::class, 'showSuccess']);
+$router->get('/empresa/{cnpj}/dashboard', [CompanyDashboardController::class, 'showDashboard']);
+$router->post('/empresa/{cnpj}/dashboard', [CompanyDashboardController::class, 'updateProfile']);
 
 // Administração de Auditoria
 $router->get('/admin/auditoria', [AuditController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);

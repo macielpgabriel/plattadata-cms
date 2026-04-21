@@ -15,9 +15,56 @@ final class MigrationService
     {
         $results = [
             'cnpj_alphanumeric' => $this->applyCnpjAlphanumericMigration($pdo),
+            'company_edit_requests' => $this->applyCompanyEditRequestsTable($pdo),
+            'company_profile_fields' => $this->applyCompanyProfileFields($pdo),
         ];
         
         return $results;
+    }
+
+    private function applyCompanyEditRequestsTable(PDO $pdo): bool
+    {
+        try {
+            if (!$this->tableExists($pdo, 'company_edit_requests')) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS company_edit_requests (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    company_id BIGINT UNSIGNED NOT NULL,
+                    cnpj VARCHAR(14) NOT NULL,
+                    requester_name VARCHAR(120) NOT NULL,
+                    requester_email VARCHAR(160) NOT NULL,
+                    verification_type ENUM('email', 'document') NOT NULL,
+                    verification_code CHAR(6) NULL,
+                    document_path VARCHAR(255) NULL,
+                    status ENUM('pending', 'verified', 'approved', 'rejected', 'cancelled') NOT NULL DEFAULT 'pending',
+                    verified_at DATETIME NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_edit_cnpj (cnpj),
+                    INDEX idx_edit_status (status),
+                    CONSTRAINT fk_edit_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                Logger::info('Migration: Tabela company_edit_requests criada');
+            }
+            return true;
+        } catch (PDOException $e) {
+            Logger::warning('Migration: company_edit_requests: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function applyCompanyProfileFields(PDO $pdo): bool
+    {
+        try {
+            $this->applyColumnIfNotExists($pdo, 'companies', 'description', 'TEXT NULL');
+            $this->applyColumnIfNotExists($pdo, 'companies', 'facebook', 'VARCHAR(255) NULL');
+            $this->applyColumnIfNotExists($pdo, 'companies', 'instagram', 'VARCHAR(50) NULL');
+            $this->applyColumnIfNotExists($pdo, 'companies', 'linkedin', 'VARCHAR(255) NULL');
+            $this->applyColumnIfNotExists($pdo, 'companies', 'whatsapp', 'VARCHAR(20) NULL');
+            return true;
+        } catch (PDOException $e) {
+            Logger::warning('Migration: company_profile: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function applyCnpjAlphanumericMigration(PDO $pdo): bool
