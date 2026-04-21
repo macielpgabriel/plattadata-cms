@@ -11,7 +11,11 @@ final class Session
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-
+        
+        if (headers_sent($filename, $lineNum)) {
+            return;
+        }
+        
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.sid_length', '48');
