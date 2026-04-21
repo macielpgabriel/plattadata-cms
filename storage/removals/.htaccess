@@ -1,0 +1,17 @@
+# Bloqueia todo acesso a arquivos PHP
+<Files "*.php">
+    Deny from all
+</Files>
+
+# Bloqueia execução de scripts
+<FilesMatch "\.(php|phtml|phar|phpt|php\d+)$">
+    Deny from all
+</FilesMatch>
+
+# Impede listagem de diretório
+Options -Indexes
+
+# Bloqueia arquivos de configuração
+<FilesMatch "^\.">
+    Deny from all
+</FilesMatch>

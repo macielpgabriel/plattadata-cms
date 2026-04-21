@@ -205,9 +205,42 @@ final class CompanyDashboardController
             redirect("/empresas/validar/documento?id=$id");
         }
 
-        $cnpj = $_POST['cnpj'] ?? '';
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = "edit_{$cnpj}_{$id}.{$extension}";
+        if ($file['size'] > 5 * 1024 * 1024) {
+            Session::flash('error', 'O arquivo é muito grande. O limite é 5MB.');
+            redirect("/empresas/validar/documento?id=$id");
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($file['tmp_name']);
+        if (!in_array($mime, $allowed, true)) {
+            Session::flash('error', 'Tipo de arquivo inválido.');
+            redirect("/empresas/validar/documento?id=$id");
+        }
+
+        $handle = fopen($file['tmp_name'], 'rb');
+        if ($handle) {
+            $header = fread($handle, 8);
+            fclose($handle);
+            
+            $pdfMagic = "%PDF";
+            $jpgMagic1 = "\xFF\xD8\xFF";
+            $jpgMagic2 = "\x89PNG";
+            
+            $isValidMagic = (
+                str_starts_with($header, $pdfMagic) ||
+                str_starts_with($header, $jpgMagic1) ||
+                str_starts_with($header, $jpgMagic2)
+            );
+            
+            if (!$isValidMagic) {
+                Session::flash('error', 'Arquivo corrupto ou inválido.');
+                redirect("/empresas/validar/documento?id=$id");
+            }
+        }
+
+        $cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj'] ?? '');
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $filename = "edit_{$cnpj}_{$id}." . $extension;
         
         $uploadDir = base_path('storage/edit_documents/');
         if (!is_dir($uploadDir)) {
