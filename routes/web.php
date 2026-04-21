@@ -60,6 +60,7 @@ if (env('APP_ENV', 'production') !== 'production') {
 $router->post('/buscar-cnpj', [PublicController::class, 'publicSearch']);
 $router->get('/politica-de-privacidade', [PublicController::class, 'privacyPolicy']);
 $router->get('/termos-de-servico', [PublicController::class, 'termsOfService']);
+$router->get('/ripd', [PublicController::class, 'ripd']);
 $router->get('/indicadores-economicos', [EconomicController::class, 'index']);
 $router->post('/api/economic/sync-rates', [EconomicController::class, 'syncRates']);
 $router->post('/api/impostometro/sync', [ImpostometroController::class, 'sync']);

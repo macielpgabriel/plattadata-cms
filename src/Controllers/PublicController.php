@@ -60,7 +60,7 @@ final class PublicController
         ]);
     }
 
-    public function termsOfService(): void
+public function termsOfService(): void
     {
         if (!(new SetupService())->isDatabaseReady()) {
             redirect('/install');
@@ -69,7 +69,20 @@ final class PublicController
         View::render('public/terms_of_service', [
             'title' => 'Termos de Serviço',
             'metaTitle' => 'Termos de Serviço | ' . site_setting('site_name', config('app.name')),
-            'metaDescription' => 'Condicoes de uso da plataforma Plattadata para consulta de dados empresariais.',
+            'metaDescription' => 'Condições de uso da plataforma Plattadata para consulta de dados empresariais.',
+        ]);
+    }
+
+    public function ripd(): void
+    {
+        if (!(new SetupService())->isDatabaseReady()) {
+            redirect('/install');
+        }
+
+        View::render('public/ripd', [
+            'title' => 'Relatório de Impacto à Proteção de Dados',
+            'metaTitle' => 'RIPD | ' . site_setting('site_name', config('app.name')),
+            'metaDescription' => 'Relatório de Impacto à Proteção de Dados Pessoais conforme LGPD Art. 5-XVII.',
         ]);
     }
 
