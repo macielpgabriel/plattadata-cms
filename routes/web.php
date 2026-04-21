@@ -39,15 +39,21 @@ $router->get('/', static function (): void {
     (new PublicController())->home();
 });
 
-$router->get('/install', [InstallController::class, 'show']);
-$router->post('/install', [InstallController::class, 'save']);
+// Install route - only in development if not configured
+$setupService = new SetupService();
+if (env('APP_ENV', 'production') !== 'production' || !$setupService->isDatabaseReady()) {
+    $router->get('/install', [InstallController::class, 'show']);
+    $router->post('/install', [InstallController::class, 'save']);
+}
 
 // Debug Routes (Public - for testing)
-$router->get('/debug/test-extract', [DebugController::class, 'testExtract']);
-$router->get('/debug/view-variables', [DebugController::class, 'viewVariables']);
-$router->get('/debug/company-data/{cnpj}', [DebugController::class, 'companyData']);
-// Suporta CNPJ formatado com barra (XX.XXX.XXX/XXXX-XX)
-$router->getWithPattern('/debug/company-data/(?P<cnpj_formatted>\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})', [DebugController::class, 'companyData']);
+// Debug routes - only in development
+if (env('APP_ENV', 'production') !== 'production') {
+    $router->get('/debug/test-extract', [DebugController::class, 'testExtract']);
+    $router->get('/debug/view-variables', [DebugController::class, 'viewVariables']);
+    $router->get('/debug/company-data/{cnpj}', [DebugController::class, 'companyData']);
+    $router->getWithPattern('/debug/company-data/(?P<cnpj_formatted>\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})', [DebugController::class, 'companyData']);
+}
 
 $router->post('/buscar-cnpj', [PublicController::class, 'publicSearch']);
 $router->get('/politica-de-privacidade', [PublicController::class, 'privacyPolicy']);
@@ -221,10 +227,11 @@ $router->post('/empresas/{cnpj}/monitorar', [CompanyController::class, 'subscrib
 $router->delete('/empresas/{cnpj}/monitorar', [CompanyController::class, 'unsubscribeMonitor'], [AuthMiddleware::class]);
 $router->get('/empresas/{cnpj}', [CompanyController::class, 'show']);
 
-// Debug Routes (Admin only)
-$router->get('/admin/debug/company-data/{cnpj}', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/debug/company-data/{cnpj_formatted}', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/debug/view-variables', [DebugController::class, 'viewVariables'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/debug/test-extract', [DebugController::class, 'testExtract'], [AuthMiddleware::class, AdminMiddleware::class]);
-// Suporta CNPJ formatado com barra (XX.XXX.XXX/XXXX-XX)
-$router->getWithPattern('/admin/debug/company-data/(?P<cnpj_formatted>\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
+// Debug Routes (Admin only) - only in development
+if (env('APP_ENV', 'production') !== 'production') {
+    $router->get('/admin/debug/company-data/{cnpj}', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
+    $router->get('/admin/debug/company-data/{cnpj_formatted}', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
+    $router->get('/admin/debug/view-variables', [DebugController::class, 'viewVariables'], [AuthMiddleware::class, AdminMiddleware::class]);
+    $router->get('/admin/debug/test-extract', [DebugController::class, 'testExtract'], [AuthMiddleware::class, AdminMiddleware::class]);
+    $router->getWithPattern('/admin/debug/company-data/(?P<cnpj_formatted>\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})', [DebugController::class, 'companyData'], [AuthMiddleware::class, AdminMiddleware::class]);
+}
