@@ -1,0 +1,4 @@
+# Bloqueia todo acesso
+<Files "*">
+    Deny from all
+</Files>
