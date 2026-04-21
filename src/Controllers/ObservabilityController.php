@@ -736,14 +736,13 @@ final class ObservabilityController
         
         foreach ($schedules as $hook => $interval) {
             $lastRun = (int) \App\Core\Cache::get("cron_last_run_{$hook}", 0);
-            $nextRun = $lastRun + $interval;
-            $due = $timestamp >= $nextRun;
+            $due = $lastRun === 0 || $timestamp >= ($lastRun + $interval);
             
             $status[$hook] = [
                 'interval_seconds' => $interval,
                 'interval_human' => self::formatInterval($interval),
-                'last_run' => $lastRun ? date('Y-m-d H:i:s', $lastRun) : 'nunca',
-                'next_run' => date('Y-m-d H:i:s', $nextRun),
+                'last_run' => $lastRun > 0 ? date('Y-m-d H:i:s', $lastRun) : 'nunca',
+                'next_run' => $due ? 'agora' : date('Y-m-d H:i:s', $lastRun + $interval),
                 'due' => $due,
             ];
         }
