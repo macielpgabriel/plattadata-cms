@@ -708,19 +708,9 @@ final class CompanyController
         
         $db = Database::connection();
         
-        $stmt = $db->prepare("SHOW TABLES LIKE 'municipalities'");
-        $stmt->execute();
-        $hasMunicipalities = $stmt->fetch() !== false;
-        
-        if ($hasMunicipalities) {
-            $sql = "SELECT c.cnpj, c.legal_name, c.trade_name, c.city, c.state, m.latitude, m.longitude 
-                     FROM companies c 
-                     LEFT JOIN municipalities m ON m.ibge_code = c.municipal_ibge_code 
-                     WHERE c.is_hidden = 0 AND m.latitude IS NOT NULL AND m.longitude IS NOT NULL";
-        } else {
-            $sql = "SELECT cnpj, legal_name, trade_name, city, state 
-                     FROM companies WHERE is_hidden = 0";
-        }
+        $sql = "SELECT c.cnpj, c.legal_name, c.trade_name, c.city, c.state, c.municipal_ibge_code 
+                 FROM companies c 
+                 WHERE c.is_hidden = 0";
         $params = [];
         
         if ($state) {
@@ -734,17 +724,55 @@ final class CompanyController
         $stmt->execute($params);
         $companies = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
+        $stmt = $db->query("SHOW TABLES LIKE 'municipalities'");
+        $hasMunicipalities = $stmt->fetch() !== false;
+        
+        $cityCoords = [];
+        
+        if ($hasMunicipalities) {
+            $stmt = $db->query("SELECT ibge_code, latitude, longitude FROM municipalities WHERE latitude IS NOT NULL AND longitude IS NOT NULL");
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $cityCoords[$row['ibge_code']] = [
+                    'lat' => (float) $row['latitude'],
+                    'lng' => (float) $row['longitude']
+                ];
+            }
+        }
+        
+        $capitals = [
+            'AC' => [-9.9750, -67.8246], 'AL' => [-9.6658, -35.7353], 'AP' => [0.0389, -51.0664],
+            'AM' => [-3.1140, -60.0253], 'BA' => [-12.9714, -38.5014], 'CE' => [-3.7172, -38.5433],
+            'DF' => [-15.7939, -47.8828], 'ES' => [-20.3155, -40.3128], 'GO' => [-16.6795, -49.2551],
+            'MA' => [-2.5307, -44.3068], 'MT' => [-15.5989, -56.0649], 'MS' => [-20.4697, -54.6201],
+            'MG' => [-19.9167, -43.9375], 'PA' => [-1.4558, -48.5039], 'PB' => [-7.1195, -34.8450],
+            'PR' => [-25.4284, -49.2733], 'PE' => [-8.0476, -34.8770], 'PI' => [-5.0892, -42.8019],
+            'RJ' => [-22.9068, -43.1729], 'RN' => [-5.7945, -35.2110], 'RS' => [-30.0346, -51.2177],
+            'RO' => [-8.7619, -63.9039], 'RR' => [2.8235, -60.6758], 'SC' => [-27.5954, -48.5480],
+            'SP' => [-23.5505, -46.6333], 'SE' => [-10.9472, -37.0731], 'TO' => [-10.1688, -48.3317]
+        ];
+        
         $markers = [];
         $seenCoords = [];
         
         foreach ($companies as $c) {
-            if (!empty($c['latitude']) && !empty($c['longitude'])) {
-                $coordKey = $c['latitude'] . ',' . $c['longitude'];
+            $lat = null;
+            $lng = null;
+            
+            if (!empty($c['municipal_ibge_code']) && isset($cityCoords[$c['municipal_ibge_code']])) {
+                $lat = $cityCoords[$c['municipal_ibge_code']]['lat'];
+                $lng = $cityCoords[$c['municipal_ibge_code']]['lng'];
+            } elseif (!empty($c['state']) && isset($capitals[$c['state']])) {
+                $lat = $capitals[$c['state']][0];
+                $lng = $capitals[$c['state']][1];
+            }
+            
+            if ($lat !== null && $lng !== null) {
+                $coordKey = $lat . ',' . $lng;
                 
                 if (!isset($seenCoords[$coordKey])) {
                     $seenCoords[$coordKey] = [
-                        'lat' => (float) $c['latitude'],
-                        'lng' => (float) $c['longitude'],
+                        'lat' => $lat,
+                        'lng' => $lng,
                         'city' => $c['city'] ?? '',
                         'state' => $c['state'] ?? '',
                         'count' => 0
