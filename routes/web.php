@@ -129,7 +129,8 @@ $router->get('/dashboard', [DashboardController::class, 'index'], [AuthMiddlewar
 $router->post('/dashboard', [DashboardController::class, 'updateProfile'], [AuthMiddleware::class]);
 
 // LGPD - Direitos do titular (Art. 18)
-$router->get('/meus-dados/exportar', [UserController::class, 'exportData'], [AuthMiddleware::class]);
+$router->get('/meus-dados', [UserController::class, 'exportData']);
+$router->get('/meus-dados/exportar', [UserController::class, 'exportData']);
 
 $router->get('/favoritos', [FavoriteController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/favoritos/{cnpj}/toggle', [FavoriteController::class, 'toggle'], [AuthMiddleware::class]);
