@@ -126,7 +126,22 @@ final class ValidationService
         if (strlen($cnpj) !== 14) {
             return false;
         }
-        if (preg_match('/^([A-Z0-9])\1{13}$/', $cnpj)) {
+        
+        // Verificar se é CNPJ legaco (só números) ou novo alfanumérico
+        if (ctype_digit($cnpj)) {
+            // CNPJ legaco - validacao tradicional
+            return $this->validateLegacyCnpj($cnpj);
+        } else {
+            // CNPJ novo alfanumerico - usa nova validacao
+            $validator = new CnpjAlphanumericValidator();
+            return $validator->validate($cnpj);
+        }
+    }
+    
+    private function validateLegacyCnpj(string $cnpj): bool
+    {
+        // Verificar caracteres repetidos (exceto para CNPJ com letras)
+        if (preg_match('/^([0-9])\1{13}$/', $cnpj)) {
             return false;
         }
 
