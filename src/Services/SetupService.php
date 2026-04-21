@@ -5,23 +5,30 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Logger;
+use App\Services\Setup\SchemaSetupService;
+use App\Services\Setup\MigrationService;
+use App\Services\Setup\ConfigSetupService;
+use App\Services\Setup\DatabaseSetupService;
+use App\Services\Setup\CompanySchemaService;
 use PDO;
 use PDOException;
-use App\Services\Setup\DatabaseSetupService;
-use App\Services\Setup\SchemaSetupService;
-use App\Services\Setup\CompanySchemaService;
+use Throwable;
 
 final class SetupService
 {
     private ?string $lastConnectionError = null;
-    private DatabaseSetupService $databaseService;
     private SchemaSetupService $schemaService;
+    private MigrationService $migrationService;
+    private ConfigSetupService $configService;
+    private DatabaseSetupService $databaseService;
     private CompanySchemaService $companySchemaService;
 
     public function __construct()
     {
-        $this->databaseService = new DatabaseSetupService();
         $this->schemaService = new SchemaSetupService();
+        $this->migrationService = new MigrationService();
+        $this->configService = new ConfigSetupService();
+        $this->databaseService = new DatabaseSetupService();
         $this->companySchemaService = new CompanySchemaService();
     }
 
@@ -69,7 +76,7 @@ final class SetupService
 
     public function getLastConnectionError(): ?string
     {
-        return $this->lastConnectionError;
+        return $this->databaseService->getLastConnectionError();
     }
 
      public function runInitialSetup(): void
@@ -655,7 +662,7 @@ final class SetupService
             Logger::warning('Setup: ' . $e->getMessage());
         }
 
-        @file_put_contents($lock, date('c'));
+        @file_put_contents(base_path('storage/.schema_v4_completed'), date('c'));
     }
 
     private function ensureMentionAlertsSchema(PDO $pdo): void
