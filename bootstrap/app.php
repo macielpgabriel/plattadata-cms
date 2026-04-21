@@ -74,6 +74,7 @@ $timezone = (string) config('app.timezone', 'America/Sao_Paulo');
 date_default_timezone_set(in_array($timezone, timezone_identifiers_list(), true) ? $timezone : 'America/Sao_Paulo');
 
 SecurityHeadersService::apply();
+\App\Services\SecurityService::applyRequestProtections();
 \App\Services\AccessLogService::log($_SERVER['REQUEST_URI'] ?? '/');
 
 // Setup e Retenção
