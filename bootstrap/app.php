@@ -79,8 +79,12 @@ SecurityHeadersService::apply();
 
 // Setup e Retenção
 $setupLockFile = base_path('storage/.setup_completed');
+$reviewsLockFile = base_path('storage/.reviews_completed');
 $setupService = new SetupService();
 if (!is_file($setupLockFile) || !$setupService->hasCriticalTables()) {
+    $setupService->runInitialSetup();
+} elseif (!is_file($reviewsLockFile)) {
+    // Criar tabelas de reviews se não existirem
     $setupService->runInitialSetup();
 }
 

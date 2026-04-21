@@ -12,6 +12,7 @@ use App\Core\Logger;
 use App\Core\Session;
 use App\Repositories\CompanyRepository;
 use App\Services\RateLimiterService;
+use App\Services\SetupService;
 use App\Services\ValidationService;
 use PDO;
 
@@ -28,6 +29,12 @@ final class CompanyReviewController
 
     public function list(array $params): void
     {
+        if (!(new SetupService())->isDatabaseReady()) {
+            http_response_code(503);
+            echo 'Sistema em manutenção.';
+            return;
+        }
+
         $cnpj = (string) ($params['cnpj'] ?? '');
         $cnpj = preg_replace('/[^0-9A-Z]/', '', $cnpj);
 
