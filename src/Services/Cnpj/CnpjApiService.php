@@ -12,15 +12,15 @@ final class CnpjApiService
     private int $timeout;
 
     private const PROVIDER_ENDPOINTS = [
-        'brasilapi' => 'https://brasilapi.com.br/api/cnpj/v1/',
-        'receitaws'  => 'https://receitaws.com.br/v1/cnpj/',
-        'cnpjws'     => 'https://api.cnpj.ws/v1/cnpj/',
         'opencnpj'   => 'https://api.opencnpj.org/',
+        'receitaws'  => 'https://receitaws.com.br/v1/cnpj/',
+        'brasilapi' => 'https://brasilapi.com.br/api/cnpj/v1/',
+        'cnpjws'     => 'https://api.cnpj.ws/v1/cnpj/',
     ];
 
     public function __construct()
     {
-        $chain = (string) config('app.cnpj.fallback_chain', 'brasilapi,receitaws,cnpjws,opencnpj');
+        $chain = (string) config('app.cnpj.fallback_chain', 'opencnpj,receitaws,brasilapi');
         $this->fallbackChain = array_values(array_unique(array_filter(array_map('trim', explode(',', $chain)))));
         $this->timeout = (int) config('app.cnpj.timeout', 10);
     }
