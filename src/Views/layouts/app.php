@@ -293,6 +293,9 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <li><button type="button" class="dropdown-item" onclick="toggleTheme()">
                                     <i class="bi bi-palette me-2 text-muted"></i>Alternar Tema
                                 </button></li>
+                                <li><a class="dropdown-item" href="/meus-dados">
+                                    <i class="bi bi-download me-2 text-muted"></i>Meus Dados (LGPD)
+                                </a></li>
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <form method="post" action="/logout" class="m-0 px-2 py-1">
