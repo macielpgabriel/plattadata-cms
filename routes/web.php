@@ -171,7 +171,7 @@ $router->post('/admin/cache/limpar', [AdminController::class, 'clearCache'], [Au
 $router->get('/admin/configuracoes', [AdminSettingController::class, 'edit'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/drive-upload', [AdminController::class, 'showDriveUpload'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/drive-upload', [AdminController::class, 'uploadDriveCredentials'], [AuthMiddleware::class, AdminMiddleware::class]);

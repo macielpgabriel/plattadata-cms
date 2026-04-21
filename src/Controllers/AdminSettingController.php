@@ -135,6 +135,12 @@ final class AdminSettingController
 
     public function downloadBackup(): void
     {
+        if (!Csrf::validate($_POST['_token'] ?? '')) {
+            http_response_code(403);
+            echo 'Token CSRF inválido';
+            return;
+        }
+
         $db = \App\Core\Database::connection();
         $tables = [];
         $result = $db->query("SHOW TABLES");

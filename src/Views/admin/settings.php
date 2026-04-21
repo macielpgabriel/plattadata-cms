@@ -428,9 +428,12 @@ MAIL_SMTP_ENCRYPTION=tls</pre>
                                         </div>
                                     </div>
                                     <p class="text-muted small mb-3">Gera um arquivo .sql com todas as tabelas e configuracoes.</p>
-                                    <a href="/admin/backup/baixar" class="btn btn-outline-primary">
-                                        <i class="bi bi-download me-2"></i>Baixar Backup
-                                    </a>
+                                    <form method="post" action="/admin/backup/baixar" class="d-inline">
+                                        <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
+                                        <button type="submit" class="btn btn-outline-primary">
+                                            <i class="bi bi-download me-2"></i>Baixar Backup
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

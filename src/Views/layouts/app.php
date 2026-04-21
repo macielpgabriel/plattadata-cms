@@ -258,9 +258,14 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <li><a class="dropdown-item" href="/admin/observabilidade">
                                     <i class="bi bi-activity me-2 text-muted"></i>Observabilidade
                                 </a></li>
-                                <li><a class="dropdown-item" href="/admin/backup/baixar">
-                                    <i class="bi bi-cloud-arrow-up me-2 text-muted"></i>Backup
-                                </a></li>
+                                <li>
+                                    <form method="post" action="/admin/backup/baixar" class="d-inline">
+                                        <input type="hidden" name="_token" value="<?= Csrf::token() ?>">
+                                        <button type="submit" class="dropdown-item bg-transparent border-0 w-100 text-start">
+                                            <i class="bi bi-cloud-arrow-up me-2 text-muted"></i>Backup
+                                        </button>
+                                    </form>
+                                </li>
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li class="px-3 py-2">
                                     <small class="text-muted text-uppercase fw-bold small">Ferramentas</small>

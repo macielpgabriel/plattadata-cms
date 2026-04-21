@@ -67,9 +67,12 @@ $sidebarLink = function($tabId, $icon, $label, $isTab = true) use ($isDashboard)
                         <i class="bi bi-lightning-charge me-1"></i> Limpar Cache
                     </button>
                 </form>
-                <a href="/admin/backup/baixar" class="btn btn-sm btn-outline-secondary w-100 text-start py-1">
-                    <i class="bi bi-cloud-arrow-down me-1"></i> Download Backup
-                </a>
+                <form method="post" action="/admin/backup/baixar" class="d-inline">
+                    <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100 text-start py-1">
+                        <i class="bi bi-cloud-arrow-down me-1"></i> Download Backup
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
