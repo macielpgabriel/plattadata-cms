@@ -28,6 +28,7 @@ use App\Controllers\IntegrationsController;
 use App\Controllers\AnalyticsController;
 use App\Controllers\AuditController;
 use App\Controllers\DebugController;
+use App\Services\CoordinateSyncService;
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\StaffMiddleware;
@@ -194,6 +195,19 @@ $router->get('/admin/security/events', [ObservabilityController::class, 'getSecu
 $router->get('/admin/logs/recent', [ObservabilityController::class, 'getRecentLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/cron', [ObservabilityController::class, 'cronStatus'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/cron/run', [ObservabilityController::class, 'runCron'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin/coordenadas/stats', function() {
+    $service = new CoordinateSyncService();
+    $stats = $service->getStats();
+    header('Content-Type: application/json');
+    echo json_encode($stats);
+}, [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/coordenadas/sync', function() {
+    $service = new CoordinateSyncService();
+    $limit = (int) ($_POST['limit'] ?? 100);
+    $result = $service->syncMissingCoordinates($limit);
+    header('Content-Type: application/json');
+    echo json_encode($result);
+}, [AuthMiddleware::class, AdminMiddleware::class]);
 
 // Rotas de Remoção de Empresa
 $router->get('/empresas/{cnpj}/remover', [CompanyRemovalController::class, 'showRequestForm']);
