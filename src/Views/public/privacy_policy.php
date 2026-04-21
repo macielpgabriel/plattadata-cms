@@ -170,6 +170,98 @@
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
                                 <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">8</span>
+                                Cadastro e Conta de Usuário
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">
+                                Para utilizar recursos personalizados da plataforma, você pode criar uma conta. Os dados coletados incluem:
+                            </p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Nome completo</li>
+                                <li>Endereço de e-mail</li>
+                                <li>Senha (criptografada com bcrypt)</li>
+                                <li>Histórico de login (data, IP)</li>
+                            </ul>
+                            <p class="text-secondary ps-5 ms-2">
+                                O usuário pode excluir sua conta a qualquer momento, solicitando a remoção dos dados associados.
+                            </p>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">9</span>
+                                Favoritos e Monitoramento
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">
+                                Usuários autenticados podem salvar empresas como favoritos e monitorar alterações. Os dados armazenados incluem:
+                            </p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Lista de empresas favoritadas</li>
+                                <li>Grupos personalizados de favoritos</li>
+                                <li>Notificações de alterações cadastrais</li>
+                                <li>Histórico de monitoramento</li>
+                            </ul>
+                            <p class="text-secondary ps-5 ms-2">
+                                O monitoramento permite que o usuário receba alertas quando uma empresa for alterada na Receita Federal.
+                            </p>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">10</span>
+                                Avaliações e Reviews de Empresas
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">
+                                Usuarios autenticados podem avaliar e comentar sobre empresas. Este recurso inclui:
+                            </p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Avaliacao (1-5 estrelas)</li>
+                                <li>Comentario em texto</li>
+                                <li>Resposta da empresa as avaliacoes</li>
+                                <li>Sistema de report de avaliacoes inappropriate</li>
+                            </ul>
+                            <p class="text-secondary ps-5 ms-2">
+                                Reservamo-nos o direito de moderar e remover avaliacoes que violarem os Termos de Servico. O usuario e responsavel pela veracidade de sua avaliacao.
+                            </p>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">11</span>
+                                Painel Empresarial (Proprietários)
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">
+                                Empresas podem validar a propriedade através de verificação por e-mail (cadastrado na Receita Federal) ou documento de identificação. Após validação, podem:
+                            </p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Editar dados complementares (descrição, redes sociais)</li>
+                                <li>Adicionar links para Facebook, Instagram, LinkedIn</li>
+                                <li>Cadastrar WhatsApp para contato</li>
+                                <li>Responder avaliações de clientes</li>
+                            </ul>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">12</span>
+                                API para Desenvolvedores
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">
+                                Oferecemos API para integração por desenvolvedores. O uso da API inclui:
+                            </p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Chave de API pessoal (armazenada de forma segura)</li>
+                                <li>Registro de todas as requisições (IP, timestamp, endpoint)</li>
+                                <li>Limite de requisições (rate limit)</li>
+                                <li>Histórico de uso da API</li>
+                            </ul>
+                            <p class="text-secondary ps-5 ms-2">
+                                A chave de API é de responsabilidade exclusiva do usuário e não deve ser compartilhada.
+                            </p>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">13</span>
                                 Compartilhamento de Dados
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -182,7 +274,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">9</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">14</span>
                                 Retenção de Dados
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -198,7 +290,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">10</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">15</span>
                                 Seus Direitos (LGPD Art. 18)
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -220,7 +312,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">11</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">16</span>
                                 Encarregado de Dados (DPO)
                             </h2>
                             <p class="text-secondary ps-5 ms-2">
@@ -233,7 +325,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">12</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">17</span>
                                 Contato
                             </h2>
                             <div class="ps-5 ms-2">

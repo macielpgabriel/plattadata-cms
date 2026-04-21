@@ -59,6 +59,8 @@
                                     <li>Realizar scraping automatizado que sobrecarregue os servidores</li>
                                     <li>Utilizar os dados para spam, phishing ou práticas abusivas</li>
                                     <li>Revender os dados sem autorização expressa</li>
+                                    <li>Criar avaliações falsas ou manipulas reviews</li>
+                                    <li>Usar o sistema de avaliações de forma abusiva ou fraudulenta</li>
                                 </ul>
                             </div>
                         </section>
@@ -66,6 +68,21 @@
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
                                 <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">5</span>
+                                Sistema de Avaliações
+                            </h2>
+                            <p class="text-secondary ps-5 ms-2">Usuarios autenticados podem avaliar empresas de 1 a 5 estrelas e publicar comentarios. Ao utilizar este recurso, voce concorda em:</p>
+                            <ul class="text-secondary ps-5 ms-2">
+                                <li>Fornecer avaliacoes honestas e genuinas</li>
+                                <li>Nao criar avaliacoes falsas ou de concorrentes</li>
+                                <li>Nao usar avaliacoes para extorquir empresas</li>
+                                <li>Respeitar a comunidade e demais usuarios</li>
+                            </ul>
+                            <p class="text-secondary ps-5 ms-2">Reservamo-nos o direito de remover avaliacoes que violem estes termos e suspender usuarios que abusarem do sistema.</p>
+                        </section>
+
+                        <section class="mb-5">
+                            <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">6</span>
                                 Propriedade Intelectual
                             </h2>
                             <p class="text-secondary ps-5 ms-2">O código, design, logo e demais elementos visuais da plataforma Plattadata são propriedade intelectual protegida. Os dados públicos exibidos pertencem às fontes oficiais (Receita Federal, Juntas Comerciais, etc.).</p>
@@ -73,7 +90,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">6</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">7</span>
                                 Limitação de Responsabilidade
                             </h2>
                             <p class="text-secondary ps-5 ms-2">A plataforma fornece dados de fontes públicas oficiais, mas não garante a exatidão, completude ou atualidade das informações. Utilize os dados por sua conta e risco. Não nos responsabilizamos por decisões tomadas com base nos dados fornecidos.</p>
@@ -81,7 +98,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">7</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">8</span>
                                 Alterações nos Termos
                             </h2>
                             <p class="text-secondary ps-5 ms-2">Reservamo-nos o direito de modificar estes Termos de Serviço a qualquer momento. Alterações serão publicadas nesta página e entrarán em vigor automaticamente após publicação.</p>
@@ -89,7 +106,7 @@
 
                         <section class="mb-5">
                             <h2 class="h4 fw-bold mb-3 d-flex align-items-center">
-                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">8</span>
+                                <span class="bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-size: 0.9rem;">9</span>
                                 Contato
                             </h2>
                             <div class="ps-5 ms-2">
