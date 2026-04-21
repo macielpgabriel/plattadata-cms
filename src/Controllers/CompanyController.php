@@ -724,12 +724,12 @@ final class CompanyController
         $stmt->execute($params);
         $companies = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
-        $stmt = $db->query("SHOW TABLES LIKE 'municipalities'");
-        $hasMunicipalities = $stmt->fetch() !== false;
+        $stmt = $db->query("SHOW COLUMNS FROM municipalities LIKE 'latitude'");
+        $hasLatLng = $stmt->fetch() !== false;
         
         $cityCoords = [];
         
-        if ($hasMunicipalities) {
+        if ($hasLatLng) {
             $stmt = $db->query("SELECT ibge_code, latitude, longitude FROM municipalities WHERE latitude IS NOT NULL AND longitude IS NOT NULL");
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                 $cityCoords[$row['ibge_code']] = [
