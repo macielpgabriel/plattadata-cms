@@ -97,6 +97,7 @@ final class SetupService
         $this->ensureImpostometroArrecadacaoSchema($pdo);
         $this->ensureMentionAlertsSchema($pdo);
         $this->ensureReviewsSystemSchema($pdo);
+        $this->ensurePerformanceIndexes($pdo);
 
         // AGORA verifica o lock - apenas após criar todas as tabelas críticas
         if ($this->isSetupLocked()) {
@@ -866,6 +867,32 @@ final class SetupService
         } else {
             Logger::info('Setup: VALIDAÇÃO COMPLETA - Todas as tabelas críticas foram criadas com sucesso');
         }
+    }
+
+    private function ensurePerformanceIndexes(PDO $pdo): void
+    {
+        $lock = base_path('storage/.performance_indexes_completed');
+        if (is_file($lock)) {
+            return;
+        }
+
+        $indexes = [
+            'idx_companies_cnae_main' => 'CREATE INDEX IF NOT EXISTS idx_companies_cnae_main ON companies(cnae_main_code)',
+            'idx_companies_opened_at' => 'CREATE INDEX IF NOT EXISTS idx_companies_opened_at ON companies(opened_at)',
+            'idx_companies_status_opened' => 'CREATE INDEX IF NOT EXISTS idx_companies_status_opened ON companies(status, opened_at)',
+            'idx_companies_city_state' => 'CREATE INDEX IF NOT EXISTS idx_companies_city_state ON companies(city, state)',
+            'idx_companies_state_status' => 'CREATE INDEX IF NOT EXISTS idx_companies_state_status ON companies(state, status)',
+        ];
+
+        foreach ($indexes as $name => $sql) {
+            try {
+                $pdo->exec($sql);
+            } catch (PDOException $e) {
+                Logger::warning('Setup index ' . $name . ': ' . $e->getMessage());
+            }
+        }
+
+        @file_put_contents($lock, date('c'));
     }
 
     private function log(string $message): void
