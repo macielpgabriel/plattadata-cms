@@ -9,9 +9,9 @@
                         Documentação dos processos de tratamento de dados pessoais e medidas de mitigação de riscos.
                     </p>
                     <hr class="my-4">
-                    <div class="d-flex align-items-center text-muted small mb-4">
-                        <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(date('d/m/Y')) ?>
-                    </div>
+<div class="d-flex align-items-center text-muted small mb-4">
+                         <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(format_datetime(null)) ?>
+                     </div>
 
                     <section class="mb-5">
                         <h2 class="h4 fw-bold mb-3">1. Base Legal</h2>
@@ -165,12 +165,12 @@
                                     <th>Alterações</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><?= e(date('d/m/Y')) ?></td>
-                                    <td>1.0</td>
-                                    <td>Versão inicial do RIPD</td>
-                                </tr>
+<tbody>
+                                 <tr>
+                                     <td><?= e(format_datetime(null)) ?></td>
+                                     <td>1.0</td>
+                                     <td>Versão inicial do RIPD</td>
+                                 </tr>
                             </tbody>
                         </table>
                     </section>

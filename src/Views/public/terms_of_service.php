@@ -8,9 +8,9 @@
                         <h1 class="display-6 fw-bold mb-3">Termos de Serviço</h1>
                         <p class="text-muted lead mb-0">Condições de uso da plataforma Plattadata para consulta de dados empresariais.</p>
                         <hr class="my-4 opacity-25">
-                        <div class="d-flex align-items-center text-muted small">
-                            <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(format_date(date('Y-m-d'))) ?>
-                        </div>
+<div class="d-flex align-items-center text-muted small">
+                             <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(format_datetime(null)) ?>
+                         </div>
                     </div>
 
                     <div class="terms-content">

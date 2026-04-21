@@ -666,7 +666,7 @@ $mentionData = $mentionData ?? [];
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted" style="font-size: 0.75rem;"><?= e($news['source']) ?></small>
-                                    <small class="text-muted" style="font-size: 0.7rem;"><?= date('d/m/Y', strtotime($news['pubDate'])) ?></small>
+                                    <small class="text-muted" style="font-size: 0.7rem;"><?= format_date($news['pubDate']) ?></small>
                                 </div>
                             </a>
                         <?php endforeach; ?>

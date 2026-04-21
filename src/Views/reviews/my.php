@@ -26,9 +26,9 @@
                         <span class="badge bg-<?= $review['status'] === 'approved' ? 'success' : 'warning' ?>">
                             <?= $review['status'] === 'approved' ? 'Publicada' : 'Pendente' ?>
                         </span>
-                        <span class="text-muted small">
-                            <?= date('d/m/Y H:i', strtotime($review['created_at'])) ?>
-                        </span>
+<span class="text-muted small">
+                             <?= format_datetime($review['created_at']) ?>
+                         </span>
                     </div>
                     <div class="card-body">
                         <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/minha-avaliacao/editar">

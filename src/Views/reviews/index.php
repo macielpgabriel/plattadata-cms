@@ -39,9 +39,9 @@
                                             <i class="bi bi-star-fill <?= $i <= $review['rating'] ? 'text-warning' : 'text-muted' ?>"></i>
                                         <?php endfor; ?>
                                     </div>
-                                    <div class="text-muted small">
-                                        <?= e($review['user_name']) ?> &bull; <?= date('d/m/Y', strtotime($review['created_at'])) ?>
-                                    </div>
+<div class="text-muted small">
+                                         <?= e($review['user_name']) ?> &bull; <?= format_date($review['created_at']) ?>
+                                     </div>
                                 </div>
                                 <?php if (Auth::check()): ?>
                                 <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/reportar" class="d-inline">

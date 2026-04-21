@@ -262,7 +262,7 @@ $uniqueIps = isset($dash['unique_ips']) ? (int) $dash['unique_ips'] : 0;
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </td>
-                                <td><small><?= date('d/m/Y H:i', strtotime($log['created_at'])) ?></small></td>
+                                <td><small><?= format_datetime($log['created_at']) ?></small></td>
                                 <td><small class="text-muted"><?= e($log['ip_address'] ?? '-') ?></small></td>
                                 <td>
                                     <button class="btn btn-xs btn-outline-secondary py-0 px-1" style="font-size: 0.7rem;" data-bs-toggle="modal" data-bs-target="#modal-<?= $log['id'] ?>">
@@ -289,7 +289,7 @@ $uniqueIps = isset($dash['unique_ips']) ? (int) $dash['unique_ips'] : 0;
                                                 <div class="col-md-6">
                                                     <h6>IP</h6>
                                                     <p class="mb-0"><?= e($log['ip_address'] ?? '-') ?></p>
-                                                    <small class="text-muted"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></small>
+                                                    <small class="text-muted"><?= format_datetime($log['created_at'], true) ?></small>
                                                 </div>
                                             </div>
                                             <div class="row">

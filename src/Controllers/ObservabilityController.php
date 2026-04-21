@@ -16,6 +16,8 @@ use Throwable;
 
 final class ObservabilityController
 {
+    private const DATE_FORMAT = 'Y-m-d H:i:s';
+
     public function health(): void
     {
         $snapshot = (new ObservabilityService())->healthSnapshot();
@@ -372,14 +374,14 @@ final class ObservabilityController
                 'cepim' => is_array($details['cepim'] ?? null) ? $details['cepim'] : [],
             ],
             'message' => (string) ($result['message'] ?? ''),
-            'last_check' => (string) ($result['last_check'] ?? date('Y-m-d H:i:s')),
+        'last_check' => (string) ($result['last_check'] ?? date(self::DATE_FORMAT)),
         ];
     }
 
     public function clearLogs(): void
     {
         $logFile = base_path('storage/logs/app.log');
-        file_put_contents($logFile, date('Y-m-d H:i:s') . " - clearLogs called\n", FILE_APPEND);
+        file_put_contents($logFile, date(self::DATE_FORMAT) . " - clearLogs called\n", FILE_APPEND);
         
 
         $type = $_POST['type'] ?? 'all';
@@ -447,7 +449,7 @@ final class ObservabilityController
     public function testClearLogs(): void
     {
         header('Content-Type: text/plain; charset=utf-8');
-        echo "Test endpoint called at " . date('Y-m-d H:i:s') . "\n";
+        echo "Test endpoint called at " . date(self::DATE_FORMAT) . "\n";
         
         $logDir = base_path('storage/logs');
         echo "Log dir: $logDir\n";
@@ -742,8 +744,8 @@ final class ObservabilityController
             $status[$hook] = [
                 'interval_seconds' => $interval,
                 'interval_human' => self::formatInterval($interval),
-                'last_run' => $lastRun > 0 ? date('Y-m-d H:i:s', $lastRun) : 'nunca',
-                'next_run' => $due ? 'agora' : date('Y-m-d H:i:s', $lastRun + $interval),
+                'last_run' => $lastRun > 0 ? date(self::DATE_FORMAT, $lastRun) : 'nunca',
+                'next_run' => $due ? 'agora' : date(self::DATE_FORMAT, $lastRun + $interval),
                 'due' => $due,
             ];
         }

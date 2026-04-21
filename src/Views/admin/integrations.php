@@ -75,7 +75,7 @@
                                                 <span class="badge bg-secondary">Inativo</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= date('d/m/Y H:i', strtotime($secret['created_at'])) ?></td>
+                                        <td><?= format_datetime($secret['created_at']) ?></td>
                                         <td>
                                             <form method="post" action="/admin/integracoes/webhook/excluir" class="d-inline">
                                                 <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">

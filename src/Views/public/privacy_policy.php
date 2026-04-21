@@ -8,9 +8,9 @@
                         <h1 class="display-6 fw-bold mb-3">Política de Privacidade e Tratamento de Dados</h1>
                         <p class="text-muted lead mb-0">Entenda como tratamos seus dados com transparência, segurança e em conformidade com a LGPD (Lei nº 13.709/2018) e o Marco Civil da Internet (Lei nº 12.965/2014).</p>
                         <hr class="my-4 opacity-25">
-                        <div class="d-flex align-items-center text-muted small">
-                            <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(date('d/m/Y')) ?>
-                        </div>
+<div class="d-flex align-items-center text-muted small">
+     <i class="bi bi-clock-history me-2"></i> Última atualização: <?= e(format_datetime(null)) ?>
+</div>
                     </div>
 
                     <div class="privacy-content">
