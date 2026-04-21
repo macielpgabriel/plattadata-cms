@@ -704,20 +704,19 @@ final class CompanyController
 
     public function mapApi(): void
     {
-        $bounds = $_GET['bounds'] ?? '';
         $state = $_GET['state'] ?? '';
         
         $db = Database::connection();
         
-        $stmt = $db->prepare("SHOW TABLES LIKE 'company_enrichments'");
+        $stmt = $db->prepare("SHOW TABLES LIKE 'municipalities'");
         $stmt->execute();
-        $hasEnrichments = $stmt->fetch() !== false;
+        $hasMunicipalities = $stmt->fetch() !== false;
         
-        if ($hasEnrichments) {
-            $sql = "SELECT c.cnpj, c.legal_name, c.trade_name, c.city, c.state, e.latitude, e.longitude 
+        if ($hasMunicipalities) {
+            $sql = "SELECT c.cnpj, c.legal_name, c.trade_name, c.city, c.state, m.latitude, m.longitude 
                      FROM companies c 
-                     LEFT JOIN company_enrichments e ON c.id = e.company_id 
-                     WHERE c.is_hidden = 0 AND e.latitude IS NOT NULL AND e.longitude IS NOT NULL";
+                     LEFT JOIN municipalities m ON m.ibge_code = c.municipal_ibge_code 
+                     WHERE c.is_hidden = 0 AND m.latitude IS NOT NULL AND m.longitude IS NOT NULL";
         } else {
             $sql = "SELECT cnpj, legal_name, trade_name, city, state 
                      FROM companies WHERE is_hidden = 0";
@@ -725,7 +724,7 @@ final class CompanyController
         $params = [];
         
         if ($state) {
-            $sql .= " AND state = :state";
+            $sql .= " AND c.state = :state";
             $params['state'] = strtoupper($state);
         }
         
@@ -736,17 +735,34 @@ final class CompanyController
         $companies = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
         $markers = [];
+        $seenCoords = [];
+        
         foreach ($companies as $c) {
             if (!empty($c['latitude']) && !empty($c['longitude'])) {
-                $markers[] = [
-                    'id' => $c['cnpj'],
-                    'name' => $c['trade_name'] ?: $c['legal_name'],
-                    'lat' => (float) $c['latitude'],
-                    'lng' => (float) $c['longitude'],
-                    'city' => $c['city'] ?? '',
-                    'state' => $c['state'] ?? '',
-                ];
+                $coordKey = $c['latitude'] . ',' . $c['longitude'];
+                
+                if (!isset($seenCoords[$coordKey])) {
+                    $seenCoords[$coordKey] = [
+                        'lat' => (float) $c['latitude'],
+                        'lng' => (float) $c['longitude'],
+                        'city' => $c['city'] ?? '',
+                        'state' => $c['state'] ?? '',
+                        'count' => 0
+                    ];
+                }
+                $seenCoords[$coordKey]['count']++;
             }
+        }
+        
+        foreach ($seenCoords as $coord) {
+            $markers[] = [
+                'name' => $coord['city'] . ' (' . $coord['state'] . ')',
+                'lat' => $coord['lat'],
+                'lng' => $coord['lng'],
+                'city' => $coord['city'],
+                'state' => $coord['state'],
+                'count' => $coord['count']
+            ];
         }
         
         header('Content-Type: application/json');
