@@ -733,8 +733,26 @@ final class CompanyController
         $stmt->execute($params);
         $companies = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
+        $markers = [];
+        foreach ($companies as $c) {
+            if (!empty($c['latitude']) && !empty($c['longitude'])) {
+                $markers[] = [
+                    'id' => $c['cnpj'],
+                    'name' => $c['trade_name'] ?: $c['legal_name'],
+                    'lat' => (float) $c['latitude'],
+                    'lng' => (float) $c['longitude'],
+                    'city' => $c['city'] ?? '',
+                    'state' => $c['state'] ?? '',
+                ];
+            }
+        }
+        
         header('Content-Type: application/json');
-        echo json_encode(['companies' => $companies]);
+        echo json_encode([
+            'success' => true,
+            'markers' => $markers,
+            'count' => count($markers)
+        ]);
     }
 
     public function subscribeMonitor(array $params): void
