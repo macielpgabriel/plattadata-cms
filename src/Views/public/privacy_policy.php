@@ -165,6 +165,9 @@
                                 <li>HTTPS com HSTS</li>
                                 <li>Headers de segurança (CSP, X-Frame-Options, etc.)</li>
                             </ul>
+                            <p class="text-secondary ps-5 ms-2 mt-3">
+                                <strong>Infraestrutura e CDNs:</strong> Utilizamos redes de entrega de conteúdo (CDN) como jsDelivr para carregar bibliotecas públicas de forma mais rápida. Esses serviços podem estar hospedados em servidores internacionais, mas não processam ou armazenam dados pessoais dos usuários.
+                            </p>
                         </section>
 
                         <section class="mb-5">
