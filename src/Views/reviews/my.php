@@ -61,17 +61,39 @@
 
                         <hr class="my-4">
 
-                        <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/minha-avaliacao/excluir" 
-                            onsubmit="return confirm('Tem certeza que deseja excluir sua avaliação?');">
-                            <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-                            <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
-                            <button type="submit" class="btn btn-outline-danger">
-                                <i class="bi bi-trash"></i> Excluir Avaliação
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i> Excluir Avaliação
+                        </button>
                     </div>
                 </div>
             <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title text-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/minha-avaliacao/excluir">
+                <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
+                <input type="hidden" name="review_id" value="<?= $review['id'] ?? '' ?>">
+                <div class="modal-body pt-2 text-center">
+                    <p class="mb-2">Deseja realmente excluir sua avaliação?</p>
+                    <p class="text-muted small mb-0">Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Excluir
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
