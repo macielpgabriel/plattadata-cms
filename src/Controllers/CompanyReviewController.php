@@ -103,7 +103,7 @@ final class CompanyReviewController
             redirect('/login?redirect=/empresas/' . $cnpj . '/avaliar');
         }
 
-        if (!Csrf::validate($_POST['csrf_token'] ?? '')) {
+        if (!Csrf::validate($_POST['_token'] ?? '')) {
             Session::flash('error', 'Token expirado. Recarregue a página.');
             redirect("/empresas/$cnpj/avaliar");
         }

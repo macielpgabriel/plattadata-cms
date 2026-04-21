@@ -307,7 +307,7 @@ final class CompanyDashboardController
             return;
         }
 
-        if (!Csrf::validate($_POST['csrf_token'] ?? '')) {
+        if (!Csrf::validate($_POST['_token'] ?? '')) {
             Session::flash('error', 'Token expirado. Recarregue a página.');
             redirect("/empresas/$cnpj/dashboard");
         }
