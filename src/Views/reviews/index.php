@@ -7,7 +7,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Início</a></li>
-            <li class="breadcrumb-item"><a href="/empresa/<?= e($company['cnpj']) ?>"><?= e($company['legal_name']) ?></a></li>
+            <li class="breadcrumb-item"><a href="/empresas/<?= e($company['cnpj']) ?>"><?= e($company['legal_name']) ?></a></li>
             <li class="breadcrumb-item active" aria-current="page">Avaliações</li>
         </ol>
     </nav>
@@ -18,7 +18,7 @@
                 <h2 class="mb-0">
                     <i class="bi bi-star"></i> Avaliações
                 </h2>
-                <a href="/empresa/<?= e($company['cnpj']) ?>/avaliar" class="btn btn-primary">
+                <a href="/empresas/<?= e($company['cnpj']) ?>/avaliar" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Avaliar
                 </a>
             </div>
@@ -43,7 +43,7 @@
                                         <?= e($review['user_name']) ?> • <?= date('d/m/Y', strtotime($review['created_at'])) ?>
                                     </div>
                                 </div>
-                                <form method="post" action="/empresa/<?= e($company['cnpj']) ?>/reportar" class="d-inline">
+                                <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/reportar" class="d-inline">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="review_id" value="<?= $review['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-link text-muted" title="Reportar">

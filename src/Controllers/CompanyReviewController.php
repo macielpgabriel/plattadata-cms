@@ -93,12 +93,12 @@ final class CompanyReviewController
         $user = Auth::user();
         if (!$user) {
             Session::flash('error', 'Faça login para avaliar.');
-            redirect('/login?redirect=/empresa/' . $cnpj . '/avaliar');
+            redirect('/login?redirect=/empresas/' . $cnpj . '/avaliar');
         }
 
         if (!Csrf::validate($_POST['csrf_token'] ?? '')) {
             Session::flash('error', 'Token expirado. Recarregue a página.');
-            redirect("/empresa/$cnpj/avaliar");
+            redirect("/empresas/$cnpj/avaliar");
         }
 
         $rating = (int) ($_POST['rating'] ?? 0);
@@ -106,12 +106,12 @@ final class CompanyReviewController
 
         if ($rating < 1 || $rating > 5) {
             Session::flash('error', 'Selecione uma nota de 1 a 5.');
-            redirect("/empresa/$cnpj/avaliar");
+            redirect("/empresas/$cnpj/avaliar");
         }
 
         if (strlen($comment) > 1000) {
             Session::flash('error', 'Comentário muito longo (máx 1000 caracteres).');
-            redirect("/empresa/$cnpj/avaliar");
+            redirect("/empresas/$cnpj/avaliar");
         }
 
         $db = Database::connection();
@@ -126,7 +126,7 @@ final class CompanyReviewController
 
         if ($checkStmt->fetch()) {
             Session::flash('error', 'Você já avaliou esta empresa recentemente.');
-            redirect("/empresa/$cnpj/avaliar");
+            redirect("/empresas/$cnpj/avaliar");
         }
 
         $stmt = $db->prepare('INSERT INTO company_reviews 
@@ -142,7 +142,7 @@ final class CompanyReviewController
         ]);
 
         Session::flash('success', 'Obrigado! Sua avaliação foi registrada.');
-        redirect("/empresa/$cnpj/avaliacoes");
+        redirect("/empresas/$cnpj/avaliacoes");
     }
 
     public function reply(array $params): void
@@ -171,19 +171,19 @@ final class CompanyReviewController
 
         if (!$ownership) {
             Session::flash('error', 'Você precisa validar a empresa primeiro.');
-            redirect("/empresa/$cnpj/dashboard");
+            redirect("/empresas/$cnpj/dashboard");
         }
 
         $reviewId = (int) ($_POST['review_id'] ?? 0);
         $reply = trim($_POST['reply'] ?? '');
 
         if (!$reviewId || !$reply) {
-            redirect("/empresa/$cnpj/dashboard");
+            redirect("/empresas/$cnpj/dashboard");
         }
 
         if (strlen($reply) > 500) {
             Session::flash('error', 'Resposta muito longa.');
-            redirect("/empresa/$cnpj/dashboard");
+            redirect("/empresas/$cnpj/dashboard");
         }
 
         $update = $db->prepare('UPDATE company_reviews SET reply = :reply, reply_at = NOW() 
@@ -195,7 +195,7 @@ final class CompanyReviewController
         ]);
 
         Session::flash('success', 'Resposta publicada!');
-        redirect("/empresa/$cnpj/dashboard");
+        redirect("/empresas/$cnpj/dashboard");
     }
 
     public function report(array $params): void
@@ -217,7 +217,7 @@ final class CompanyReviewController
 
         $reviewId = (int) ($_POST['review_id'] ?? 0);
         if (!$reviewId) {
-            redirect("/empresa/$cnpj/avaliacoes");
+            redirect("/empresas/$cnpj/avaliacoes");
         }
 
         $db = Database::connection();
@@ -226,6 +226,6 @@ final class CompanyReviewController
         $update->execute(['id' => $reviewId]);
 
         Session::flash('success', 'Obrigado! Revisão reportada para moderação.');
-        redirect("/empresa/$cnpj/avaliacoes");
+        redirect("/empresas/$cnpj/avaliacoes");
     }
 }

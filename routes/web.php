@@ -203,16 +203,16 @@ $router->get('/empresas/remover/documento', [CompanyRemovalController::class, 's
 $router->post('/empresas/remover/documento', [CompanyRemovalController::class, 'uploadDocument']);
 
 // Dashboard Empresarial (validação de empresa)
-$router->get('/empresa/validar', [CompanyDashboardController::class, 'showRequestForm']);
-$router->get('/empresa/validar/{cnpj}', [CompanyDashboardController::class, 'showRequestForm']);
-$router->post('/empresa/validar/{cnpj}', [CompanyDashboardController::class, 'submitRequest']);
-$router->get('/empresa/validar/verificar', [CompanyDashboardController::class, 'showVerifyForm']);
-$router->post('/empresa/validar/verificar', [CompanyDashboardController::class, 'verifyCode']);
-$router->get('/empresa/validar/documento', [CompanyDashboardController::class, 'showDocumentForm']);
-$router->post('/empresa/validar/documento', [CompanyDashboardController::class, 'submitDocument']);
-$router->get('/empresa/validar/sucesso', [CompanyDashboardController::class, 'showSuccess']);
-$router->get('/empresa/{cnpj}/dashboard', [CompanyDashboardController::class, 'showDashboard']);
-$router->post('/empresa/{cnpj}/dashboard', [CompanyDashboardController::class, 'updateProfile']);
+$router->get('/empresas/validar', [CompanyDashboardController::class, 'showRequestForm']);
+$router->get('/empresas/validar/{cnpj}', [CompanyDashboardController::class, 'showRequestForm']);
+$router->post('/empresas/validar/{cnpj}', [CompanyDashboardController::class, 'submitRequest']);
+$router->get('/empresas/validar/verificar', [CompanyDashboardController::class, 'showVerifyForm']);
+$router->post('/empresas/validar/verificar', [CompanyDashboardController::class, 'verifyCode']);
+$router->get('/empresas/validar/documento', [CompanyDashboardController::class, 'showDocumentForm']);
+$router->post('/empresas/validar/documento', [CompanyDashboardController::class, 'submitDocument']);
+$router->get('/empresas/validar/sucesso', [CompanyDashboardController::class, 'showSuccess']);
+$router->get('/empresas/{cnpj}/dashboard', [CompanyDashboardController::class, 'showDashboard']);
+$router->post('/empresas/{cnpj}/dashboard', [CompanyDashboardController::class, 'updateProfile']);
 
 // Administração de Auditoria
 $router->get('/admin/auditoria', [AuditController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
@@ -242,11 +242,11 @@ $router->delete('/empresas/{cnpj}/monitorar', [CompanyController::class, 'unsubs
 $router->get('/empresas/{cnpj}', [CompanyController::class, 'show']);
 
 // Reviews de Empresas
-$router->get('/empresa/{cnpj}/avaliacoes', [CompanyReviewController::class, 'list']);
-$router->get('/empresa/{cnpj}/avaliar', [CompanyReviewController::class, 'showForm']);
-$router->post('/empresa/{cnpj}/avaliar', [CompanyReviewController::class, 'submit']);
-$router->post('/empresa/{cnpj}/reportar', [CompanyReviewController::class, 'report']);
-$router->post('/empresa/{cnpj}/responder', [CompanyReviewController::class, 'reply']);
+$router->get('/empresas/{cnpj}/avaliacoes', [CompanyReviewController::class, 'list']);
+$router->get('/empresas/{cnpj}/avaliar', [CompanyReviewController::class, 'showForm']);
+$router->post('/empresas/{cnpj}/avaliar', [CompanyReviewController::class, 'submit']);
+$router->post('/empresas/{cnpj}/reportar', [CompanyReviewController::class, 'report']);
+$router->post('/empresas/{cnpj}/responder', [CompanyReviewController::class, 'reply']);
 
 // Debug Routes (Admin only) - only in development
 if (env('APP_ENV', 'production') !== 'production') {

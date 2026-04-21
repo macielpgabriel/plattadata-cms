@@ -9,7 +9,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Início</a></li>
-                    <li class="breadcrumb-item"><a href="/empresa/<?= e($company['cnpj']) ?>"><?= e($company['legal_name']) ?></a></li>
+                    <li class="breadcrumb-item"><a href="/empresas/<?= e($company['cnpj']) ?>"><?= e($company['legal_name']) ?></a></li>
                     <li class="breadcrumb-item active" aria-current="page">Avaliar</li>
                 </ol>
             </nav>
@@ -19,7 +19,7 @@
                     <h4 class="mb-0"><i class="bi bi-star"></i> Avaliar <?= e($company['legal_name']) ?></h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/empresa/<?= e($company['cnpj']) ?>/avaliar">
+                    <form method="post" action="/empresas/<?= e($company['cnpj']) ?>/avaliar">
                         <?= csrf_field() ?>
                         
                         <div class="mb-4">

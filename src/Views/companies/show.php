@@ -237,7 +237,7 @@ $mentionData = $mentionData ?? [];
         <a href="/empresas/<?= e($cnpj) ?>/remover" class="btn btn-sm btn-outline-danger">
             <i class="bi bi-shield-lock me-1"></i>Solicitar Remoção
         </a>
-        <a href="/empresa/<?= e($cnpj) ?>/avaliacoes" class="btn btn-sm btn-outline-primary">
+        <a href="/empresas/<?= e($cnpj) ?>/avaliacoes" class="btn btn-sm btn-outline-primary">
             <i class="bi bi-star me-1"></i>Avaliações
         </a>
     </div>

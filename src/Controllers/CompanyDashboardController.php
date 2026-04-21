@@ -33,7 +33,7 @@ final class CompanyDashboardController
 
         if (strlen($cnpj) !== 14) {
             Session::flash('error', 'CNPJ inválido.');
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         $company = $this->repository->findByCnpj($cnpj);
@@ -71,12 +71,12 @@ final class CompanyDashboardController
 
         if (!$this->validator->name($requesterName)) {
             Session::flash('error', 'Nome inválido. Use apenas letras e espaços.');
-            redirect("/empresa/validar/$cnpj");
+            redirect("/empresas/validar/$cnpj");
         }
 
         if (!$this->validator->email($requesterEmail)) {
             Session::flash('error', 'E-mail inválido.');
-            redirect("/empresa/validar/$cnpj");
+            redirect("/empresas/validar/$cnpj");
         }
 
         $verificationType = 'document';
@@ -115,9 +115,9 @@ final class CompanyDashboardController
             $targetEmail = $company['email'] ?? $requesterEmail;
             $mailService->send($targetEmail, $subject, $body);
             
-            redirect("/empresa/validar/verificar?id=$requestId");
+            redirect("/empresas/validar/verificar?id=$requestId");
         } else {
-            redirect("/empresa/validar/documento?id=$requestId");
+            redirect("/empresas/validar/documento?id=$requestId");
         }
     }
 
@@ -125,7 +125,7 @@ final class CompanyDashboardController
     {
         $id = $_GET['id'] ?? null;
         if (!$id) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         view('dashboard_company/verify', [
@@ -141,13 +141,13 @@ final class CompanyDashboardController
 
         if (!$id || !$code) {
             Session::flash('error', 'Código inválido.');
-            redirect("/empresa/validar/verificar?id=$id");
+            redirect("/empresas/validar/verificar?id=$id");
         }
 
         $lockoutKey = "edit_verify_$id";
         if (Cache::get($lockoutKey)) {
             Session::flash('error', 'Muitas tentativas. Aguarde 5 minutos.');
-            redirect("/empresa/validar/verificar?id=$id");
+            redirect("/empresas/validar/verificar?id=$id");
         }
 
         $db = Database::connection();
@@ -159,7 +159,7 @@ final class CompanyDashboardController
             $attempts = (int) (Cache::get($lockoutKey) ?? 0) + 1;
             Cache::set($lockoutKey, $attempts, 300);
             Session::flash('error', 'Código inválido.');
-            redirect("/empresa/validar/verificar?id=$id");
+            redirect("/empresas/validar/verificar?id=$id");
         }
 
         $update = $db->prepare('UPDATE company_edit_requests SET status = "verified", verified_at = NOW() WHERE id = :id');
@@ -169,14 +169,14 @@ final class CompanyDashboardController
         $token = bin2hex(random_bytes(32));
         Cache::set("edit_token_$id", $token, 3600);
         
-        redirect("/empresa/validar/sucesso?id=$id&token=$token");
+        redirect("/empresas/validar/sucesso?id=$id&token=$token");
     }
 
     public function showDocumentForm(): void
     {
         $id = $_GET['id'] ?? null;
         if (!$id) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         view('dashboard_company/document', [
@@ -189,12 +189,12 @@ final class CompanyDashboardController
     {
         $id = $_POST['id'] ?? null;
         if (!$id) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
             Session::flash('error', 'Erro ao enviar documento.');
-            redirect("/empresa/validar/documento?id=$id");
+            redirect("/empresas/validar/documento?id=$id");
         }
 
         $file = $_FILES['document'];
@@ -202,7 +202,7 @@ final class CompanyDashboardController
         
         if (!in_array($file['type'], $allowed)) {
             Session::flash('error', 'Apenas PDF, JPG ou PNG.');
-            redirect("/empresa/validar/documento?id=$id");
+            redirect("/empresas/validar/documento?id=$id");
         }
 
         $cnpj = $_POST['cnpj'] ?? '';
@@ -217,7 +217,7 @@ final class CompanyDashboardController
         $targetPath = $uploadDir . $filename;
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
             Session::flash('error', 'Erro ao salvar arquivo.');
-            redirect("/empresa/validar/documento?id=$id");
+            redirect("/empresas/validar/documento?id=$id");
         }
 
         $db = Database::connection();
@@ -225,7 +225,7 @@ final class CompanyDashboardController
         $update->execute(['path' => "storage/edit_documents/$filename", 'id' => $id]);
 
         Session::flash('success', 'Documento enviado! Aguarde aprovação.');
-        redirect("/empresa/validar/documento?id=$id");
+        redirect("/empresas/validar/documento?id=$id");
     }
 
     public function showSuccess(array $params): void
@@ -234,13 +234,13 @@ final class CompanyDashboardController
         $token = $_GET['token'] ?? null;
 
         if (!$id || !$token) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         $storedToken = Cache::get("edit_token_$id");
         if ($storedToken !== $token) {
             Session::flash('error', 'Token expirado.');
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         $db = Database::connection();
@@ -249,7 +249,7 @@ final class CompanyDashboardController
         $request = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$request) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         $update = $db->prepare('UPDATE company_edit_requests SET status = "approved" WHERE id = :id');
@@ -271,7 +271,7 @@ final class CompanyDashboardController
         $cnpjDigits = preg_replace('/[^0-9A-Z]/', '', $cnpj);
 
         if (strlen($cnpjDigits) !== 14) {
-            redirect('/empresa/validar');
+            redirect('/empresas/validar');
         }
 
         $company = $this->repository->findByCnpj($cnpjDigits);
@@ -287,7 +287,7 @@ final class CompanyDashboardController
         $request = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$request) {
-            redirect("/empresa/validar/$cnpjDigits");
+            redirect("/empresas/validar/$cnpjDigits");
         }
 
         view('dashboard_company/index', [
@@ -309,7 +309,7 @@ final class CompanyDashboardController
 
         if (!Csrf::validate($_POST['csrf_token'] ?? '')) {
             Session::flash('error', 'Token expirado. Recarregue a página.');
-            redirect("/empresa/$cnpj/dashboard");
+            redirect("/empresas/$cnpj/dashboard");
         }
 
         $db = Database::connection();
@@ -339,6 +339,6 @@ final class CompanyDashboardController
         ]);
 
         Session::flash('success', 'Dados atualizados!');
-        redirect("/empresa/$cnpj/dashboard");
+        redirect("/empresas/$cnpj/dashboard");
     }
 }
