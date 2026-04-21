@@ -169,14 +169,57 @@ final class SecurityService
         return true;
     }
     
-    public static function applyRequestProtections(): void
+    public static function getClientIp(): string
     {
-        self::applyLfiProtection();
-        self::applyXssProtection();
+        $headers = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'];
+        foreach ($headers as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ip = $_SERVER[$header];
+                if (strpos($ip, ',') !== false) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+        return '0.0.0.0';
     }
     
-    private static function applyLfiProtection(): void
+    public static function applyRequestProtections(): void
     {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        
+        $suspicious = [
+            'sqlmap', 'nikto', 'nmap', 'metasploit',
+            'burp', 'zap', 'w3af', 'havij',
+            'acunetix', 'netsparker', 'appscan',
+        ];
+        
+        foreach ($suspicious as $tool) {
+            if (stripos($userAgent, $tool) !== false) {
+                Logger::warning('Suspicious user agent blocked', [
+                    'user_agent' => $userAgent,
+                    'tool' => $tool,
+                ]);
+                self::blockIp(self::getClientIp(), 'suspicious_user_agent');
+                http_response_code(403);
+                exit('Forbidden');
+            }
+        }
+        
+        if (isset($_SERVER['HTTP_X_SCANNER'])) {
+            Logger::warning('Scanner request blocked');
+            http_response_code(403);
+            exit('Forbidden');
+        }
+        
+        if (preg_match('/(\.\.|__|\$\{|eval\(|base64_decode)/i', $_SERVER['REQUEST_URI'] ?? '')) {
+            Logger::warning('Suspicious URI pattern detected');
+            http_response_code(400);
+            exit('Bad request');
+        }
+        
         foreach ($_GET as $key => $value) {
             if (is_string($value) && self::checkLfi($value)) {
                 Logger::warning('LFI attempt blocked', [
@@ -187,10 +230,7 @@ final class SecurityService
                 exit('Bad request');
             }
         }
-    }
-    
-    private static function applyXssProtection(): void
-    {
+        
         $xssPatterns = [
             '/<script\b/i',
             '/javascript:/i',

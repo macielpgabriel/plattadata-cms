@@ -51,6 +51,33 @@ final class ApiKeyService
         return $stmt->execute([$id]);
     }
 
+    public function rotateExpiredKeys(): int
+    {
+        $db = Database::connection();
+        
+        $stmt = $db->query("SELECT id, name, api_key, webhook_secret FROM api_keys WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+        $expired = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        
+        $rotated = 0;
+        foreach ($expired as $key) {
+            if ($key['api_key']) {
+                $newKey = bin2hex(random_bytes(32));
+                $update = $db->prepare("UPDATE api_keys SET api_key = ?, created_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL 1 YEAR) WHERE id = ?");
+                $update->execute([$newKey, $key['id']]);
+                $rotated++;
+            }
+            if ($key['webhook_secret']) {
+                $newSecret = bin2hex(random_bytes(32));
+                $update = $db->prepare("UPDATE api_keys SET webhook_secret = ?, created_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL 1 YEAR) WHERE id = ?");
+                $update->execute([$newSecret, $key['id']]);
+            }
+            
+            \App\Core\Logger::warning('API key rotated automatically', ['key_id' => $key['id'], 'name' => $key['name']]);
+        }
+        
+        return $rotated;
+    }
+
     public function removeWebhookSecret(int $id): bool
     {
         return $this->removeApiKey($id);

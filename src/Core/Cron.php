@@ -17,6 +17,8 @@ final class Cron
         'cleanup_expired_locks' => 1800,
         'cleanup_ip_blocklist' => 3600,
         'rotate_session_keys' => 86400,
+        'rotate_api_keys' => 86400,
+        'security_scan' => 3600,
     ];
 
     public static function run(string $hook): array
@@ -25,13 +27,14 @@ final class Cron
         $result = ['hook' => $hook, 'success' => true, 'output' => []];
         
         try {
-            $result['output'] = match ($hook) {
+$result['output'] = match ($hook) {
                 'cleanup_expired_sessions' => self::cleanupExpiredSessions(),
                 'cleanup_expired_tokens' => self::cleanupExpiredTokens(),
                 'cleanup_expired_locks' => self::cleanupExpiredLocks(),
                 'cleanup_ip_blocklist' => self::cleanupIpBlocklist(),
                 'rotate_session_keys' => self::rotateSessionKeys(),
-                default => ["Unknown hook: $hook"],
+                'rotate_api_keys' => self::rotateApiKeys(),
+                'security_scan' => self::runSecurityScan(),
             };
         } catch (Throwable $e) {
             $result['success'] = false;
@@ -166,6 +169,49 @@ final class Cron
         }
         
         return ["Rotated $rotated keys"];
+    }
+
+    private static function rotateApiKeys(): array
+    {
+        try {
+            $service = new \App\Controllers\Integration\ApiKeyService();
+            $rotated = $service->rotateExpiredKeys();
+            return ["Rotated {$rotated} API keys"];
+        } catch (Throwable $e) {
+            Logger::error('Cron rotate_api_keys: ' . $e->getMessage());
+            return ['Error rotating API keys'];
+        }
+    }
+
+    private static function runSecurityScan(): array
+    {
+        $issues = [];
+        
+        try {
+            $db = Database::connection();
+            
+            $stmt = $db->query("SELECT COUNT(*) as cnt FROM users WHERE is_active = 1 AND failed_login_attempts >= 5");
+            $lockedUsers = $stmt->fetch();
+            if ($lockedUsers && $lockedUsers['cnt'] > 0) {
+                $issues[] = "{$lockedUsers['cnt']} usuarios com muitas tentativas falhas";
+            }
+            
+            $stmt = $db->query("SELECT COUNT(*) as cnt FROM blocked_ips WHERE expires_at IS NULL OR expires_at > NOW()");
+            $blockedIps = $stmt->fetch();
+            if ($blockedIps && $blockedIps['cnt'] > 100) {
+                $issues[] = "{$blockedIps['cnt']} IPs bloqueados (possivel ataque)";
+            }
+            
+            if (empty($issues)) {
+                Logger::info('Security scan: no issues found');
+            } else {
+                Logger::warning('Security scan: ' . implode(', ', $issues));
+            }
+        } catch (Throwable $e) {
+            Logger::error('Security scan: ' . $e->getMessage());
+        }
+        
+        return $issues ?: ['Scan limpo'];
     }
 
     public static function schedules(): array
