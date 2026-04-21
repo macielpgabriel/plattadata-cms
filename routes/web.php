@@ -63,28 +63,22 @@ $router->get('/politica-de-privacidade', [PublicController::class, 'privacyPolic
 $router->get('/termos-de-servico', [PublicController::class, 'termsOfService']);
 $router->get('/ripd', [PublicController::class, 'ripd']);
 $router->get('/indicadores-economicos', [EconomicController::class, 'index']);
-$router->post('/api/economic/sync-rates', [EconomicController::class, 'syncRates']);
-$router->post('/api/impostometro/sync', [ImpostometroController::class, 'sync']);
-$router->get('/impostometro', [ImpostometroController::class, 'index']);
-$router->get('/api/impostometro', [ImpostometroController::class, 'api']);
-$router->get('/ranking', [ComparisonController::class, 'rankings']);
-
-$router->get('/comparacoes', [ComparisonController::class, 'index']);
-$router->get('/comparacoes/{slug}', [ComparisonController::class, 'show']);
-$router->get('/comparar', [ComparisonController::class, 'compare']);
-$router->get('/api/search', [ComparisonController::class, 'apiSearch']);
+$router->post('/api/economic/sync-rates', [EconomicController::class, 'syncRates'], [AuthMiddleware::class]);
+$router->post('/api/impostometro/sync', [ImpostometroController::class, 'sync'], [AuthMiddleware::class]);
+$router->get('/api/impostometro', [ImpostometroController::class, 'api'], [AuthMiddleware::class]);
+$router->get('/api/search', [ComparisonController::class, 'apiSearch'], [AuthMiddleware::class]);
 $router->get('/api/compare-detailed', [ComparisonController::class, 'apiCompareDetailed'], [AuthMiddleware::class]);
 $router->post('/comparar/adicionar', [ComparisonController::class, 'apiAddToComparison'], [AuthMiddleware::class]);
 $router->get('/ferramentas/{slug}', [ComparisonController::class, 'tool']);
 
 // Rotas de Integrações (API para Zapier/Make/N8N)
-$router->get('/api/v1', [IntegrationsController::class, 'apiInfo']);
-$router->get('/api/v1/company/{cnpj}', [IntegrationsController::class, 'getCompany']);
-$router->get('/api/v1/search', [IntegrationsController::class, 'search']);
-$router->get('/api/v1/rankings/states', [IntegrationsController::class, 'rankingsStates']);
-$router->get('/api/v1/rankings/cities', [IntegrationsController::class, 'rankingsCities']);
-$router->get('/api/v1/rankings/cnae', [IntegrationsController::class, 'rankingsCnae']);
-$router->post('/api/v1/webhook/favorite', [IntegrationsController::class, 'webhookFavorite']);
+$router->get('/api/v1', [IntegrationsController::class, 'apiInfo'], [AuthMiddleware::class]);
+$router->get('/api/v1/company/{cnpj}', [IntegrationsController::class, 'getCompany'], [AuthMiddleware::class]);
+$router->get('/api/v1/search', [IntegrationsController::class, 'search'], [AuthMiddleware::class]);
+$router->get('/api/v1/rankings/states', [IntegrationsController::class, 'rankingsStates'], [AuthMiddleware::class]);
+$router->get('/api/v1/rankings/cities', [IntegrationsController::class, 'rankingsCities'], [AuthMiddleware::class]);
+$router->get('/api/v1/rankings/cnae', [IntegrationsController::class, 'rankingsCnae'], [AuthMiddleware::class]);
+$router->post('/api/v1/webhook/favorite', [IntegrationsController::class, 'webhookFavorite'], [AuthMiddleware::class]);
 
 // Admin - Gerenciamento de Integrações
 $router->get('/admin/integracoes', [IntegrationsController::class, 'integrationsPage'], [AuthMiddleware::class, AdminMiddleware::class]);

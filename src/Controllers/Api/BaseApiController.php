@@ -14,24 +14,16 @@ abstract class BaseApiController
     protected array $response = [];
     protected int $statusCode = 200;
 
-    protected function json(array $data, ?int $statusCode = null): never
+protected function json(array $data, ?int $statusCode = null): never
     {
         if ($statusCode !== null) {
             $this->statusCode = $statusCode;
         }
-
+    
         http_response_code($this->statusCode);
         header('Content-Type: application/json; charset=UTF-8');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key');
         header('X-Content-Type-Options: nosniff');
-
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-            http_response_code(204);
-            exit;
-        }
-
+    
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         exit;
     }
