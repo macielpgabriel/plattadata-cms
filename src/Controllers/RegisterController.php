@@ -50,6 +50,12 @@ final class RegisterController
         $email = strtolower(trim((string) ($_POST['email'] ?? '')));
         $password = (string) ($_POST['password'] ?? '');
         $confirm = (string) ($_POST['password_confirmation'] ?? '');
+        $consent = isset($_POST['lgpd_consent']);
+
+        if (!$consent) {
+            Session::flash('error', 'Voce deve aceitar a Politica de Privacidade e os Termos de Servico para se cadastrar.');
+            redirect('/cadastro');
+        }
 
         if ($name === '' || $email === '' || $password === '') {
             Session::flash('error', 'Todos os campos sao obrigatorios.');

@@ -128,6 +128,9 @@ $router->get('/auth/google/logout', [GoogleAuthController::class, 'logout']);
 $router->get('/dashboard', [DashboardController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/dashboard', [DashboardController::class, 'updateProfile'], [AuthMiddleware::class]);
 
+// LGPD - Direitos do titular (Art. 18)
+$router->get('/meus-dados/exportar', [UserController::class, 'exportData'], [AuthMiddleware::class]);
+
 $router->get('/favoritos', [FavoriteController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/favoritos/{cnpj}/toggle', [FavoriteController::class, 'toggle'], [AuthMiddleware::class]);
 $router->post('/favoritos/{cnpj}/mover', [FavoriteController::class, 'moveToGroup'], [AuthMiddleware::class]);

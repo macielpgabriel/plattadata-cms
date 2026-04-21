@@ -52,6 +52,14 @@
                             </div>
                         </div>
 
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="lgpd_consent" name="lgpd_consent" required>
+                            <label class="form-check-label small" for="lgpd_consent">
+                                Li e concordo com a <a href="/politica-de-privacidade" target="_blank">Política de Privacidade</a> e o <a href="/termos-de-servico" target="_blank">Termos de Serviço</a>. 
+                                Estou ciente de que meus dados serão tratados conforme a LGPD (Lei nº 13.709/2018).
+                            </label>
+                        </div>
+
                         <button type="submit" class="btn btn-brand w-100 mb-3">
                             Cadastrar
                         </button>

@@ -202,4 +202,31 @@ HTML
         
         return $password;
     }
+
+    public function exportData(): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            http_response_code(401);
+            echo 'Unauthorized';
+            return;
+        }
+
+        header('Content-Type: application/json');
+        header('Content-Disposition: attachment; filename="meus_dados_' . $user['id'] . '.json"');
+        
+        echo json_encode([
+            'usuario' => [
+                'id' => $user['id'],
+                'nome' => $user['name'],
+                'email' => $user['email'],
+                'role' => $user['role'],
+                'criado_em' => $user['created_at'],
+                'ultimo_login' => $user['last_login_at'] ?? null,
+            ],
+            'exportado_em' => date('Y-m-d H:i:s'),
+            'formato' => 'JSON',
+            'versao' => '1.0',
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
 }
