@@ -15,6 +15,7 @@ use App\Controllers\SeoController;
 use App\Controllers\UserController;
 use App\Controllers\CompanyRemovalController;
 use App\Controllers\CompanyDashboardController;
+use App\Controllers\CompanyReviewController;
 use App\Controllers\LocationController;
 use App\Controllers\ActivityController;
 use App\Controllers\PartnerController;
@@ -239,6 +240,13 @@ $router->get('/empresas/{cnpj}/monitorar', [CompanyController::class, 'subscribe
 $router->post('/empresas/{cnpj}/monitorar', [CompanyController::class, 'subscribeMonitor'], [AuthMiddleware::class]);
 $router->delete('/empresas/{cnpj}/monitorar', [CompanyController::class, 'unsubscribeMonitor'], [AuthMiddleware::class]);
 $router->get('/empresas/{cnpj}', [CompanyController::class, 'show']);
+
+// Reviews de Empresas
+$router->get('/empresa/{cnpj}/avaliacoes', [CompanyReviewController::class, 'list']);
+$router->get('/empresa/{cnpj}/avaliar', [CompanyReviewController::class, 'showForm']);
+$router->post('/empresa/{cnpj}/avaliar', [CompanyReviewController::class, 'submit']);
+$router->post('/empresa/{cnpj}/reportar', [CompanyReviewController::class, 'report']);
+$router->post('/empresa/{cnpj}/responder', [CompanyReviewController::class, 'reply']);
 
 // Debug Routes (Admin only) - only in development
 if (env('APP_ENV', 'production') !== 'production') {

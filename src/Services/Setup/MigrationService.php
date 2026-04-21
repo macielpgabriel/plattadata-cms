@@ -17,6 +17,7 @@ final class MigrationService
             'cnpj_alphanumeric' => $this->applyCnpjAlphanumericMigration($pdo),
             'company_edit_requests' => $this->applyCompanyEditRequestsTable($pdo),
             'company_profile_fields' => $this->applyCompanyProfileFields($pdo),
+            'company_reviews' => $this->applyCompanyReviews($pdo),
         ];
         
         return $results;
@@ -63,6 +64,38 @@ final class MigrationService
             return true;
         } catch (PDOException $e) {
             Logger::warning('Migration: company_profile: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function applyCompanyReviews(PDO $pdo): bool
+    {
+        try {
+            if (!$this->tableExists($pdo, 'company_reviews')) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS company_reviews (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    company_id BIGINT UNSIGNED NOT NULL,
+                    user_id INT UNSIGNED NOT NULL,
+                    rating TINYINT UNSIGNED NOT NULL,
+                    comment TEXT NULL,
+                    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+                    reply TEXT NULL,
+                    reply_at DATETIME NULL,
+                    reports_count INT UNSIGNED NOT NULL DEFAULT 0,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_review_company (company_id),
+                    INDEX idx_review_user (user_id),
+                    INDEX idx_review_status (status),
+                    INDEX idx_review_created (created_at),
+                    CONSTRAINT fk_review_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+                    CONSTRAINT fk_review_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                Logger::info('Migration: Tabela company_reviews criada');
+            }
+            return true;
+        } catch (PDOException $e) {
+            Logger::warning('Migration: company_reviews: ' . $e->getMessage());
             return false;
         }
     }
