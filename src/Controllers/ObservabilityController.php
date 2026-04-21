@@ -392,6 +392,7 @@ final class ObservabilityController
             'app' => 'app*.log',
             'setup' => 'setup*.log',
             'php_errors' => 'php_errors*.log',
+            'cms' => 'cms*.log',
         ];
 
         $toClear = match ($type) {

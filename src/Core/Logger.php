@@ -7,11 +7,14 @@ namespace App\Core;
 /**
  * Logger Centralizado para o CMS.
  * Grava todos os logs em um único arquivo para facilitar a depuração.
+ * Suporta rotação automática de arquivos.
  */
 final class Logger
 {
     private static string $logPath = '';
     private static string $logFile = '';
+    private const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    private const MAX_FILES = 10;
 
     public static function init(): void
     {
@@ -21,6 +24,45 @@ final class Logger
                 @mkdir(self::$logPath, 0775, true);
             }
             self::$logFile = self::$logPath . '/cms.log';
+            self::checkRotation();
+        }
+    }
+
+    private static function checkRotation(): void
+    {
+        if (!file_exists(self::$logFile)) {
+            return;
+        }
+        
+        $size = filesize(self::$logFile);
+        
+        if ($size >= self::MAX_FILE_SIZE) {
+            $date = date('Y-m-d');
+            $newName = self::$logPath . "/cms-{$date}.log";
+            
+            if (file_exists($newName)) {
+                $newName = self::$logPath . "/cms-{$date}-" . time() . ".log";
+            }
+            
+            @rename(self::$logFile, $newName);
+            self::cleanupOldFiles();
+        }
+    }
+
+    private static function cleanupOldFiles(): void
+    {
+        $files = glob(self::$logPath . '/cms-*.log');
+        
+        if (count($files) <= self::MAX_FILES) {
+            return;
+        }
+        
+        usort($files, fn($a, $b) => filemtime($b) - filemtime($a));
+        
+        $toDelete = array_slice($files, self::MAX_FILES);
+        
+        foreach ($toDelete as $file) {
+            @unlink($file);
         }
     }
 
