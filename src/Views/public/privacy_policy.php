@@ -305,6 +305,9 @@
                             <p class="text-secondary ps-5 ms-2">
                                 <strong>E-mail:</strong> <a href="mailto:<?= e(config('mail.admin_email', 'privacidade@plattadata.com')) ?>" class="text-brand"><?= e(config('mail.admin_email', 'privacidade@plattadata.com')) ?></a>
                             </p>
+                            <p class="text-secondary ps-5 ms-2 mt-2">
+                                <a href="/ripd" class="text-brand">Relatório de Impacto à Proteção de Dados Pessoais (RIPD)</a>
+                            </p>
                         </section>
 
                         <section class="mb-5">
