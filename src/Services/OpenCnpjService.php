@@ -23,7 +23,7 @@ final class OpenCnpjService
             ]
         ]);
 
-        $url = self::BASE_URL . '/v1/cnpj/' . $cnpjDigits;
+        $url = self::BASE_URL . '/' . $cnpjDigits;
         $response = @file_get_contents($url, false, $context);
 
         if ($response === false) {
@@ -32,11 +32,11 @@ final class OpenCnpjService
 
         $data = json_decode($response, true);
         
-        if (empty($data['data'])) {
+        if (empty($data) || isset($data['error'])) {
             return null;
         }
 
-        return $data['data'];
+        return $data;
     }
 
     public function enrichFromOpenCnpj(array $company): array
