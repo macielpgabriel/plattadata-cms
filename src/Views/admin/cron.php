@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Session;
+
 $flash = Session::flash('success');
 $error = Session::flash('error');
 
