@@ -247,6 +247,9 @@ $router->get('/empresas/{cnpj}/avaliar', [CompanyReviewController::class, 'showF
 $router->post('/empresas/{cnpj}/avaliar', [CompanyReviewController::class, 'submit']);
 $router->post('/empresas/{cnpj}/reportar', [CompanyReviewController::class, 'report']);
 $router->post('/empresas/{cnpj}/responder', [CompanyReviewController::class, 'reply']);
+$router->get('/empresas/{cnpj}/minha-avaliacao', [CompanyReviewController::class, 'myReview']);
+$router->post('/empresas/{cnpj}/minha-avaliacao/editar', [CompanyReviewController::class, 'update']);
+$router->post('/empresas/{cnpj}/minha-avaliacao/excluir', [CompanyReviewController::class, 'remove']);
 
 // Debug Routes (Admin only) - only in development
 if (env('APP_ENV', 'production') !== 'production') {

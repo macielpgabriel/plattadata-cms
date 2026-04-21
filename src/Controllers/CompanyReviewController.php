@@ -235,4 +235,123 @@ final class CompanyReviewController
         Session::flash('success', 'Obrigado! Revisão reportada para moderação.');
         redirect("/empresas/$cnpj/avaliacoes");
     }
+
+    public function myReview(array $params): void
+    {
+        $cnpj = (string) ($params['cnpj'] ?? '');
+        $cnpj = preg_replace('/[^0-9A-Z]/', '', $cnpj);
+
+        $company = $this->repository->findByCnpj($cnpj);
+        if (!$company) {
+            http_response_code(404);
+            echo 'Empresa não encontrada.';
+            return;
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            redirect('/login?redirect=/empresas/' . $cnpj . '/minha-avaliacao');
+        }
+
+        $db = Database::connection();
+        $stmt = $db->prepare('SELECT * FROM company_reviews 
+            WHERE company_id = :company_id AND user_id = :user_id 
+            ORDER BY created_at DESC LIMIT 1');
+        $stmt->execute(['company_id' => $company['id'], 'user_id' => $user['id']]);
+        $review = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        view('reviews/my', [
+            'company' => $company,
+            'review' => $review,
+            'title' => 'Minha Avaliação',
+        ]);
+    }
+
+    public function update(array $params): void
+    {
+        $cnpj = (string) ($params['cnpj'] ?? '');
+        $cnpj = preg_replace('/[^0-9A-Z]/', '', $cnpj);
+
+        $company = $this->repository->findByCnpj($cnpj);
+        if (!$company) {
+            http_response_code(404);
+            return;
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            Session::flash('error', 'Faça login para editar.');
+            redirect('/login');
+        }
+
+        if (!Csrf::validate($_POST['_token'] ?? '')) {
+            Session::flash('error', 'Token expirado. Recarregue a página.');
+            redirect("/empresas/$cnpj/minha-avaliacao");
+        }
+
+        $reviewId = (int) ($_POST['review_id'] ?? 0);
+        $rating = (int) ($_POST['rating'] ?? 0);
+        $comment = trim($_POST['comment'] ?? '');
+
+        if ($rating < 1 || $rating > 5) {
+            Session::flash('error', 'Selecione uma nota de 1 a 5.');
+            redirect("/empresas/$cnpj/minha-avaliacao");
+        }
+
+        if (strlen($comment) > 1000) {
+            Session::flash('error', 'Comentário muito longo (máx 1000 caracteres).');
+            redirect("/empresas/$cnpj/minha-avaliacao");
+        }
+
+        $db = Database::connection();
+        $update = $db->prepare('UPDATE company_reviews SET rating = :rating, comment = :comment 
+            WHERE id = :id AND user_id = :user_id AND company_id = :company_id');
+        $update->execute([
+            'rating' => $rating,
+            'comment' => $comment ?: null,
+            'id' => $reviewId,
+            'user_id' => $user['id'],
+            'company_id' => $company['id'],
+        ]);
+
+        Session::flash('success', 'Avaliação atualizada!');
+        redirect("/empresas/$cnpj/minha-avaliacao");
+    }
+
+    public function remove(array $params): void
+    {
+        $cnpj = (string) ($params['cnpj'] ?? '');
+        $cnpj = preg_replace('/[^0-9A-Z]/', '', $cnpj);
+
+        $company = $this->repository->findByCnpj($cnpj);
+        if (!$company) {
+            http_response_code(404);
+            return;
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            Session::flash('error', 'Faça login para excluir.');
+            redirect('/login');
+        }
+
+        if (!Csrf::validate($_POST['_token'] ?? '')) {
+            Session::flash('error', 'Token expirado. Recarregue a página.');
+            redirect("/empresas/$cnpj/minha-avaliacao");
+        }
+
+        $reviewId = (int) ($_POST['review_id'] ?? 0);
+
+        $db = Database::connection();
+        $delete = $db->prepare('DELETE FROM company_reviews 
+            WHERE id = :id AND user_id = :user_id AND company_id = :company_id');
+        $delete->execute([
+            'id' => $reviewId,
+            'user_id' => $user['id'],
+            'company_id' => $company['id'],
+        ]);
+
+        Session::flash('success', 'Avaliação excluída.');
+        redirect("/empresas/$cnpj/avaliacoes");
+    }
 }

@@ -12,9 +12,16 @@
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0"><i class="bi bi-star"></i> Avaliações</h2>
-                <a href="/empresas/<?= e($company['cnpj']) ?>/avaliar" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Avaliar
-                </a>
+                <div class="d-flex gap-2">
+                    <?php if (Auth::check()): ?>
+                        <a href="/empresas/<?= e($company['cnpj']) ?>/minha-avaliacao" class="btn btn-outline-secondary">
+                            <i class="bi bi-person"></i> Minha Avaliação
+                        </a>
+                    <?php endif; ?>
+                    <a href="/empresas/<?= e($company['cnpj']) ?>/avaliar" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Avaliar
+                    </a>
+                </div>
             </div>
 
             <?php if (empty($reviews)): ?>
