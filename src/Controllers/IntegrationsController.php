@@ -340,15 +340,11 @@ final class IntegrationsController
             return;
         }
 
-        $apiKeys = $this->getApiKeys();
         $webhookSecrets = $this->getWebhookSecrets();
-        $apiLogs = $this->getRecentApiLogs(20);
 
         View::render('admin/integrations', [
-            'title' => 'Integrações - API & Webhooks',
-            'apiKeys' => $apiKeys,
+            'title' => 'Integrações - Webhooks',
             'webhookSecrets' => $webhookSecrets,
-            'apiLogs' => $apiLogs,
             'flash' => Session::flash('success'),
             'error' => Session::flash('error'),
             'metaRobots' => 'noindex,nofollow',
@@ -357,36 +353,13 @@ final class IntegrationsController
 
     public function generateApiKey(): void
     {
-        if (!Auth::can(['admin'])) {
-            http_response_code(403);
-            echo 'Sem permissão para acessar esta página.';
-            return;
-        }
-
-        $name = trim((string) ($_POST['name'] ?? 'API Key'));
-        
-        try {
-            $key = $this->createApiKey($name);
-            Session::flash('success', 'API Key gerada com sucesso. Copie agora pois não será mostrada novamente.');
-        } catch (\Exception $e) {
-            Session::flash('error', 'Erro ao criar API Key: ' . $e->getMessage());
-        }
-
+        Session::flash('error', 'API Keys não estão mais disponíveis.');
         redirect('/admin/integracoes');
     }
 
     public function deleteApiKey(): void
     {
-        if (!Auth::can(['admin'])) {
-            http_response_code(403);
-            echo 'Sem permissão para acessar esta página.';
-            return;
-        }
-
-        $id = (int) ($_POST['id'] ?? 0);
-        $this->removeApiKey($id);
-
-        Session::flash('success', 'API Key removida com sucesso.');
+        Session::flash('error', 'API Keys não estão mais disponíveis.');
         redirect('/admin/integracoes');
     }
 

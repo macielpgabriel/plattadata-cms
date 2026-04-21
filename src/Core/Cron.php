@@ -17,7 +17,6 @@ final class Cron
         'cleanup_expired_locks' => 1800,
         'cleanup_ip_blocklist' => 3600,
         'rotate_session_keys' => 86400,
-        'rotate_api_keys' => 86400,
         'security_scan' => 3600,
     ];
 
@@ -33,7 +32,6 @@ $result['output'] = match ($hook) {
                 'cleanup_expired_locks' => self::cleanupExpiredLocks(),
                 'cleanup_ip_blocklist' => self::cleanupIpBlocklist(),
                 'rotate_session_keys' => self::rotateSessionKeys(),
-                'rotate_api_keys' => self::rotateApiKeys(),
                 'security_scan' => self::runSecurityScan(),
             };
         } catch (Throwable $e) {
@@ -169,18 +167,6 @@ $result['output'] = match ($hook) {
         }
         
         return ["Rotated $rotated keys"];
-    }
-
-    private static function rotateApiKeys(): array
-    {
-        try {
-            $service = new \App\Controllers\Integration\ApiKeyService();
-            $rotated = $service->rotateExpiredKeys();
-            return ["Rotated {$rotated} API keys"];
-        } catch (Throwable $e) {
-            Logger::error('Cron rotate_api_keys: ' . $e->getMessage());
-            return ['Error rotating API keys'];
-        }
     }
 
     private static function runSecurityScan(): array

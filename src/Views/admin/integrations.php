@@ -27,79 +27,7 @@
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card mb-4 fade-in">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-key me-2"></i>API Keys</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted small mb-3">
-                    Use API Keys para autenticar requisições da API REST. 
-                    Headers necessários: <code>X-API-Key: sua_chave_aqui</code>
-                </p>
-                
-                <?php if (empty($apiKeys)): ?>
-                    <p class="text-muted">Nenhuma API Key criada ainda.</p>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>API Key</th>
-                                    <th>Status</th>
-                                    <th>Criada em</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($apiKeys as $key): ?>
-                                    <tr>
-                                        <td><?= e($key['name']) ?></td>
-                                        <td>
-                                            <code class="user-select-all"><?= e(substr($key['api_key'], 0, 12)) ?>...</code>
-                                            <button class="btn btn-sm btn-link p-0 ms-1" onclick="copyToClipboard('<?= e($key['api_key']) ?>')" title="Copiar">
-                                                <i class="bi bi-clipboard"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <?php if ($key['is_active']): ?>
-                                                <span class="badge bg-success">Ativa</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-secondary">Inativa</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= date('d/m/Y H:i', strtotime($key['created_at'])) ?></td>
-                                        <td>
-                                            <form method="post" action="/admin/integracoes/apikey/excluir" class="d-inline">
-                                                <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-                                                <input type="hidden" name="id" value="<?= (int) $key['id'] ?>">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Excluir esta API Key?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-                
-                <hr>
-                <h6 class="mb-2">Criar nova API Key</h6>
-                <form method="post" action="/admin/integracoes/apikey/criar" class="row g-2">
-                    <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-                    <div class="col-md-6">
-                        <input type="text" name="name" class="form-control" placeholder="Nome da API Key" required>
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-1"></i>Gerar API Key
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        
 
         <div class="card mb-4 fade-in">
             <div class="card-header">
@@ -244,29 +172,6 @@
                         <strong>Power Automate</strong> - HTTP connectors
                     </li>
                 </ul>
-            </div>
-        </div>
-
-        <div class="card fade-in">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Logs Recentes</h5>
-            </div>
-            <div class="card-body p-0">
-                <?php if (empty($apiLogs)): ?>
-                    <p class="text-muted p-3 mb-0">Nenhum acesso registrado.</p>
-                <?php else: ?>
-                    <ul class="list-group list-group-flush small">
-                        <?php foreach (array_slice($apiLogs, 0, 10) as $log): ?>
-                            <li class="list-group-item px-3 py-2">
-                                <div class="d-flex justify-content-between">
-                                    <span class="badge bg-secondary"><?= e($log['action']) ?></span>
-                                    <small class="text-muted"><?= date('H:i', strtotime($log['created_at'])) ?></small>
-                                </div>
-                                <div class="text-muted small"><?= e($log['api_key'] ?? '') ?> / <?= e($log['resource'] ?? '') ?></div>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>
             </div>
         </div>
     </div>
