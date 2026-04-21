@@ -165,6 +165,28 @@ if ($verificationType === 'email') {
             Session::flash('error', 'O arquivo é muito grande. O limite é 5MB.');
             redirect("/empresas/remover/documento?id=$id");
         }
+        
+        // Verificar bytes mágicos (arquivo real)
+        $handle = fopen($file['tmp_name'], 'rb');
+        if ($handle) {
+            $header = fread($handle, 8);
+            fclose($handle);
+            
+            $pdfMagic = "%PDF";
+            $jpgMagic1 = "\xFF\xD8\xFF";
+            $jpgMagic2 = "\x89PNG";
+            
+            $isValidMagic = (
+                str_starts_with($header, $pdfMagic) ||
+                str_starts_with($header, $jpgMagic1) ||
+                str_starts_with($header, $jpgMagic2)
+            );
+            
+            if (!$isValidMagic) {
+                Session::flash('error', 'Arquivo corrupto ou inválido.');
+                redirect("/empresas/remover/documento?id=$id");
+            }
+        }
 
         $db = Database::connection();
 
