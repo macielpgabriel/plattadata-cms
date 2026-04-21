@@ -260,6 +260,9 @@ final class SetupService
         
         // Aplica migration CNPJ Alfanumérico apos schema
         $this->applyCnpjAlphanumericMigration($pdo);
+        
+        // Aplica outras migrations
+        $this->migrationService->applyAllMigrations($pdo);
     }
     
     private function applyCnpjAlphanumericMigration(PDO $pdo): void
