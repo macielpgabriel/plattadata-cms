@@ -118,7 +118,43 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Aprovação por moderadores
 - Armazenamento de documentos em Google Drive
 
-### 1.9 Sistema de Jobs
+### 1.9 Sistema de Avaliações de Empresas
+
+- Usuários autenticados podem avaliar empresas (1-5 estrelas)
+- Comentários públicos com sistema de moderação
+- Dono da empresa pode responder avaliações
+- Sistema de reports para avaliações inadequadas
+- Limite: 1 avaliação por usuário/empresa a cada 7 dias
+
+### 1.10 Dashboard Empresarial (Owners)
+
+- Validação de propriedade via e-mail da Receita ou documento
+- Edição de dados complementares (descrição, redes sociais)
+- Links para Facebook, Instagram, LinkedIn
+- Cadastro de WhatsApp para contato
+- Resposta às avaliações de clientes
+
+### 1.11 Portabilidade de Dados (LGPD Art. 18-V)
+
+- Página `/meus-dados` com explicação sobre portabilidade
+- Download dos dados do usuário em formato JSON
+- Link no menu do usuário autenticado
+- Conformidade total com LGPD
+
+### 1.12 RIPD - Relatório de Impacto (LGPD Art. 5-XVII)
+
+- Página pública `/ripd` com relatório completo
+- Base legal, dados tratados, medidas de segurança
+- Análise de riscos e mitigações
+- Direitos dos titulares e contato do DPO
+
+### 1.13 Consentimento LGPD
+
+- Checkbox obrigatório no cadastro de usuários
+- Link para Política de Privacidade e Termos de Serviço
+- Consentimento armazenado com timestamp
+
+### 1.14 Sistema de Jobs
 
 - Fila de processamento baseada em banco de dados
 - Interface de gerenciamento web
@@ -126,7 +162,7 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Retry automático de jobs falhos
 - Scheduling via cron
 
-### 1.10 Observabilidade
+### 1.15 Observabilidade
 
 - Healthcheck JSON (`GET /health`)
 - Dashboard com gráficos de uso
@@ -134,7 +170,7 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Histórico de chamadas API
 - API Tester integrado
 
-### 1.11 Dados Geográficos
+### 1.16 Dados Geográficos
 
 - Listagem de estados brasileiros
 - Listagem de municípios por UF
@@ -552,6 +588,7 @@ server {
 | GET | `/parceiros` | Parceiros |
 | GET | `/privacidade` | Política de privacidade |
 | GET | `/termos` | Termos de uso |
+| GET | `/ripd` | Relatório de Impacto (LGPD) |
 
 ### 6.2 Rotas de Autenticação
 
@@ -585,6 +622,28 @@ server {
 | POST | `/perfil` | Salvar perfil |
 | GET | `/conta` | Configurações da conta |
 | POST | `/conta/alterar-senha` | Alterar senha |
+| GET | `/meus-dados` | Portabilidade de dados (LGPD) |
+| GET | `/meus-dados/exportar` | Baixar dados em JSON |
+
+### 6.3 Rotas de Avaliações e Dashboard Empresarial
+
+| Método | URL | Descrição |
+|--------|-----|-----------|
+| GET | `/empresas/{cnpj}/avaliacoes` | Lista de avaliações |
+| GET | `/empresas/{cnpj}/avaliar` | Formulário de avaliação |
+| POST | `/empresas/{cnpj}/avaliar` | Enviar avaliação |
+| GET | `/empresas/{cnpj}/minha-avaliacao` | Editar minha avaliação |
+| POST | `/empresas/{cnpj}/minha-avaliacao/editar` | Salvar avaliação |
+| POST | `/empresas/{cnpj}/minha-avaliacao/excluir` | Excluir avaliação |
+| POST | `/empresas/{cnpj}/reportar` | Reportar avaliação |
+| GET | `/empresas/{cnpj}/dashboard` | Dashboard do proprietário |
+| POST | `/empresas/{cnpj}/dashboard` | Atualizar dados complementares |
+| GET | `/empresas/validar/{cnpj}` | Validar propriedade |
+| POST | `/empresas/validar/{cnpj}` | Enviar validação |
+| GET | `/empresas/validar/verificar` | Verificar código |
+| POST | `/empresas/validar/verificar` | Validar código |
+| GET | `/empresas/validar/documento` | Enviar documento |
+| POST | `/empresas/validar/documento` | Upload documento |
 
 ### 6.4 Rotas Administrativas
 
@@ -718,6 +777,20 @@ server {
 | `LGPD_RETENTION_ENABLED` | true | Retenção habilitada |
 | `RETENTION_COMPANY_QUERY_LOGS_DAYS` | 90 | Retenção logs consulta |
 | `RETENTION_ACCESS_LOGS_DAYS` | 30 | Retenção logs acesso |
+
+#### Conformidade LGPD
+
+O CMS Plattadata está em conformidade com a LGPD (Lei Geral de Proteção de Dados - Lei 13.709/2018):
+
+- **Política de Privacidade**: Página `/politica-de-privacidade` com 16 seções
+- **Termos de Serviço**: Página `/termos-de-servico` atualizados
+- **RIPD**: Relatório de Impacto à Proteção de Dados disponível em `/ripd`
+- **Portabilidade**: Usuários podem baixar seus dados em JSON via `/meus-dados`
+- **Consentimento**: Checkbox obrigatório no cadastro com aceite da Política de Privacidade
+- **Direitos do Titular**: Sistema completo de acesso, correção e eliminação de dados
+- **Sistema de Avaliações**: Com moderação e sistema de reports
+- **Dashboard Empresarial**: Proprietários podem validar e gerenciar dados da empresa
+- **DPO**: Contato disponível na Política de Privacidade
 
 ---
 
