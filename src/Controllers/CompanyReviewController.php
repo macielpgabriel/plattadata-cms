@@ -62,7 +62,7 @@ final class CompanyReviewController
         view('reviews/index', [
             'company' => $company,
             'reviews' => $reviews,
-            'avg_rating' => round($stats['avg'] ?? 0, 1),
+            'avg_rating' => round((float) ($stats['avg'] ?? 0), 1),
             'total_reviews' => (int) ($stats['total'] ?? 0),
             'title' => 'Avaliações - ' . $company['legal_name'],
         ]);
