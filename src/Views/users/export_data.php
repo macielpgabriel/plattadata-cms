@@ -33,13 +33,8 @@
                     <p>
                         Dados de empresas favoritadas, histórico de consultas e outros dados relacionados 
                         ao uso da plataforma são armazenados separadamente e não são incluídos nesta exportação.
-                    </p>
-                    
-                    <div class="alert alert-info mt-4">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Nota:</strong> Esta exportação não inclui os dados das empresas que você consultou ou favoritrou. 
                         Esses dados são de acesso público e estão disponíveis na plataforma.
-                    </div>
+                    </p>
                     
                     <div class="d-flex gap-3 mt-5">
                         <a href="/meus-dados/exportar?confirm=1" class="btn btn-primary btn-lg">
