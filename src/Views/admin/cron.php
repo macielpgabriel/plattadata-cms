@@ -76,12 +76,27 @@ $status = $status ?? [];
         <h5 class="mb-0">Configuração do Cron</h5>
     </div>
     <div class="card-body">
-        <p>Para executar automaticamente, adicione ao crontab do servidor:</p>
-        <div class="bg-dark text-light p-3 rounded">
+        <h6>Opção 1: Serviço externo (Recomendado)</h6>
+        <p class="small text-muted">Use um serviço gratuito de cron sem precisar de acesso SSH:</p>
+        <ul class="small">
+            <li><a href="https://cron-job.org" target="_blank">cron-job.org</a> -.gratis, confiável</li>
+            <li><a href="https://easycron.io" target="_blank">EasyCron</a> - até 20 crons gratis</li>
+        </ul>
+        <div class="bg-dark text-light p-3 rounded mb-3">
+            <code>URL: <?= e(config('app.url', 'https://plattadata.com')) ?>/api/v1/cron</code>
+        </div>
+        
+        <h6>Opção 2: Painel da hospedagem</h6>
+        <p class="small text-muted">Acesse o cPanel/Plesk e adicione um novo cron job:</p>
+        <div class="bg-dark text-light p-3 rounded mb-3">
             <code>*/15 * * * * curl -s <?= e(config('app.url', 'https://plattadata.com')) ?>/api/v1/cron > /dev/null 2>&1</code>
         </div>
-        <p class="mt-3 text-muted small">
-            Execute a cada 15 minutos para verificar tarefas pendentes.
-        </p>
+        
+        <h6>Opção 3: VPS/Servidor dedicado</h6>
+        <p class="small text-muted">Adicione ao crontab do sistema:</p>
+        <div class="bg-dark text-light p-3 rounded">
+            <code>crontab -e</code><br>
+            <code class="small">*/15 * * * * curl -s <?= e(config('app.url', 'https://plattadata.com')) ?>/api/v1/cron > /dev/null 2>&1</code>
+        </div>
     </div>
 </div>
