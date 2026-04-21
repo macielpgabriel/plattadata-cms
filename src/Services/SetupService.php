@@ -184,11 +184,13 @@ final class SetupService
             $companiesExists = (bool) $stmt->fetch();
             if ($companiesExists) {
                 Logger::info('Setup: Tabela companies já existe, pulando execução de schema.sql');
+                
+                // Aplica migration CNPJ Alfanumérico automaticamente
+                $this->applyCnpjAlphanumericMigration($pdo);
                 return;
             }
         } catch (PDOException $exception) {
             Logger::warning('Setup: Erro ao verificar existência de tabela companies: ' . $exception->getMessage());
-            // Continua mesmo com erro na verificação
         }
 
         // Valida que o arquivo schema.sql existe
@@ -247,6 +249,60 @@ final class SetupService
             }
         } catch (PDOException $exception) {
             Logger::error('Setup: Erro ao validar criação de tabela companies: ' . $exception->getMessage());
+        }
+        
+        // Aplica migration CNPJ Alfanumérico apos schema
+        $this->applyCnpjAlphanumericMigration($pdo);
+    }
+    
+    private function applyCnpjAlphanumericMigration(PDO $pdo): void
+    {
+        try {
+            // Verifica se ja foi aplicada
+            $checkStmt = $pdo->query("DESCRIBE companies cnpj");
+            $columnInfo = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($columnInfo && $columnInfo['Type'] === 'varchar(14)') {
+                Logger::info('Setup: CNPJ Alfanumérico migration ja aplicada (varchar)');
+                return;
+            }
+            
+            if ($columnInfo && str_starts_with($columnInfo['Type'], 'char(14)')) {
+                Logger::info('Setup: Aplicando CNPJ Alfanumérico migration...');
+                
+                // Executa os ALTERs
+                $alterStatements = [
+                    "ALTER TABLE companies MODIFY cnpj VARCHAR(14) NOT NULL UNIQUE",
+                    "ALTER TABLE company_partners MODIFY cnpj VARCHAR(14) NULL",
+                    "ALTER TABLE company_partners MODIFY partner_cnpj VARCHAR(14) NULL",
+                    "ALTER TABLE company_enrichments MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_source_payloads MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_query_logs MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_changes MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_removal_requests MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_competitors MODIFY competitor_cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_mentions MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE company_mentions_history MODIFY cnpj VARCHAR(14) NOT NULL",
+                    "ALTER TABLE favorite_groups MODIFY entity_cnpj VARCHAR(14) NULL",
+                    "ALTER TABLE user_favorites MODIFY entity_cnpj VARCHAR(14) NULL",
+                    "ALTER TABLE cnpj_blacklist MODIFY cnpj VARCHAR(14) NOT NULL UNIQUE",
+                    "ALTER TABLE api_access_logs MODIFY cnpj VARCHAR(14) NULL",
+                ];
+                
+                $executed = 0;
+                foreach ($alterStatements as $sql) {
+                    try {
+                        $pdo->exec($sql);
+                        $executed++;
+                    } catch (PDOException $e) {
+                        Logger::warning('Setup: ALTER CNPJ ignorado: ' . $e->getMessage());
+                    }
+                }
+                
+                Logger::info("Setup: CNPJ Alfanumérico migration concluida ({$executed} alters)");
+            }
+        } catch (PDOException $e) {
+            Logger::warning('Setup: CNPJ migration error: ' . $e->getMessage());
         }
     }
 
