@@ -39,6 +39,7 @@ final class ObservabilityController
             'title' => 'Observabilidade',
             'health' => $service->healthSnapshot(),
             'metrics' => $service->adminMetrics(),
+            'securityEvents' => \App\Core\Logger::getSecurityEvents(),
             'flash' => Session::flash('success'),
             'error' => Session::flash('error'),
             'metaRobots' => 'noindex,nofollow',

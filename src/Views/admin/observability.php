@@ -53,9 +53,10 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
         <div class="d-flex flex-wrap gap-2">
             <a href="#sec-overview" class="btn btn-outline-primary btn-sm">Visão Geral</a>
             <a href="#sec-business" class="btn btn-outline-primary btn-sm">Negócio</a>
-            <a href="#sec-integrations" class="btn btn-outline-primary btn-sm">Integrações</a>
-            <a href="#sec-health" class="btn btn-outline-primary btn-sm">Saúde e Logs</a>
-        </div>
+                <a href="#sec-integrations" class="btn btn-outline-primary btn-sm">Integrações</a>
+                <a href="#sec-health" class="btn btn-outline-primary btn-sm">Saúde e Logs</a>
+                <a href="#sec-security" class="btn btn-outline-primary btn-sm">Segurança</a>
+            </div>
     </div>
 </div>
 
@@ -518,6 +519,54 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
         </div>
     </div>
 </section>
+
+<section id="sec-security" class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="h5 mb-1">Eventos de Segurança</h2>
+            <p class="text-muted small mb-0">Registros de atividades suspeitas, tentativas de acesso e alertas de segurança.</p>
+        </div>
+    </div>
+
+<?php if (!empty($securityEvents)): ?>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-0 pt-4 px-4">
+        <h3 class="h6 mb-0 fw-bold"><i class="bi bi-shield-check me-2 text-danger"></i>Eventos de Segurança</h3>
+    </div>
+    <div class="card-body px-4 pb-4">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Tipo</th>
+                        <th>Mensagem</th>
+                        <th>Usuário</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($securityEvents as $event): ?>
+                    <tr>
+                        <td><small><?= $formatDate($event['timestamp'] ?? null, 'd/m H:i:s') ?></small></td>
+                        <td><span class="badge bg-<?= $event['level'] === 'ERROR' ? 'danger' : 'warning' ?>"><?= $event['level'] ?></span></td>
+                        <td><?= e($event['message'] ?? '-') ?></td>
+                        <td><?= $event['user_id'] !== null ? '#' . $event['user_id'] : 'Anônimo' ?></td>
+                        <td><small><?= $event['remote_ip'] ?? '-' ?></small></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php else: ?>
+<div class="alert alert-info alert-dismissible fade show shadow-sm mb-4" role="alert">
+    <i class="bi bi-info-circle me-2"></i>
+    Nenhum evento de segurança registrado recentemente.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<?php endif; ?>
 
 <div class="row g-4">
     <div class="col-md-6">
