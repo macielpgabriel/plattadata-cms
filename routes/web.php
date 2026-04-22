@@ -192,6 +192,14 @@ $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadB
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin?tab=observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
 
+// Rotas POST para /dashboard/admin (ações)
+$router->post('/dashboard/admin/clear-cache', function() { redirect('/dashboard/admin'); });
+$router->post('/dashboard/admin/localidades/sync', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->post('/dashboard/admin/localidades/enrich', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->post('/dashboard/admin/cnae/sync', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->post('/dashboard/admin/migrations/run', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->post('/dashboard/admin/logs/clear', function() { redirect('/dashboard/admin/observabilidade'); });
+
 // Rotas /admin com POST (ações) - continuam funcionando mas também redirecionam
 $router->post('/admin/localidades/sync', [ObservabilityController::class, 'syncMunicipalities'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/dashboard/admin/localidades/sync', function() { redirect('/dashboard/admin/observabilidade'); });

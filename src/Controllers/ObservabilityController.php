@@ -108,7 +108,7 @@ final class ObservabilityController
             \App\Core\Session::flash('error', 'Erro ao executar migrations: ' . $e->getMessage());
         }
 
-        redirect('/admin#observabilidade');
+        redirect('/dashboard/admin#observabilidade');
     }
 
     public function syncMunicipalities(): void
@@ -121,7 +121,7 @@ final class ObservabilityController
 
         if (!\App\Core\Csrf::validate($_POST['_token'] ?? null)) {
             Session::flash('error', 'Sessão expirada.');
-            redirect('/admin#observabilidade');
+            redirect('/dashboard/admin#observabilidade');
         }
 
         try {
@@ -132,20 +132,20 @@ final class ObservabilityController
                 
                 if ($file['error'] !== UPLOAD_ERR_OK) {
                     Session::flash('error', 'Erro ao fazer upload do arquivo.');
-                    redirect('/admin/observabilidade');
+                    redirect('/dashboard/admin/observabilidade');
                 }
 
                 $allowedExtensions = ['csv', 'txt', 'zip'];
                 $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
                 if (!in_array($extension, $allowedExtensions)) {
                     Session::flash('error', 'Extensão inválida. Use .csv, .txt ou .zip');
-                    redirect('/admin/observabilidade');
+                    redirect('/dashboard/admin/observabilidade');
                 }
 
                 $maxSize = 50 * 1024 * 1024;
                 if ($file['size'] > $maxSize) {
                     Session::flash('error', 'Arquivo muito grande. Máximo 50MB.');
-                    redirect('/admin/observabilidade');
+                    redirect('/dashboard/admin/observabilidade');
                 }
 
                 $importService = new \App\Services\MunicipalityImportService();
@@ -177,7 +177,7 @@ final class ObservabilityController
                 }
 
                 Session::flash('success', $result['message']);
-                redirect('/admin/observabilidade');
+                redirect('/dashboard/admin/observabilidade');
             }
 
             if ($action === 'munic_url' && !empty($_POST['munic_url'])) {
@@ -188,7 +188,7 @@ final class ObservabilityController
                 
                 $result = $importService->importFromUrl($url);
                 Session::flash('success', $result['message']);
-                redirect('/admin/observabilidade');
+                redirect('/dashboard/admin/observabilidade');
             }
 
             $service = new IbgeService();
@@ -211,7 +211,7 @@ final class ObservabilityController
             Session::flash('error', 'Erro na sincronização: ' . $e->getMessage());
         }
 
-        redirect('/admin#observabilidade');
+        redirect('/dashboard/admin#observabilidade');
     }
 
     public function syncMunicipalityEnrichment(): void
@@ -247,7 +247,7 @@ final class ObservabilityController
                     break;
                 default:
                     Session::flash('error', 'Tipo de enriquecimento inválido.');
-                    redirect('/admin#observabilidade');
+                    redirect('/dashboard/admin#observabilidade');
             }
 
             if ($count > 0) {
@@ -259,7 +259,7 @@ final class ObservabilityController
             Session::flash('error', "Erro no enriquecimento ({$type}): " . $e->getMessage());
         }
 
-        redirect('/admin#observabilidade');
+        redirect('/dashboard/admin#observabilidade');
     }
 
     public function syncCnaeActivities(): void
@@ -277,7 +277,7 @@ final class ObservabilityController
             Session::flash('error', 'Erro ao sincronizar CNAEs: ' . $e->getMessage());
         }
 
-        redirect('/admin#observabilidade');
+        redirect('/dashboard/admin#observabilidade');
     }
 
     public function apiTester(): void
@@ -539,7 +539,7 @@ final class ObservabilityController
             Session::flash('info', 'Nenhum log para limpar.');
         }
 
-        redirect('/admin#observabilidade');
+        redirect('/dashboard/admin#observabilidade');
     }
 
     public function testClearLogs(): void
