@@ -152,4 +152,30 @@ final class DashboardController
         \App\Core\Session::flash('success', 'Configuracoes de seguranca atualizadas.');
         redirect('/dashboard');
     }
+
+    public function myReviews(): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            redirect('/login?redirect=/dashboard/minhas-avaliacoes');
+        }
+
+        $db = Database::connection();
+        $stmt = $db->prepare('
+            SELECT r.id, r.rating, r.comment, r.status, r.created_at, r.reply, r.reply_at,
+                   c.cnpj, c.legal_name, c.trade_name
+            FROM company_reviews r
+            JOIN companies c ON r.company_id = c.id
+            WHERE r.user_id = :user_id
+            ORDER BY r.created_at DESC
+        ');
+        $stmt->execute(['user_id' => $user['id']]);
+        $reviews = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        View::render('dashboard/my-reviews', [
+            'title' => 'Minhas Avaliações',
+            'reviews' => $reviews,
+            'metaRobots' => 'noindex,nofollow',
+        ]);
+    }
 }

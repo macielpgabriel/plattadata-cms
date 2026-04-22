@@ -116,6 +116,7 @@ $router->post('/unsubscribe', [AuthController::class, 'processUnsubscribe']);
 
 $router->get('/dashboard', [DashboardController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/dashboard', [DashboardController::class, 'updateProfile'], [AuthMiddleware::class]);
+$router->get('/dashboard/minhas-avaliacoes', [DashboardController::class, 'myReviews'], [AuthMiddleware::class]);
 
 // LGPD - Direitos do titular (Art. 18)
 $router->get('/meus-dados', [UserController::class, 'exportData']);

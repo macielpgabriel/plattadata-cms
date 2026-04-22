@@ -326,8 +326,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <a href="/favoritos" class="btn btn-brand">
                         <i class="bi bi-star-fill me-2 text-warning"></i>Minhas Empresas Favoritas
                     </a>
+                    <a href="/dashboard/minhas-avaliacoes" class="btn btn-outline-primary">
+                        <i class="bi bi-star me-2"></i>Minhas Avaliações
+                    </a>
                 </div>
-                <p class="text-muted small mt-2 mb-0">Acesse rapidamente as empresas que voce salvou para prospecção ou acompanhamento.</p>
+                <p class="text-muted small mt-2 mb-0">Acesse rapidamente as empresas que voce salvou para prospecção ou acompanhamento.<br>
+                <span class="text-muted small">Veja e gerencie suas avaliações de empresas.</span>
             </div>
         </div>
     </div>
