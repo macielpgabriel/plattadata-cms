@@ -93,10 +93,6 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
-                    <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-trash me-1"></i>Excluir Avaliação
-                    </button>
                 </form>
             </div>
         </div>

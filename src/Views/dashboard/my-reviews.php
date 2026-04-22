@@ -66,8 +66,8 @@
                             </div>
                         <?php endif; ?>
                         
-                        <div class="d-flex justify-content-between align-items-center small text-muted">
-                            <span><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted"><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
                             <div class="d-flex gap-2">
                                 <a href="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/editar" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil me-1"></i>Editar
@@ -75,30 +75,30 @@
                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-<?= $review['id'] ?>">
                                     <i class="bi bi-trash"></i>
                                 </button>
-
-                                <div class="modal fade" id="deleteModal-<?= $review['id'] ?>" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered modal-sm">
-                                        <div class="modal-content">
-                                            <div class="modal-header border-0 pb-0">
-                                                <h5 class="modal-title text-danger">
-                                                    <i class="bi bi-exclamation-triangle me-2"></i>Excluir
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body pt-2 text-center">
-                                                <p class="mb-0">Excluir avaliação de <strong><?= e($review['trade_name'] ?: $review['legal_name']) ?></strong>?</p>
-                                            </div>
-                                            <div class="modal-footer border-0 pt-0 justify-content-center">
-                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <form method="post" action="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/excluir" class="d-inline">
-                                                    <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
-                                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="deleteModal-<?= $review['id'] ?>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Excluir
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body pt-2 text-center">
+                            <p class="mb-0">Excluir avaliação de <strong><?= e($review['trade_name'] ?: $review['legal_name']) ?></strong>?</p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0 justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form method="post" action="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/excluir" class="d-inline">
+                                <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                            </form>
                         </div>
                     </div>
                 </div>
