@@ -359,6 +359,30 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
             <p class="text-muted small mb-0">Atualizações externas e requisições para provedores de dados.</p>
         </div>
     </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="bi bi-building me-2 text-info"></i>Municípios - Importar MUNICCSV
+            </h5>
+            <p class="text-muted small mb-3">Importe o arquivo MUNICCSV da Receita Federal para atualizar a lista de municípios.</p>
+            <form method="post" action="/admin/localidades/sync" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                <input type="hidden" name="action" value="munic">
+                <div class="row g-3 align-items-end">
+                    <div class="col-auto flex-grow-1">
+                        <input type="file" name="munic_file" class="form-control" accept=".csv,.txt" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i> Importar
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted">Arquivos .csv ou .txt (máx 50MB)</small>
+            </form>
+        </div>
+    </div>
 </section>
 
 <div class="row g-4 mb-4">
