@@ -336,3 +336,64 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<?php if ($isAdmin || $isStaff): ?>
+<!-- Seção Admin - Apenas para admins e staff -->
+<div class="card mt-4 fade-in">
+    <div class="card-body">
+        <h2 class="h5 mb-3">
+            <i class="bi bi-gear me-2 text-secondary"></i>Painel Admin
+        </h2>
+        <p class="text-muted small mb-3">Acesso rápido às funcionalidades administrativas.</p>
+        
+        <div class="row g-3">
+            <?php if ($isAdmin): ?>
+            <div class="col-6 col-md-3">
+                <a href="/admin" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="/admin/observabilidade" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-activity me-2"></i>Observabilidade
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="/admin/configuracoes" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-gear me-2"></i>Configurações
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="/admin/analytics" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-graph-up me-2"></i>Analytics
+                </a>
+            </div>
+            <?php endif; ?>
+            <?php if ($isStaff): ?>
+            <div class="col-6 col-md-3">
+                <a href="/admin/remocoes" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-shield-check me-2"></i>Remoções
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="/admin/integracoes" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-plug me-2"></i>Integrações
+                </a>
+            </div>
+            <?php endif; ?>
+            <?php if ($isAdmin): ?>
+            <div class="col-6 col-md-3">
+                <a href="/usuarios" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-people me-2"></i>Usuários
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="/admin/api-tester" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-braces me-2"></i>Testador API
+                </a>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
