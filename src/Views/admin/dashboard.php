@@ -38,65 +38,121 @@ $jobsTotal = $jobsTotal ?? 0;
 <form method="post" action="/admin/configuracoes" id="settingsForm">
     <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
     
-    <!-- Toast Container (para mensagens temporárias) -->
+    <!-- Toast Container -->
     <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 10000;"></div>
     
     <div class="tab-content" id="adminTabsContent">
         <!-- DASHBOARD -->
         <div class="tab-pane fade show active" id="dashboard">
-            <!-- Barra de Alertas em Tempo Real -->
-<div class="position-relative mb-4">
-    <div id="alerts-bar" class="d-flex justify-content-end gap-2" style="min-height: 50px;"></div>
-</div>
+            <!-- Título da Página -->
+            <div class="section-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1"><i class="bi bi-grid-1x2 me-2"></i>Dashboard</h4>
+                        <p class="mb-0 opacity-75 small">Visão geral do sistema</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Atualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-<!-- Filtros de Logs -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <h5 class="card-title"><i class="bi bi-funnel me-2"></i>Filtrar Logs</h5>
-        <form id="log-filter-form" class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label small">Tipo</label>
-                <select class="form-select" name="level" id="log-level-filter">
-                    <option value="">Todos</option>
-                    <option value="INFO">INFO</option>
-                    <option value="WARNING">WARNING</option>
-                    <option value="ERROR">ERROR</option>
-                    <option value="DEBUG">DEBUG</option>
-                </select>
+            <!-- Resumo Executivo -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-building fs-2 text-primary mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['companies'] ?? 0) ?></div>
+                            <small class="text-muted">Total Empresas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle fs-2 text-success mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['active_companies'] ?? 0) ?></div>
+                            <small class="text-muted">Ativas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-x-circle fs-2 text-danger mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['inactive_companies'] ?? 0) ?></div>
+                            <small class="text-muted">Inativas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-geo-alt fs-2 text-warning mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['municipalities'] ?? 0) ?></div>
+                            <small class="text-muted">Municípios</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label small">Data</label>
-                <input type="date" class="form-control" name="date" id="log-date-filter">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small">Linhas</label>
-                <select class="form-select" name="lines" id="log-lines-filter">
-                    <option value="10">10</option>
-                    <option value="25" selected>25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-primary w-100" onclick="filterLogs()">
-                    <i class="bi bi-filter me-1"></i>Filtrar
-                </button>
-            </div>
-        </form>
-        <div id="logs-filter-result" class="mt-3" style="max-height: 300px; overflow-y: auto;"></div>
-    </div>
-</div>
 
-<div class="section-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="mb-1"><i class="bi bi-grid-1x2 me-2"></i>Visão Geral</h4>
-            <p class="mb-0 opacity-75 small">Resumo do sistema</p>
+            <!-- Métricas Secundárias -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people fs-2 text-info mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['users'] ?? 0) ?></div>
+                            <small class="text-muted">Usuários</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-search fs-2 text-secondary mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['query_logs_24h'] ?? 0) ?></div>
+                            <small class="text-muted">Buscas (24h)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-cloud-download fs-2 text-primary mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['api_attempts_24h'] ?? 0) ?></div>
+                            <small class="text-muted">API (24h)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-currency-exchange fs-2 text-success mb-2"></i>
+                            <div class="h4 mb-0"><?= number_format($counts['exchange_currencies'] ?? 0) ?></div>
+                            <small class="text-muted">Moedas</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
         </div>
     </div>
-</div>
 
-            <!-- Negocios e Uso (Moved from outer layout) -->
+    <!-- Seção: Negócio e Uso -->
+    <div class="section-header mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-1">Negócio e Uso</h4>
+                <p class="mb-0 opacity-75 small">Indicadores de cadastro e comportamento</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Negócios e Uso -->
             <?php if (!empty($latestCompany) || !empty($companiesByStatus)): ?>
             <div class="row g-4 mb-4">
                 <?php if (!empty($latestCompany)): ?>
