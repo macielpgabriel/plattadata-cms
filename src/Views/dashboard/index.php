@@ -350,22 +350,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Menu dinâmico - páginas disponíveis por role
         $adminMenu = [
             'admin' => [
-                ['url' => '/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
-                ['url' => '/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
-                ['url' => '/admin/configuracoes', 'label' => 'Configurações', 'icon' => 'bi-gear'],
-                ['url' => '/admin/analytics', 'label' => 'Analytics', 'icon' => 'bi-graph-up'],
-                ['url' => '/admin/auditoria', 'label' => 'Auditoria', 'icon' => 'bi-journal-text'],
-                ['url' => '/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
-                ['url' => '/admin/api-tester', 'label' => 'Testador API', 'icon' => 'bi-braces'],
+                ['url' => '/dashboard/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
+                ['url' => '/dashboard/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
+                ['url' => '/dashboard/admin/configuracoes', 'label' => 'Configurações', 'icon' => 'bi-gear'],
+                ['url' => '/dashboard/admin/analytics', 'label' => 'Analytics', 'icon' => 'bi-graph-up'],
+                ['url' => '/dashboard/admin/auditoria', 'label' => 'Auditoria', 'icon' => 'bi-journal-text'],
+                ['url' => '/dashboard/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
+                ['url' => '/dashboard/admin/api-tester', 'label' => 'Testador API', 'icon' => 'bi-braces'],
                 ['url' => '/usuarios', 'label' => 'Usuários', 'icon' => 'bi-people'],
             ],
             'moderator' => [
-                ['url' => '/admin/remocoes', 'label' => 'Remoções', 'icon' => 'bi-shield-check'],
-                ['url' => '/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
+                ['url' => '/dashboard/admin/remocoes', 'label' => 'Remoções', 'icon' => 'bi-shield-check'],
+                ['url' => '/dashboard/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
             ],
             'editor' => [
-                ['url' => '/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
-                ['url' => '/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
+                ['url' => '/dashboard/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
+                ['url' => '/dashboard/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
             ],
         ];
         

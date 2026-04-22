@@ -157,7 +157,31 @@ $router->post('/usuarios/{id}', [UserController::class, 'update'], [AuthMiddlewa
 $router->post('/usuarios/{id}/excluir', [UserController::class, 'delete'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 // Rotas de Admin
-$router->get('/admin', [AdminController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+// Dashboard Admin - novas rotas em /dashboard/admin
+$router->get('/dashboard/admin', [AdminController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/configuracoes', [AdminSettingController::class, 'edit'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/analytics', [AnalyticsController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/auditoria', [AuditController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/remocoes', [CompanyRemovalController::class, 'adminList'], [AuthMiddleware::class, StaffMiddleware::class]);
+$router->get('/dashboard/admin/integracoes', [IntegrationsController::class, 'integrationsPage'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/bloqueados', [AdminController::class, 'listBlockedIPs'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/dashboard/admin/cron', [ObservabilityController::class, 'cronStatus'], [AuthMiddleware::class, AdminMiddleware::class]);
+
+// Redirecionar rotas /admin antigas para /dashboard/admin
+$router->get('/admin', function() { redirect('/dashboard/admin'); });
+$router->get('/admin/configuracoes', function() { redirect('/dashboard/admin/configuracoes'); });
+$router->get('/admin/observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->get('/admin/analytics', function() { redirect('/dashboard/admin/analytics'); });
+$router->get('/admin/auditoria', function() { redirect('/dashboard/admin/auditoria'); });
+$router->get('/admin/remocoes', function() { redirect('/dashboard/admin/remocoes'); });
+$router->get('/admin/integracoes', function() { redirect('/dashboard/admin/integracoes'); });
+$router->get('/admin/api-tester', function() { redirect('/dashboard/admin/api-tester'); });
+$router->get('/admin/bloqueados', function() { redirect('/dashboard/admin/bloqueados'); });
+$router->get('/admin/cron', function() { redirect('/dashboard/admin/cron'); });
+
+// Rotas originais /admin (mantidas para POST e APIs internas)
 $router->post('/admin/clear-cache', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/cache/limpar', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
 
@@ -166,8 +190,10 @@ $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'],
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin?tab=observabilidade', function() { redirect('/admin/observabilidade'); });
-$router->get('/admin/observabilidade/recent-logs', [ObservabilityController::class, 'getRecentLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin?tab=observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
+
+// Rotas /admin com POST (ações) - continuam funcionando
+$router->post('/admin/clear-cache', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-queries', [ObservabilityController::class, 'getTopQueriesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-companies', [ObservabilityController::class, 'getTopCompaniesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
