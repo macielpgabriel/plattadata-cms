@@ -346,51 +346,56 @@ document.addEventListener('DOMContentLoaded', function() {
         </h2>
         <p class="text-muted small mb-3">Acesso rápido às funcionalidades administrativas.</p>
         
+        <?php
+        // Menu dinâmico - páginas disponíveis por role
+        $adminMenu = [
+            'admin' => [
+                ['url' => '/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
+                ['url' => '/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
+                ['url' => '/admin/configuracoes', 'label' => 'Configurações', 'icon' => 'bi-gear'],
+                ['url' => '/admin/analytics', 'label' => 'Analytics', 'icon' => 'bi-graph-up'],
+                ['url' => '/admin/auditoria', 'label' => 'Auditoria', 'icon' => 'bi-journal-text'],
+                ['url' => '/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
+                ['url' => '/admin/api-tester', 'label' => 'Testador API', 'icon' => 'bi-braces'],
+                ['url' => '/usuarios', 'label' => 'Usuários', 'icon' => 'bi-people'],
+            ],
+            'moderator' => [
+                ['url' => '/admin/remocoes', 'label' => 'Remoções', 'icon' => 'bi-shield-check'],
+                ['url' => '/admin/integracoes', 'label' => 'Integrações', 'icon' => 'bi-plug'],
+            ],
+            'editor' => [
+                ['url' => '/admin', 'label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
+                ['url' => '/admin/observabilidade', 'label' => 'Observabilidade', 'icon' => 'bi-activity'],
+            ],
+        ];
+        
+        // Filtrar menus disponíveis para o role do usuário
+        $userRole = $user['role'] ?? 'user';
+        $availableMenus = $adminMenu[$userRole] ?? [];
+        
+        // Se for admin, mostrar todos; se não, mostrar apenas os do role
+        if ($userRole === 'admin') {
+            $availableMenus = array_merge($adminMenu['admin'], $adminMenu['moderator'] ?? []);
+        }
+        ?>
+        
         <div class="row g-3">
+            <?php foreach ($availableMenus as $menu): ?>
+            <div class="col-6 col-md-3">
+                <a href="<?= $menu['url'] ?>" class="btn btn-outline-secondary w-100">
+                    <i class="bi <?= $menu['icon'] ?> me-2"></i><?= $menu['label'] ?>
+                </a>
+            </div>
+            <?php endforeach; ?>
+            
             <?php if ($isAdmin): ?>
             <div class="col-6 col-md-3">
-                <a href="/admin" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="/admin/observabilidade" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-activity me-2"></i>Observabilidade
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="/admin/configuracoes" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-gear me-2"></i>Configurações
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="/admin/analytics" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-graph-up me-2"></i>Analytics
-                </a>
-            </div>
-            <?php endif; ?>
-            <?php if ($isStaff): ?>
-            <div class="col-6 col-md-3">
-                <a href="/admin/remocoes" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-shield-check me-2"></i>Remoções
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="/admin/integracoes" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-plug me-2"></i>Integrações
-                </a>
-            </div>
-            <?php endif; ?>
-            <?php if ($isAdmin): ?>
-            <div class="col-6 col-md-3">
-                <a href="/usuarios" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-people me-2"></i>Usuários
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="/admin/api-tester" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-braces me-2"></i>Testador API
-                </a>
+                <form method="post" action="/admin/clear-cache" class="d-inline w-100">
+                    <input type="hidden" name="_token" value="<?= e(\App\Core\Csrf::token()) ?>">
+                    <button type="submit" class="btn btn-outline-secondary w-100" onclick="return confirm('Limpar cache?');">
+                        <i class="bi bi-trash me-2"></i>Limpar Cache
+                    </button>
+                </form>
             </div>
             <?php endif; ?>
         </div>
