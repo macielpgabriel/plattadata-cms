@@ -791,6 +791,15 @@ final class ObservabilityController
             'events' => $events
         ]);
     }
+
+    public function getSecurityEventsAjax(): void
+    {
+        $events = \App\Core\Logger::getSecurityEvents();
+        Response::json([
+            'success' => true,
+            'events' => $events
+        ]);
+    }
     
     public function getRecentLogs(): void
     {

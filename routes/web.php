@@ -165,6 +165,7 @@ $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'],
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin/observabilidade/security-events', [ObservabilityController::class, 'getSecurityEventsAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/api-tester/test', [ObservabilityController::class, 'runTest'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/migrations/run', [ObservabilityController::class, 'runMigrations'], [AuthMiddleware::class, AdminMiddleware::class]);
