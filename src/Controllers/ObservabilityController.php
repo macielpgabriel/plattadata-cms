@@ -795,8 +795,6 @@ final class ObservabilityController
             'logs' => $logs
         ]);
     }
-    
-    public function runCron(): void
     {
         $hook = $_GET['hook'] ?? null;
         

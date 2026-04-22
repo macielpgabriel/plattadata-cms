@@ -38,17 +38,25 @@ $jobsTotal = $jobsTotal ?? 0;
 <form method="post" action="/admin/configuracoes" id="settingsForm">
     <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
     
+    <!-- Toast Container (para mensagens temporárias) -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 10000;"></div>
+    
     <div class="tab-content" id="adminTabsContent">
         <!-- DASHBOARD -->
         <div class="tab-pane fade show active" id="dashboard">
-            <div class="section-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-1"><i class="bi bi-grid-1x2 me-2"></i>Visao Geral</h4>
-                        <p class="mb-0 opacity-75 small">Resumo do sistema</p>
-                    </div>
-                </div>
-            </div>
+            <!-- Barra de Alertas em Tempo Real -->
+<div class="position-relative mb-4">
+    <div id="alerts-bar" class="d-flex justify-content-end gap-2" style="min-height: 50px;"></div>
+</div>
+
+<div class="section-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-grid-1x2 me-2"></i>Visão Geral</h4>
+            <p class="mb-0 opacity-75 small">Resumo do sistema</p>
+        </div>
+    </div>
+</div>
 
             <!-- Negocios e Uso (Moved from outer layout) -->
             <?php if (!empty($latestCompany) || !empty($companiesByStatus)): ?>
@@ -358,11 +366,70 @@ $jobsTotal = $jobsTotal ?? 0;
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body p-4">
                             <h6 class="fw-bold mb-3">Informacoes Principais</h6>
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">Nome do site</label>
-                                    <input class="form-control" type="text" name="site_name" value="<?= e($settings['site_name'] ?? config('app.name')) ?>" placeholder="Ex: PlattaData CMS">
-                                </div>
+<!-- Resumo Executivo -->
+<div class="card bg-primary text-white mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Resumo Executivo</h5>
+        <div class="row">
+            <div class="col-md-3">
+                <h3 class="mb-0"><?= number_format($counts['companies'] ?? 0) ?></h3>
+                <small>Total de Empresas</small>
+            </div>
+            <div class="col-md-3">
+                <h3 class="mb-0"><?= number_format($counts['active_companies'] ?? 0) ?></h3>
+                <small>Empresas Ativas</small>
+            </div>
+            <div class="col-md-3">
+                <h3 class="mb-0"><?= number_format($counts['inactive_companies'] ?? 0) ?></h3>
+                <small>Inativas</small>
+            </div>
+            <div class="col-md-3">
+                <h3 class="mb-0"><?= number_format($counts['municipalities'] ?? 0) ?></h3>
+                <small>Municípios</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Métricas Principais -->
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-2 text-info mb-2"></i>
+                <div class="h4 mb-0"><?= number_format($counts['users'] ?? 0) ?></div>
+                <small class="text-muted">Usuários</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-search fs-2 text-secondary mb-2"></i>
+                <div class="h4 mb-0"><?= number_format($counts['query_logs_24h'] ?? 0) ?></div>
+                <small class="text-muted">Buscas (24h)</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud-download fs-2 text-primary mb-2"></i>
+                <div class="h4 mb-0"><?= number_format($counts['api_attempts_24h'] ?? 0) ?></div>
+                <small class="text-muted">API (24h)</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-exchange fs-2 text-success mb-2"></i>
+                <div class="h4 mb-0"><?= number_format($counts['exchange_currencies'] ?? 0) ?></div>
+                <small class="text-muted">Moedas</small>
+            </div>
+        </div>
+    </div>
+</div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted">Descricao (SEO)</label>
                                     <input class="form-control" type="text" name="site_description" value="<?= e($settings['site_description'] ?? '') ?>" maxlength="160" placeholder="Breve resumo para buscadores...">
@@ -1080,6 +1147,75 @@ document.addEventListener('DOMContentLoaded', loadSecurityEvents);
     font-size: 0.75rem;
 }
 </style>
+
+<script nonce="<?= (string) ($_SERVER['CSP_NONCE'] ?? '') ?>">
+// Sistema de Toast (mensagens temporárias)
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0 show`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    const icon = type === 'success' ? 'bi-check-circle-fill' : type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill';
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi ${icon} me-2"></i>${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+// Sistema de Alertas em Tempo Real (barra superior)
+function loadAlerts() {
+    const alertsBar = document.getElementById('alerts-bar');
+    if (!alertsBar) return;
+    
+    fetch('/admin/observabilidade/recent-logs?level=WARNING&lines=5')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.logs && data.logs.length > 0) {
+                alertsBar.innerHTML = data.logs.slice(0, 3).map(log => {
+                    const level = log.level || 'WARNING';
+                    const icon = level === 'ERROR' ? 'bi-exclamation-octagon-fill' : 'bi-exclamation-triangle-fill';
+                    const bgClass = level === 'ERROR' ? 'bg-danger' : 'bg-warning';
+                    const textClass = level === 'ERROR' ? 'text-white' : 'text-dark';
+                    
+                    return `
+                        <div class="alert alert-sm ${bgClass} ${textClass} d-flex align-items-center py-1 px-2 me-2" role="alert">
+                            <i class="bi ${icon} me-1"></i>
+                            <small>${log.message || 'Alerta detectado'}</small>
+                            <button type="button" class="btn-close btn-close-${textClass} ms-2" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                }).join('');
+            }
+        })
+        .catch(() => {});
+}
+
+// Carrega alertas ao abrir a página
+document.addEventListener('DOMContentLoaded', function() {
+    loadAlerts();
+    
+    // Atualiza alertas automaticamente a cada 30 segundos
+    setInterval(loadAlerts, 30000);
+});
+</script>
 
 <script nonce="<?= (string) ($_SERVER['CSP_NONCE'] ?? '') ?>">
 function apiTester() {

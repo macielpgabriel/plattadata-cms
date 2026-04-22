@@ -596,7 +596,9 @@ if (isset($structuredData) && is_array($structuredData)) {
                             <i class="bi bi-file-text me-1"></i>Termos
                         </a>
                     </div>
-                    <button class="btn btn-sm btn-outline-secondary theme-toggle-btn" onclick="toggleTheme()">
+                    <button class="btn btn-sm btn-outline-secondary theme-toggle-btn" id="theme-toggle-menu" onclick="toggleTheme()">
+    <i class="bi bi-moon-fill me-1"></i>Tema
+</button>
                         <i class="bi bi-palette me-1"></i>Tema
                     </button>
                 </div>
