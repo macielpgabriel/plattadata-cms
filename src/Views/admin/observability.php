@@ -367,6 +367,10 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
             </h5>
             <p class="text-muted small mb-3">Importe o arquivo MUNICCSV da Receita Federal para atualizar a lista de municípios.</p>
             
+            <div class="mb-3">
+                <span class="badge bg-secondary"><?= number_format($counts['municipalities'] ?? 0) ?></span> municípios cadastrados atualmente
+            </div>
+            
             <form method="post" action="/admin/localidades/sync" enctype="multipart/form-data" class="mb-3">
                 <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
                 <input type="hidden" name="action" value="munic">
