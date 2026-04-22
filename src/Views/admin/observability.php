@@ -576,72 +576,7 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
     </div>
 </div>
 
-<script>
-    function loadSecurityEvents() {
-        const container = document.getElementById('security-events-table-body');
-        container.innerHTML = '<tr><td colspan="5" class="text-center py-4">
-            <div class="d-flex flex-column align-items-center">
-                <div class="spinner-border text-danger" role="status">
-                    <span class="visually-hidden">Carregando...</span>
-                </div>
-                <p class="text-muted small mt-2">Carregando eventos...</p>
-            </div>
-        </td></tr>';
 
-        fetch('/admin/observabilidade/security-events')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    container.innerHTML = '';
-                    data.events.forEach(event => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td><small>${new Date(event.timestamp).toLocaleString()}</small></td>
-                            <td><span class="badge bg-${event.level === 'ERROR' ? 'danger' : 'warning'}">${event.level}</span></td>
-                            <td>${event.message}</td>
-                            <td>${event.user_id !== null ? '#' + event.user_id : 'Anônimo'}</td>
-                            <td><small>${event.remote_ip || '-'}</small></td>`;
-                        container.appendChild(row);
-                    });
-                } else {
-                    container.innerHTML = '<tr><td colspan="5" class="text-center py-4">
-                        <div class="alert alert-danger small">
-                            Falha ao carregar eventos: ' + (data.error || 'Erro desconhecido') + '
-                        </div>
-                    </td></tr>';
-                }
-            })
-            .catch(error => {
-                container.innerHTML = '<tr><td colspan="5" class="text-center py-4">
-                    <div class="alert alert-danger small">
-                        Erro ao carregar eventos: ' + error.message + '
-                    </div>
-                </td></tr>';
-            });
-    }
-
-    // Inicializa o botão de atualização
-    document.addEventListener('DOMContentLoaded', function() {
-        const button = document.querySelector('#sec-security .btn-outline-danger');
-        if (button) {
-            button.addEventListener('click', loadSecurityEvents);
-        }
-    });
-</script>
-
-<script>
-    // Carrega eventos automaticamente ao abrir a seção
-    document.addEventListener('DOMContentLoaded', function() {
-        const observer = new MutationObserver(function() {
-            const securitySection = document.getElementById('sec-security');
-            if (securitySection && !securitySection.dataset.loaded) {
-                loadSecurityEvents();
-                securitySection.dataset.loaded = 'true';
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-    });
-</script>
 
 <div class="row g-4">
     <div class="col-md-6">
