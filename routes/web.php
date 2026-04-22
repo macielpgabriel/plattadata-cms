@@ -192,8 +192,10 @@ $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadB
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin?tab=observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
 
-// Rotas /admin com POST (ações) - continuam funcionando
-$router->post('/admin/clear-cache', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
+// Rotas /admin com POST (ações) - continuam funcionando mas também redirecionam
+$router->post('/admin/localidades/sync', [ObservabilityController::class, 'syncMunicipalities'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/dashboard/admin/localidades/sync', function() { redirect('/dashboard/admin/observabilidade'); });
+$router->post('/admin/localidades/enrich', [ObservabilityController::class, 'syncMunicipalityEnrichment'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-queries', [ObservabilityController::class, 'getTopQueriesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-companies', [ObservabilityController::class, 'getTopCompaniesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
