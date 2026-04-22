@@ -49,6 +49,44 @@ $jobsTotal = $jobsTotal ?? 0;
     <div id="alerts-bar" class="d-flex justify-content-end gap-2" style="min-height: 50px;"></div>
 </div>
 
+<!-- Filtros de Logs -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-funnel me-2"></i>Filtrar Logs</h5>
+        <form id="log-filter-form" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">Tipo</label>
+                <select class="form-select" name="level" id="log-level-filter">
+                    <option value="">Todos</option>
+                    <option value="INFO">INFO</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="ERROR">ERROR</option>
+                    <option value="DEBUG">DEBUG</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Data</label>
+                <input type="date" class="form-control" name="date" id="log-date-filter">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Linhas</label>
+                <select class="form-select" name="lines" id="log-lines-filter">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary w-100" onclick="filterLogs()">
+                    <i class="bi bi-filter me-1"></i>Filtrar
+                </button>
+            </div>
+        </form>
+        <div id="logs-filter-result" class="mt-3" style="max-height: 300px; overflow-y: auto;"></div>
+    </div>
+</div>
+
 <div class="section-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
@@ -366,26 +404,28 @@ $jobsTotal = $jobsTotal ?? 0;
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body p-4">
                             <h6 class="fw-bold mb-3">Informacoes Principais</h6>
-<!-- Resumo Executivo -->
-<div class="card bg-primary text-white mb-4">
+<!-- Status dos Serviços -->
+<div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
-        <h5 class="card-title">Resumo Executivo</h5>
+        <h5 class="card-title"><i class="bi bi-cloud-check me-2 text-success"></i>Status dos Serviços</h5>
         <div class="row">
-            <div class="col-md-3">
-                <h3 class="mb-0"><?= number_format($counts['companies'] ?? 0) ?></h3>
-                <small>Total de Empresas</small>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success me-2">Online</span>
+                    <span>Banco de Dados</span>
+                </div>
             </div>
-            <div class="col-md-3">
-                <h3 class="mb-0"><?= number_format($counts['active_companies'] ?? 0) ?></h3>
-                <small>Empresas Ativas</small>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-<?= !empty($counts['api_attempts_24h']) ? 'success' : 'warning' ?> me-2"><?= !empty($counts['api_attempts_24h']) ? 'Online' : 'Aguardando' ?></span>
+                    <span>API Externa</span>
+                </div>
             </div>
-            <div class="col-md-3">
-                <h3 class="mb-0"><?= number_format($counts['inactive_companies'] ?? 0) ?></h3>
-                <small>Inativas</small>
-            </div>
-            <div class="col-md-3">
-                <h3 class="mb-0"><?= number_format($counts['municipalities'] ?? 0) ?></h3>
-                <small>Municípios</small>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-success me-2">Online</span>
+                    <span>Cache</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1214,6 +1254,51 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Atualiza alertas automaticamente a cada 30 segundos
     setInterval(loadAlerts, 30000);
+});
+
+// Filtros de Logs
+function filterLogs() {
+    const container = document.getElementById('logs-filter-result');
+    const level = document.getElementById('log-level-filter')?.value || '';
+    const lines = document.getElementById('log-lines-filter')?.value || 25;
+    
+    container.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div></div>';
+    
+    let url = '/admin/observabilidade/recent-logs?lines=' + lines;
+    if (level) url += '&level=' + level;
+    
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.logs && data.logs.length > 0) {
+                let html = '<table class="table table-sm table-hover"><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Mensagem</th><th>IP</th></tr></thead><tbody>';
+                
+                data.logs.forEach(log => {
+                    const levelClass = log.level === 'ERROR' ? 'text-danger' : log.level === 'WARNING' ? 'text-warning' : 'text-muted';
+                    html += `
+                        <tr>
+                            <td><small>${log.timestamp || '-'}</small></td>
+                            <td><span class="${levelClass}">${log.level || '-'}</span></td>
+                            <td><small>${log.message || '-'}</small></td>
+                            <td><small>${log.remote_ip || '-'}</small></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="alert alert-info">Nenhum log encontrado.</div>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<div class="alert alert-danger">Erro ao carregar logs.</div>';
+        });
+}
+
+// Carrega logs automaticamente ao abrir a página
+document.addEventListener('DOMContentLoaded', function() {
+    filterLogs();
 });
 </script>
 
