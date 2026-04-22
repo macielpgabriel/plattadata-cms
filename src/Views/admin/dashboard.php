@@ -1,5 +1,6 @@
-<?php declare(strict_types=1); use App\Core\Csrf; ?>
+<?php declare(strict_types=1); use App\Core\Csrf; use App\Core\Auth; ?>
 <?php 
+$user = Auth::user();
 $health = $health ?? [];
 $metrics = $metrics ?? [];
 $counts = $metrics['counts'] ?? [];
@@ -224,11 +225,11 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
         </div>
     </div>
 
-    <!-- Links Adicionais -->
-    <div class="row g-3">
+    <?php if ($user['role'] === 'admin'): ?>
+    <div class="row g-3 mt-2">
         <div class="col-6 col-md-3">
-            <a href="/admin/api-tester" class="btn btn-outline-secondary w-100">
-                <i class="bi bi-braces me-2"></i>Testador de API
+            <a href="/usuarios" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-people me-2"></i>Usuários
             </a>
         </div>
         <div class="col-6 col-md-3">
@@ -237,22 +238,27 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <form method="post" action="/admin/backup/baixar" class="d-inline w-100">
-                <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-                <button type="submit" class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-cloud-arrow-up me-2"></i>Backup
-                </button>
-            </form>
+            <a href="/admin/bloqueados" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-shield-x me-2"></i>IPs Bloqueados
+            </a>
         </div>
         <div class="col-6 col-md-3">
-            <form method="post" action="/admin/clear-cache" class="d-inline w-100">
+            <a href="/admin/auditoria" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-journal-text me-2"></i>Auditoria
+            </a>
+        </div>
+    </div>
+    <div class="row g-3 mt-2">
+        <div class="col-6 col-md-3">
+            <form method="post" action="/admin/migrations/run" class="d-inline w-100" onsubmit="return confirm('Executar migrations?');">
                 <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
-                <button type="submit" class="btn btn-outline-secondary w-100" onclick="return confirm('Limpar cache?');">
-                    <i class="bi bi-trash me-2"></i>Limpar Cache
+                <button type="submit" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-database-up me-2"></i>Migrations
                 </button>
             </form>
         </div>
     </div>
+<?php endif; ?>
 </div>
 
 <style>
