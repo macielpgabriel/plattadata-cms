@@ -45,6 +45,8 @@ final class CompanySchemaService
             'revenue' => 'ALTER TABLE companies ADD COLUMN revenue DECIMAL(18,2) NULL AFTER source_provider',
             'last_synced_at' => 'ALTER TABLE companies ADD COLUMN last_synced_at DATETIME NULL AFTER revenue',
             'query_failures' => 'ALTER TABLE companies ADD COLUMN query_failures INT UNSIGNED NOT NULL DEFAULT 0 AFTER last_synced_at',
+            'employees_estimate' => 'ALTER TABLE companies ADD COLUMN employees_estimate VARCHAR(50) NULL AFTER query_failures',
+            'revenue_estimate' => 'ALTER TABLE companies ADD COLUMN revenue_estimate DECIMAL(18,2) NULL AFTER employees_estimate',
         ];
 
         foreach ($columns as $column => $sql) {
