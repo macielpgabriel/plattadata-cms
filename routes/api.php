@@ -15,6 +15,6 @@ $router->get('/api/v1/companies', [CompanyApiController::class, 'list'], [AuthMi
 $router->get('/api/v1/exchange-rates', [InfoApiController::class, 'exchangeRates'], [AuthMiddleware::class]);
 $router->get('/api/v1/exchange-rates/{currency}/history', [InfoApiController::class, 'exchangeRateHistory'], [AuthMiddleware::class]);
 $router->post('/api/v1/weather/refresh', [WeatherApiController::class, 'refresh'], [AuthMiddleware::class]);
-$router->get('/api/v1/health/drive', [InfoApiController::class, 'testDriveConnection'], [AuthMiddleware::class]);
+$router->get('/api/v1/health/storage', [InfoApiController::class, 'testStorageConnection'], [AuthMiddleware::class]);
 $router->post('/api/v1/exchange-rates/refresh', [InfoApiController::class, 'refreshExchangeRates'], [AuthMiddleware::class]);
 $router->get('/api/v1/cron', [\App\Controllers\ObservabilityController::class, 'runCron'], [AuthMiddleware::class]);

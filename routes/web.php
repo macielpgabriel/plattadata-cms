@@ -22,7 +22,6 @@ use App\Controllers\PartnerController;
 use App\Controllers\EconomicController;
 use App\Controllers\ImpostometroController;
 use App\Controllers\ComparisonController;
-use App\Controllers\GoogleAuthController;
 use App\Controllers\FavoriteController;
 use App\Controllers\IntegrationsController;
 use App\Controllers\AnalyticsController;
@@ -115,12 +114,6 @@ $router->post('/verificar-email/reenviar', [RegisterController::class, 'resendVe
 $router->get('/unsubscribe', [AuthController::class, 'unsubscribe']);
 $router->post('/unsubscribe', [AuthController::class, 'processUnsubscribe']);
 
-// Rotas de Autenticação com Google Drive
-$router->get('/auth/google', function() { redirect('/auth/google/login'); });
-$router->get('/auth/google/login', [GoogleAuthController::class, 'login']);
-$router->get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
-$router->get('/auth/google/logout', [GoogleAuthController::class, 'logout']);
-
 $router->get('/dashboard', [DashboardController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/dashboard', [DashboardController::class, 'updateProfile'], [AuthMiddleware::class]);
 
@@ -168,8 +161,6 @@ $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'],
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/drive-upload', [AdminController::class, 'showDriveUpload'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/drive-upload', [AdminController::class, 'uploadDriveCredentials'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/api-tester/test', [ObservabilityController::class, 'runTest'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/migrations/run', [ObservabilityController::class, 'runMigrations'], [AuthMiddleware::class, AdminMiddleware::class]);

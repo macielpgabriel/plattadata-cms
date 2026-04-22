@@ -10,8 +10,7 @@ use App\Core\Csrf;
 use App\Core\Database;
 use App\Core\Session;
 use App\Repositories\CompanyRepository;
-use App\Services\GoogleDriveService;
-use App\Services\GoogleDriveServiceOAuth;
+use App\Services\LocalStorageService;
 use App\Services\MailService;
 use App\Services\ValidationService;
 use App\Services\AuditLogService;
@@ -190,67 +189,21 @@ if ($verificationType === 'email') {
 
         $db = Database::connection();
 
-        $driveServiceOAuth = new GoogleDriveServiceOAuth();
-        $driveService = new GoogleDriveService();
+        $storage = new LocalStorageService();
+        $result = $storage->uploadFile($file['tmp_name'], 'removals');
 
-        if ($driveServiceOAuth->isAuthenticated()) {
-            $fileName = bin2hex(random_bytes(16)) . '.' . $fileExtension;
-            $result = $driveServiceOAuth->uploadFile($file['tmp_name'], $fileName);
+        if ($result && isset($result['id'])) {
+            $stmt = $db->prepare('UPDATE company_removal_requests SET document_path = :path, status = "pending" WHERE id = :id');
+            $stmt->execute([
+                'path' => $result['id'],
+                'id' => $id
+            ]);
 
-            if ($result && isset($result['id'])) {
-                $stmt = $db->prepare('UPDATE company_removal_requests SET document_path = :path, status = "pending" WHERE id = :id');
-                $stmt->execute([
-                    'path' => 'gdrive:' . $result['id'],
-                    'id' => $id
-                ]);
-
-                Session::flash('success', 'Documento enviado com sucesso. Nossa equipe analisará sua solicitação.');
-                redirect('/');
-            } else {
-                Session::flash('error', 'Erro ao enviar o documento para o Google Drive. Tente novamente.');
-                redirect("/empresas/remover/documento?id=$id");
-            }
-        } elseif ($driveService->isEnabled()) {
-            $fileName = bin2hex(random_bytes(16)) . '.' . $fileExtension;
-            $uploaded = $driveService->uploadFile($file['tmp_name'], $fileName);
-            $fileId = (string) ($uploaded['id'] ?? '');
-
-            if ($fileId) {
-                $stmt = $db->prepare('UPDATE company_removal_requests SET document_path = :path, status = "pending" WHERE id = :id');
-                $stmt->execute([
-                    'path' => 'gdrive:' . $fileId,
-                    'id' => $id
-                ]);
-
-                Session::flash('success', 'Documento enviado com sucesso. Nossa equipe analisará sua solicitação.');
-                redirect('/');
-            } else {
-                Session::flash('error', 'Erro ao enviar o documento para o Google Drive. Tente novamente.');
-                redirect("/empresas/remover/documento?id=$id");
-            }
+            Session::flash('success', 'Documento enviado com sucesso. Nossa equipe analisará sua solicitação.');
+            redirect('/');
         } else {
-            $uploadDir = base_path('storage/removals/');
-
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0750, true);
-            }
-
-            $fileName = bin2hex(random_bytes(16)) . '.' . $fileExtension;
-            $destPath = $uploadDir . $fileName;
-
-            if (move_uploaded_file($file['tmp_name'], $destPath)) {
-                $stmt = $db->prepare('UPDATE company_removal_requests SET document_path = :path, status = "pending" WHERE id = :id');
-                $stmt->execute([
-                    'path' => $fileName,
-                    'id' => $id
-                ]);
-
-                Session::flash('success', 'Documento enviado com sucesso. Nossa equipe analisará sua solicitação.');
-                redirect('/');
-            } else {
-                Session::flash('error', 'Erro ao salvar o arquivo. Verifique as permissões da pasta.');
-                redirect("/empresas/remover/documento?id=$id");
-            }
+            Session::flash('error', 'Erro ao salvar o documento. Tente novamente.');
+            redirect("/empresas/remover/documento?id=$id");
         }
     }
 
@@ -338,7 +291,7 @@ if ($verificationType === 'email') {
         ]);
     }
 
-    public function downloadDocument(array $params): void
+public function downloadDocument(array $params): void
     {
         if (!Auth::can(['admin', 'moderator'])) {
             http_response_code(403);
@@ -348,44 +301,15 @@ if ($verificationType === 'email') {
 
         $fileIdentifier = basename($params['file'] ?? '');
 
-        if (str_starts_with($fileIdentifier, 'gdrive:')) {
-            $driveServiceOAuth = new GoogleDriveServiceOAuth();
-            $fileId = substr($fileIdentifier, 7);
+        $storage = new LocalStorageService();
+        $fileData = $storage->getFileContents($fileIdentifier, 'removals');
+        $meta = $storage->getFileInfo($fileIdentifier, 'removals');
 
-            if (!$driveServiceOAuth->isAuthenticated()) {
-                http_response_code(401);
-                echo 'Google Drive não conectado. Faça login na área admin primeiro.';
-                return;
-            }
-
-            $fileData = $driveServiceOAuth->downloadFile($fileId);
-            $meta = $driveServiceOAuth->getFileMetadata($fileId);
-            $fileName = $meta['name'] ?? 'documento';
-
-            header('Content-Type: ' . ($meta['mimeType'] ?? 'application/octet-stream'));
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
-            header('Content-Length: ' . strlen($fileData));
-            header('Cache-Control: no-store, private');
-            echo $fileData;
-            exit;
-        }
-
-        $filePath = base_path('storage/removals/' . $fileIdentifier);
-
-        if (!is_file($filePath)) {
-            http_response_code(404);
-            echo 'Documento nao encontrado.';
-            return;
-        }
-
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($filePath);
-
-        header('Content-Type: ' . $mime);
-        header('Content-Disposition: attachment; filename="' . $fileIdentifier . '"');
-        header('Content-Length: ' . filesize($filePath));
+        header('Content-Type: ' . ($meta['mimeType'] ?? 'application/octet-stream'));
+        header('Content-Disposition: attachment; filename="' . ($meta['name'] ?? $fileIdentifier) . '"');
+        header('Content-Length: ' . strlen($fileData));
         header('Cache-Control: no-store, private');
-        readfile($filePath);
+        echo $fileData;
         exit;
     }
 

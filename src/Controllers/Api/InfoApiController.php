@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Api;
 
 use App\Services\BcbService;
-use App\Services\GoogleDriveService;
-use App\Services\GoogleDriveServiceOAuth;
+use App\Services\LocalStorageService;
 
 final class InfoApiController extends BaseApiController
 {
@@ -179,44 +178,21 @@ final class InfoApiController extends BaseApiController
         }
     }
 
-    public function testDriveConnection(): never
+    public function testStorageConnection(): never
     {
-        $driveOAuth = new GoogleDriveServiceOAuth();
-        $drive = new GoogleDriveService();
-        
-        if ($driveOAuth->isAuthenticated()) {
-            $result = $driveOAuth->testConnection();
-            
-            if ($result['status'] === 'connected') {
-                $this->success([
-                    'status' => 'connected',
-                    'type' => 'oauth',
-                    'message' => 'Conexão com Google Drive (OAuth) funcionando!',
-                    'user' => $result['user'] ?? null,
-                    'storage' => $result['storageQuota'] ?? null,
-                ]);
-            } else {
-                $this->error('Erro OAuth: ' . $result['message'], 500);
-            }
-        } elseif ($drive->isEnabled()) {
-            $result = $drive->testConnection();
-            
-            if ($result['status'] === 'connected') {
-                $this->success([
-                    'status' => 'connected',
-                    'type' => 'service_account',
-                    'message' => 'Conexão com Google Drive (conta de serviço) funcionando!',
-                    'user' => $result['user'] ?? null,
-                    'storage' => $result['storageQuota'] ?? null,
-                    'config' => [
-                        'folder_id' => !empty(env('GOOGLE_DRIVE_FOLDER_ID')),
-                    ],
-                ]);
-            } else {
-                $this->error('Erro: ' . $result['message'], 500);
-            }
+        $storage = new LocalStorageService();
+        $result = $storage->testConnection();
+
+        if ($result['status'] === 'connected') {
+            $this->success([
+                'status' => 'connected',
+                'type' => 'local',
+                'message' => 'Armazenamento local funcionando!',
+                'user' => $result['user'] ?? null,
+                'storage' => $result['storageQuota'] ?? null,
+            ]);
         } else {
-            $this->error('Google Drive não configurado. Configure OAuth no .env ou credenciais de service account.', 503);
+            $this->error('Erro: ' . ($result['message'] ?? 'Erro desconhecido'), 500);
         }
     }
 }

@@ -88,9 +88,6 @@
                 <a href="#email" class="nav-link" data-bs-toggle="tab">
                     <i class="bi bi-send me-2"></i>E-mail
                 </a>
-                <a href="#drive" class="nav-link" data-bs-toggle="tab">
-                    <i class="bi bi-cloud me-2"></i>Google Drive
-                </a>
 
                 <div class="admin-section-title">Ferramentas</div>
                 <a href="#tools" class="nav-link" data-bs-toggle="tab">
@@ -317,74 +314,6 @@ MAIL_SMTP_PORT=587
 MAIL_SMTP_USERNAME=seu-email@gmail.com
 MAIL_SMTP_PASSWORD=sua-senha-de-app
 MAIL_SMTP_ENCRYPTION=tls</pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Google Drive -->
-                <div class="tab-pane fade" id="drive">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white border-bottom">
-                            <h5 class="mb-0 py-2"><i class="bi bi-cloud me-2 text-primary"></i>Google Drive Integration</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info mb-4">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Documentos de remocao sao salvos no Google Drive quando configurado. Sem configuracao, usa armazenamento local.
-                            </div>
-                            
-                            <div class="row g-4">
-                                <div class="col-12">
-                                    <div class="card border">
-                                        <div class="card-body">
-                                            <h6 class="fw-bold mb-3">
-                                                <i class="bi bi-upload me-2"></i>Carregar Service Account JSON
-                                            </h6>
-                                            <p class="small text-muted mb-3">Baixe o arquivo JSON da sua Service Account no Google Cloud Console.</p>
-                                            
-                                            <form method="post" action="/admin/drive-upload" enctype="multipart/form-data">
-                                                <input type="hidden" name="_token" value="<?= Csrf::token() ?>">
-                                                <div class="row g-3 align-items-end">
-                                                    <div class="col-auto flex-grow-1">
-                                                        <input type="file" name="credentials" class="form-control" accept=".json" required>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <button type="submit" class="btn btn-primary">
-                                                            <i class="bi bi-upload me-1"></i> Carregar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="card border">
-                                        <div class="card-body">
-                                            <h6 class="fw-bold mb-3"><i class="bi bi-1-circle me-2 text-primary"></i>Passos</h6>
-                                            <ol class="small mb-0">
-                                                <li>Acesse <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank">Google Cloud Console</a></li>
-                                                <li>Crie uma Service Account</li>
-                                                <li>Va em Keys > Add Key > JSON</li>
-                                                <li>Baixe e carregue acima</li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="card border">
-                                        <div class="card-body">
-                                            <h6 class="fw-bold mb-3"><i class="bi bi-folder me-2 text-warning"></i>Pasta Opcional</h6>
-                                            <p class="small text-muted mb-0">
-                                                Crie uma pasta no Google Drive e adicione o ID no .env:<br>
-                                                <code>GOOGLE_DRIVE_FOLDER_ID=seu_id_aqui</code>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
