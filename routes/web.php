@@ -181,15 +181,12 @@ $router->get('/admin/api-tester', function() { redirect('/dashboard/admin/api-te
 $router->get('/admin/bloqueados', function() { redirect('/dashboard/admin/bloqueados'); });
 $router->get('/admin/cron', function() { redirect('/dashboard/admin/cron'); });
 
-// Rotas originais /admin (mantidas para POST e APIs internas)
-$router->post('/admin/clear-cache', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/cache/limpar', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
-
+// Rotas originais /admin (mantidas para POST e internas)
 $router->get('/admin/configuracoes', [AdminSettingController::class, 'edit'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin/observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
 $router->get('/admin?tab=observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
 
 // Rotas POST para /dashboard/admin (ações)
@@ -200,9 +197,8 @@ $router->post('/dashboard/admin/cnae/sync', function() { redirect('/dashboard/ad
 $router->post('/dashboard/admin/migrations/run', function() { redirect('/dashboard/admin/observabilidade'); });
 $router->post('/dashboard/admin/logs/clear', function() { redirect('/dashboard/admin/observabilidade'); });
 
-// Rotas /admin com POST (ações) - continuam funcionando mas também redirecionam
+// Rotas /admin com POST (ações) - continuam funcionando
 $router->post('/admin/localidades/sync', [ObservabilityController::class, 'syncMunicipalities'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/dashboard/admin/localidades/sync', function() { redirect('/dashboard/admin/observabilidade'); });
 $router->post('/admin/localidades/enrich', [ObservabilityController::class, 'syncMunicipalityEnrichment'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-queries', [ObservabilityController::class, 'getTopQueriesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-companies', [ObservabilityController::class, 'getTopCompaniesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
