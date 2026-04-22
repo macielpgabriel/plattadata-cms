@@ -166,6 +166,7 @@ $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'],
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade', [ObservabilityController::class, 'adminIndex'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->get('/admin?tab=observabilidade', function() { redirect('/admin/observabilidade'); });
 $router->get('/admin/observabilidade/recent-logs', [ObservabilityController::class, 'getRecentLogs'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-queries', [ObservabilityController::class, 'getTopQueriesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-companies', [ObservabilityController::class, 'getTopCompaniesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
