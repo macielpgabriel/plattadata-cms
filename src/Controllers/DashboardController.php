@@ -178,4 +178,84 @@ final class DashboardController
             'metaRobots' => 'noindex,nofollow',
         ]);
     }
+
+    public function editReview(array $params): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            redirect('/login');
+        }
+
+        $reviewId = (int) ($params['id'] ?? 0);
+        if (!$reviewId) {
+            redirect('/dashboard/minhas-avaliacoes');
+        }
+
+        $db = Database::connection();
+        $stmt = $db->prepare('
+            SELECT r.id, r.rating, r.comment, r.status, r.created_at, r.company_id,
+                   c.cnpj, c.legal_name, c.trade_name
+            FROM company_reviews r
+            JOIN companies c ON r.company_id = c.id
+            WHERE r.id = :id AND r.user_id = :user_id
+        ');
+        $stmt->execute(['id' => $reviewId, 'user_id' => $user['id']]);
+        $review = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$review) {
+            \App\Core\Session::flash('error', 'Avaliação não encontrada.');
+            redirect('/dashboard/minhas-avaliacoes');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $rating = (int) ($_POST['rating'] ?? 0);
+            $comment = trim($_POST['comment'] ?? '');
+
+            if ($rating < 1 || $rating > 5) {
+                \App\Core\Session::flash('error', 'Nota deve ser entre 1 e 5.');
+                redirect('/dashboard/minhas-avaliacoes/' . $reviewId . '/editar');
+            }
+
+            $update = $db->prepare('
+                UPDATE company_reviews 
+                SET rating = :rating, comment = :comment, status = "pending", updated_at = NOW()
+                WHERE id = :id AND user_id = :user_id
+            ');
+            $update->execute([
+                'rating' => $rating,
+                'comment' => $comment,
+                'id' => $reviewId,
+                'user_id' => $user['id']
+            ]);
+
+            \App\Core\Session::flash('success', 'Avaliação atualizada. Aguarde aprovação.');
+            redirect('/dashboard/minhas-avaliacoes');
+        }
+
+        View::render('dashboard/edit-review', [
+            'title' => 'Editar Avaliação',
+            'review' => $review,
+            'metaRobots' => 'noindex,nofollow',
+        ]);
+    }
+
+    public function deleteReview(array $params): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            redirect('/login');
+        }
+
+        $reviewId = (int) ($params['id'] ?? 0);
+        if (!$reviewId) {
+            redirect('/dashboard/minhas-avaliacoes');
+        }
+
+        $db = Database::connection();
+        $delete = $db->prepare('DELETE FROM company_reviews WHERE id = :id AND user_id = :user_id');
+        $delete->execute(['id' => $reviewId, 'user_id' => $user['id']]);
+
+        \App\Core\Session::flash('success', 'Avaliação excluída.');
+        redirect('/dashboard/minhas-avaliacoes');
+    }
 }

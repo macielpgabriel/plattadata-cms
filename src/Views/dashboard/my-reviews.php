@@ -68,10 +68,16 @@
                         
                         <div class="d-flex justify-content-between align-items-center small text-muted">
                             <span><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></span>
-                            <div>
-                                <a href="/empresas/<?= e($review['cnpj']) ?>/minha-avaliacao" class="btn btn-sm btn-outline-secondary">
+                            <div class="d-flex gap-2">
+                                <a href="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/editar" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-pencil me-1"></i>Editar
                                 </a>
+                                <form method="post" action="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/excluir" onsubmit="return confirm('Excluir esta avaliação?')" class="d-inline">
+                                    <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
