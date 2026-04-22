@@ -383,20 +383,7 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
                 <small class="text-muted">Arquivos .csv, .txt ou .zip (máx 50MB)</small>
             </form>
             
-            <hr class="my-3">
-            
-            <p class="small text-muted mb-2">Ou baixe automaticamente da Receita Federal:</p>
-            <form method="post" action="/admin/localidades/sync">
-                <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
-                <input type="hidden" name="action" value="munic_url">
-                <input type="hidden" name="munic_url" value="https://arquivos.receitafederal.gov.br/public.php/dav/files/YggdBLfdninEJX9/2026-01/Municipios.zip">
-                <button type="submit" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-cloud-download me-1"></i> Baixar e Importar
-                </button>
-            </form>
-        </div>
-    </div>
-</section>
+            </section>
 
 <div class="row g-4 mb-4">
     <div class="col-md-6">
