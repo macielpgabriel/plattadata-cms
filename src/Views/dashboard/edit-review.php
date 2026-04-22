@@ -65,7 +65,34 @@
                     <i class="bi bi-exclamation-triangle me-2"></i>Zona de Perigo
                 </h5>
                 <p class="text-muted mb-3">Excluir esta avaliação não poderá ser desfeito.</p>
-                <form method="post" action="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/excluir" onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-1"></i>Excluir Avaliação
+                    </button>
+
+                    <div class="modal fade" id="deleteModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title text-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Excluir Avaliação
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body pt-2 text-center">
+                                    <p class="mb-0">Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita.</p>
+                                </div>
+                                <div class="modal-footer border-0 pt-0 justify-content-center">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <form method="post" action="/dashboard/minhas-avaliacoes/<?= $review['id'] ?>/excluir" class="d-inline">
+                                        <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-trash me-1"></i>Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
                     <button type="submit" class="btn btn-outline-danger">
                         <i class="bi bi-trash me-1"></i>Excluir Avaliação
