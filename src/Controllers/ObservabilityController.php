@@ -93,8 +93,42 @@ final class ObservabilityController
 
     public function syncMunicipalities(): void
     {
+        if (!\App\Core\Csrf::validate($_POST['_token'] ?? null)) {
+            Session::flash('error', 'Sessão expirada.');
+            redirect('/admin#observabilidade');
+        }
 
         try {
+            $action = $_POST['action'] ?? 'ibge';
+
+            if ($action === 'munic' && !empty($_FILES['munic_file'])) {
+                $file = $_FILES['munic_file'];
+                
+                if ($file['error'] !== UPLOAD_ERR_OK) {
+                    Session::flash('error', 'Erro ao fazer upload do arquivo.');
+                    redirect('/admin#observabilidade');
+                }
+
+                $allowedExtensions = ['csv', 'txt'];
+                $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                if (!in_array($extension, $allowedExtensions)) {
+                    Session::flash('error', 'Extensão inválida. Use .csv ou .txt');
+                    redirect('/admin#observabilidade');
+                }
+
+                $maxSize = 50 * 1024 * 1024;
+                if ($file['size'] > $maxSize) {
+                    Session::flash('error', 'Arquivo muito grande. Máximo 50MB.');
+                    redirect('/admin#observabilidade');
+                }
+
+                $importService = new \App\Services\MunicipalityImportService();
+                $result = $importService->importMunicCsv($file['tmp_name']);
+
+                Session::flash('success', $result['message']);
+                redirect('/admin#observabilidade');
+            }
+
             $service = new IbgeService();
             $count = $service->syncAllMunicipalities();
             
@@ -106,7 +140,7 @@ final class ObservabilityController
                 if ($total >= 5500) {
                     Session::flash('success', "Sincronização completa! Total de {$total} municípios brasileiros.");
                 } else {
-                    Session::flash('success', "Sucesso! Foram sincronizados {$count} municípios. Total no banco: {$total}.");
+                    Session::flash('success', "Sucesso! Foram sincronizados {$count} municipios. Total no banco: {$total}.");
                 }
             } else {
                 Session::flash('error', 'Nenhum município foi sincronizado. Verifique a conexão com o IBGE.');
