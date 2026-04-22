@@ -39,7 +39,6 @@ final class ObservabilityController
             'title' => 'Observabilidade',
             'health' => $service->healthSnapshot(),
             'metrics' => $service->adminMetrics(),
-            'securityEvents' => \App\Core\Logger::getSecurityEvents(),
             'flash' => Session::flash('success'),
             'error' => Session::flash('error'),
             'metaRobots' => 'noindex,nofollow',
@@ -782,24 +781,7 @@ final class ObservabilityController
         return null;
     }
     
-    public function getSecurityEvents(): void
-    {
-        $events = \App\Core\Logger::getSecurityEvents();
-        Response::json([
-            'success' => true,
-            'count' => count($events),
-            'events' => $events
-        ]);
-    }
 
-    public function getSecurityEventsAjax(): void
-    {
-        $events = \App\Core\Logger::getSecurityEvents();
-        Response::json([
-            'success' => true,
-            'events' => $events
-        ]);
-    }
     
     public function getRecentLogs(): void
     {

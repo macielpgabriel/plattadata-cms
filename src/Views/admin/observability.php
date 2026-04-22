@@ -55,7 +55,6 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
             <a href="#sec-business" class="btn btn-outline-primary btn-sm">Negócio</a>
                 <a href="#sec-integrations" class="btn btn-outline-primary btn-sm">Integrações</a>
                 <a href="#sec-health" class="btn btn-outline-primary btn-sm">Saúde e Logs</a>
-                <a href="#sec-security" class="btn btn-outline-primary btn-sm">Segurança</a>
             </div>
     </div>
 </div>
@@ -520,126 +519,7 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
     </div>
 </section>
 
-<section id="sec-security" class="mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h2 class="h5 mb-1">Eventos de Segurança</h2>
-            <p class="text-muted small mb-0">Registros de atividades suspeitas, tentativas de acesso e alertas de segurança.</p>
-        </div>
-        <div>
-            <button class="btn btn-sm btn-outline-danger" id="load-security-events-btn">
-                <i class="bi bi-arrow-clockwise me-1"></i> Atualizar Eventos
-            </button>
-        </div>
-    </div>
 
-<div id="security-events-container" class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white border-0 pt-4 px-4">
-        <h3 class="h6 mb-0 fw-bold"><i class="bi bi-shield-check me-2 text-danger"></i>Eventos de Segurança</h3>
-    </div>
-    <div class="card-body px-4 pb-4">
-        <div class="table-responsive" id="security-events-table">
-            <table class="table table-sm table-hover" id="security-events-table-body">
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Tipo</th>
-                        <th>Mensagem</th>
-                        <th>Usuário</th>
-                        <th>IP</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($securityEvents)): ?>
-                        <?php foreach ($securityEvents as $event): ?>
-                        <tr>
-                            <td><small><?= $formatDate($event['timestamp'] ?? null, 'd/m H:i:s') ?></small></td>
-                            <td><span class="badge bg-<?= $event['level'] === 'ERROR' ? 'danger' : 'warning' ?>"><?= $event['level'] ?></span></td>
-                            <td><?= e($event['message'] ?? '-') ?></td>
-                            <td><?= $event['user_id'] !== null ? '#' . $event['user_id'] : 'Anônimo' ?></td>
-                            <td><small><?= $event['remote_ip'] ?? '-' ?></small></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <div class="d-flex flex-column align-items-center">
-                                    <i class="bi bi-info-circle fs-4 text-muted mb-2"></i>
-                                    <p class="text-muted small mb-0">Nenhum evento de segurança registrado recentemente.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Script para carregar eventos de segurança apenas uma vez ao carregar a página -->
-<script>
-    function loadSecurityEvents() {
-        const container = document.getElementById('security-events-table-body');
-        const button = document.querySelector('#sec-security .btn-outline-danger');
-        
-        if (!button) return;
-
-        // Desabilita o botão durante o carregamento
-        button.disabled = true;
-        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Carregando...';
-
-        fetch('/admin/observabilidade/security-events')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    container.innerHTML = '';
-                    data.events.forEach(event => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td><small>${new Date(event.timestamp).toLocaleString()}</small></td>
-                            <td><span class="badge bg-${event.level === 'ERROR' ? 'danger' : 'warning'}">${event.level}</span></td>
-                            <td>${event.message}</td>
-                            <td>${event.user_id !== null ? '#' + event.user_id : 'Anônimo'}</td>
-                            <td><small>${event.remote_ip || '-'}</small></td>`;
-                        container.appendChild(row);
-                    });
-                } else {
-                    container.innerHTML = '<tr><td colspan="5" class="text-center py-4">
-                        <div class="alert alert-danger small">
-                            Falha ao carregar eventos: ${data.error || 'Erro desconhecido'}
-                        </div>
-                    </td></tr>';
-                }
-                
-                // Restaura o botão após carregamento
-                button.disabled = false;
-                button.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Atualizar Eventos';
-            })
-            .catch(error => {
-                container.innerHTML = '<tr><td colspan="5" class="text-center py-4">
-                    <div class="alert alert-danger small">
-                        Erro ao carregar eventos: ${error.message}
-                    </div>
-                </td></tr>';
-                
-                // Restaura o botão em caso de erro
-                button.disabled = false;
-                button.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Atualizar Eventos';
-            });
-    }
-
-    // Inicializa o botão de atualização
-    document.addEventListener('DOMContentLoaded', function() {
-        const button = document.querySelector('#sec-security .btn-outline-danger');
-        if (button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                loadSecurityEvents();
-            });
-        }
-    });
-</script>
 
 
 
