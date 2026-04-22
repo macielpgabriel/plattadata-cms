@@ -567,7 +567,7 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
         <h3 class="h6 mb-0 fw-bold"><i class="bi bi-file-text me-2 text-warning"></i>Últimas Entradas do Log</h3>
     </div>
     <div class="card-body px-4 pb-4">
-        <pre class="bg-dark text-light p-3 rounded small" style="max-height: 300px; overflow: auto;"><?php foreach ($appLogs as $line): ?><?= e($line) ?>
+        <pre class="bg-dark text-light p-3 rounded small" style="max-height: 300px; overflow: auto;"><?php foreach ($appLogs as $line): ?><?= e($line) . "\n" ?>
 
 <?php endforeach; ?></pre>
     </div>
