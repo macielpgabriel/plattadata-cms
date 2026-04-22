@@ -28,7 +28,21 @@ final class ObservabilityController
 
     public function adminIndex(): void
     {
-        redirect('/admin#observabilidade');
+        $this->renderObservability();
+    }
+    
+    public function renderObservability(): void
+    {
+        $service = new ObservabilityService();
+        
+        View::render('admin/observability', [
+            'title' => 'Observabilidade',
+            'health' => $service->healthSnapshot(),
+            'metrics' => $service->adminMetrics(),
+            'flash' => Session::flash('success'),
+            'error' => Session::flash('error'),
+            'metaRobots' => 'noindex,nofollow',
+        ]);
     }
 
     public function runMigrations(): void
