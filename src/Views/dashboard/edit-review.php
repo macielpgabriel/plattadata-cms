@@ -44,7 +44,7 @@
                         <small class="text-muted">Máximo 1000 caracteres</small>
                     </div>
 
-                    <div class="alert alert-warning">
+                    <div class="alert alert-warning alert-permanent">
                         <i class="bi bi-info-circle me-2"></i>
                         Após editar, sua avaliação entrará em processo de moderação novamente.
                     </div>
