@@ -158,6 +158,7 @@ $router->post('/usuarios/{id}/excluir', [UserController::class, 'delete'], [Auth
 
 // Rotas de Admin
 $router->get('/admin', [AdminController::class, 'index'], [AuthMiddleware::class, AdminMiddleware::class]);
+$router->post('/admin/clear-cache', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/cache/limpar', [AdminController::class, 'clearCache'], [AuthMiddleware::class, AdminMiddleware::class]);
 
 $router->get('/admin/configuracoes', [AdminSettingController::class, 'edit'], [AuthMiddleware::class, AdminMiddleware::class]);

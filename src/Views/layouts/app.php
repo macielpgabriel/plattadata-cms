@@ -242,18 +242,14 @@ if (isset($structuredData) && is_array($structuredData)) {
                                     <i class="bi bi-shield-check me-2 text-muted"></i>Remocoes Pendentes
                                 </a></li>
                                 <li><a class="dropdown-item" href="/admin/auditoria">
-                                    <i class="bi bi-journal-text me-2 text-muted"></i>Auditoria
-                                </a></li>
-                                <?php if ($user['role'] === 'admin'): ?>
-                                <li><a class="dropdown-item" href="/admin/analytics">
-                                    <i class="bi bi-graph-up me-2 text-muted"></i>Analytics
+                                    <i class="bi bi-people me-2 text-muted"></i>Usuários
                                 </a></li>
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li class="px-3 py-2">
-                                    <small class="text-muted text-uppercase fw-bold small">Sistema</small>
+                                    <small class="text-muted text-uppercase fw-bold small">Sistema & Dados</small>
                                 </li>
-                                <li><a class="dropdown-item" href="/admin/configuracoes">
-                                    <i class="bi bi-sliders me-2 text-muted"></i>Configuracoes
+                                <li><a class="dropdown-item" href="/admin/analytics">
+                                    <i class="bi bi-graph-up me-2 text-muted"></i>Analytics
                                 </a></li>
                                 <li><a class="dropdown-item" href="/admin/observabilidade">
                                     <i class="bi bi-activity me-2 text-muted"></i>Observabilidade
@@ -266,9 +262,12 @@ if (isset($structuredData) && is_array($structuredData)) {
                                         </button>
                                     </form>
                                 </li>
+                                <li><a class="dropdown-item" href="/admin/clear-cache">
+                                    <i class="bi bi-trash me-2 text-muted"></i>Limpar Cache
+                                </a></li>
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li class="px-3 py-2">
-                                    <small class="text-muted text-uppercase fw-bold small">Ferramentas</small>
+                                    <small class="text-muted text-uppercase fw-bold small">Desenvolvedor</small>
                                 </li>
                                 <li><a class="dropdown-item" href="/admin/api-tester">
                                     <i class="bi bi-braces me-2 text-muted"></i>Testador de API
@@ -276,7 +275,9 @@ if (isset($structuredData) && is_array($structuredData)) {
                                 <li><a class="dropdown-item" href="/admin/migrations/run" onclick="return confirm('Executar migrations?');">
                                     <i class="bi bi-database-up me-2 text-muted"></i>Migrations
                                 </a></li>
-                                <?php endif; ?>
+                                <li><a class="dropdown-item" href="/admin/configuracoes">
+                                    <i class="bi bi-gear me-2 text-muted"></i>Configuracoes
+                                </a></li>
                             </ul>
                         </li>
                         <?php endif; ?>
