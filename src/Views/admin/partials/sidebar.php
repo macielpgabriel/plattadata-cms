@@ -45,6 +45,9 @@ $sidebarLink = function($tabId, $icon, $label, $isTab = true) use ($isDashboard)
         <a href="/admin/remocoes" class="nav-link <?= str_contains($requestPath, 'remocoes') ? 'active' : '' ?>">
             <i class="bi bi-trash me-2"></i>Pedidos de Remocao
         </a>
+        <a href="/dashboard/minhas-avaliacoes" class="nav-link">
+            <i class="bi bi-star me-2"></i>Minhas Avaliações
+        </a>
 
         <div class="admin-section-title">Sistema & Dev</div>
         <?= $sidebarLink('api-tester', 'braces', 'Testador de API') ?>
