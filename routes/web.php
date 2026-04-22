@@ -186,20 +186,7 @@ $router->get('/admin/configuracoes', [AdminSettingController::class, 'edit'], [A
 $router->post('/admin/configuracoes', [AdminSettingController::class, 'update'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/configuracoes/autosave', [AdminSettingController::class, 'autosave'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->post('/admin/backup/baixar', [AdminSettingController::class, 'downloadBackup'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->get('/admin/observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
 $router->get('/admin?tab=observabilidade', function() { redirect('/dashboard/admin/observabilidade'); });
-
-// Rotas POST para /dashboard/admin (ações)
-$router->post('/dashboard/admin/clear-cache', function() { redirect('/dashboard/admin'); });
-$router->post('/dashboard/admin/localidades/sync', function() { redirect('/dashboard/admin/observabilidade'); });
-$router->post('/dashboard/admin/localidades/enrich', function() { redirect('/dashboard/admin/observabilidade'); });
-$router->post('/dashboard/admin/cnae/sync', function() { redirect('/dashboard/admin/observabilidade'); });
-$router->post('/dashboard/admin/migrations/run', function() { redirect('/dashboard/admin/observabilidade'); });
-$router->post('/dashboard/admin/logs/clear', function() { redirect('/dashboard/admin/observabilidade'); });
-
-// Rotas /admin com POST (ações) - continuam funcionando
-$router->post('/admin/localidades/sync', [ObservabilityController::class, 'syncMunicipalities'], [AuthMiddleware::class, AdminMiddleware::class]);
-$router->post('/admin/localidades/enrich', [ObservabilityController::class, 'syncMunicipalityEnrichment'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-queries', [ObservabilityController::class, 'getTopQueriesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/observabilidade/ajax/top-companies', [ObservabilityController::class, 'getTopCompaniesAjax'], [AuthMiddleware::class, AdminMiddleware::class]);
 $router->get('/admin/api-tester', [ObservabilityController::class, 'apiTester'], [AuthMiddleware::class, AdminMiddleware::class]);
