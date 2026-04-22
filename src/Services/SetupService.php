@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Core\Logger;
 use App\Services\Setup\SchemaSetupService;
+use App\Services\IpBlocklistService;
 use App\Services\Setup\MigrationService;
 use App\Services\Setup\ConfigSetupService;
 use App\Services\Setup\DatabaseSetupService;
@@ -69,6 +70,12 @@ final class SetupService
             if (!$this->schemaService->tableExists($pdo, $tableName)) {
                 return false;
             }
+        }
+
+        try {
+            (new IpBlocklistService())->ensureTables();
+        } catch (Throwable $e) {
+            Logger::warning('Setup security tables: ' . $e->getMessage());
         }
 
         return true;
