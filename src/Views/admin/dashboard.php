@@ -146,7 +146,7 @@ $jobsTotal = $jobsTotal ?? 0;
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h6 class="card-title mb-0 fw-bold"><i class="bi bi-shield-check text-primary me-2"></i>Eventos de Seguranca</h6>
+                                        <h6 class="card-title mb-0 fw-bold"><i class="bi bi-shield-check text-primary me-2"></i>Segurança</h6>
                                         <button type="button" onclick="loadSecurityEvents()" class="btn btn-link btn-xs p-0 text-decoration-none">
                                             <i class="bi bi-arrow-clockwise"></i>
                                         </button>
@@ -595,7 +595,7 @@ $jobsTotal = $jobsTotal ?? 0;
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-body">
-                                    <h6 class="card-title mb-3"><i class="bi bi-shield-exclamation text-warning me-2"></i>Eventos de Seguranca</h6>
+                                    <h6 class="card-title mb-3"><i class="bi bi-shield-exclamation text-warning me-2"></i>Alertas de Segurança</h6>
                                     <p class="text-muted small mb-3">Logs de acessos, tentativas de login e eventos de seguranca.</p>
                                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="loadSecurityEvents()">
                                         <i class="bi bi-arrow-clockwise me-1"></i>Verificar Eventos
