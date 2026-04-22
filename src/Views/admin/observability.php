@@ -363,7 +363,7 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <h5 class="card-title">
-                <i class="bi bi-building me-2 text-info"></i>Municípios - Importar MUNICCSV
+                <i class="bi bi-upload me-2 text-info"></i>Importar MUNICCSV
             </h5>
             <p class="text-muted small mb-3">Importe o arquivo MUNICCSV da Receita Federal para atualizar a lista de municípios.</p>
             <form method="post" action="/admin/localidades/sync" enctype="multipart/form-data">
