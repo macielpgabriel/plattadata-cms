@@ -77,14 +77,15 @@ final class MunicipalityImportService
 
     public function importFromUrl(string $url): array
     {
-        $tempFile = sys_get_temp_dir() . '/munic_' . time() . '.csv';
+        $tempDir = sys_get_temp_dir() . '/munic_' . time();
+        $tempFile = $tempDir . '.zip';
 
         try {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
             curl_setopt($ch, CURLOPT_USERAGENT, 'Plattadata/1.0');
 
             $content = curl_exec($ch);
@@ -95,15 +96,35 @@ final class MunicipalityImportService
                 return ['success' => 0, 'errors' => 0, 'message' => "Erro ao baixar: HTTP $httpCode"];
             }
 
+            mkdir($tempDir);
             file_put_contents($tempFile, $content);
-            $result = $this->importMunicCsv($tempFile);
-            unlink($tempFile);
+
+            $zip = new \ZipArchive();
+            if ($zip->open($tempFile) === true) {
+                $zip->extractTo($tempDir);
+                $zip->close();
+            }
+
+            $csvFiles = glob($tempDir . '/*.{csv,txt,CSV,TXT}', GLOB_BRACE);
+            $csvFile = $csvFiles[0] ?? null;
+
+            if (!$csvFile || !file_exists($csvFile)) {
+                rmdir($tempDir);
+                @unlink($tempFile);
+                return ['success' => 0, 'errors' => 0, 'message' => 'Arquivo CSV não encontrado no ZIP'];
+            }
+
+            $result = $this->importMunicCsv($csvFile);
+
+            array_map('unlink', glob($tempDir . '/*'));
+            rmdir($tempDir);
+            @unlink($tempFile);
 
             return $result;
         } catch (Throwable $e) {
-            if (file_exists($tempFile)) {
-                unlink($tempFile);
-            }
+            @array_map('unlink', glob($tempDir . '/*'));
+            @rmdir($tempDir);
+            @unlink($tempFile);
             return ['success' => 0, 'errors' => 0, 'message' => 'Erro: ' . $e->getMessage()];
         }
     }

@@ -366,12 +366,13 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
                 <i class="bi bi-upload me-2 text-info"></i>Importar MUNICCSV
             </h5>
             <p class="text-muted small mb-3">Importe o arquivo MUNICCSV da Receita Federal para atualizar a lista de municípios.</p>
-            <form method="post" action="/admin/localidades/sync" enctype="multipart/form-data">
+            
+            <form method="post" action="/admin/localidades/sync" enctype="multipart/form-data" class="mb-3">
                 <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
                 <input type="hidden" name="action" value="munic">
                 <div class="row g-3 align-items-end">
                     <div class="col-auto flex-grow-1">
-                        <input type="file" name="munic_file" class="form-control" accept=".csv,.txt" required>
+                        <input type="file" name="munic_file" class="form-control" accept=".csv,.txt,.zip" required>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary">
@@ -379,7 +380,19 @@ $formatDate = static function (?string $value, string $pattern = 'd/m/Y H:i'): s
                         </button>
                     </div>
                 </div>
-                <small class="text-muted">Arquivos .csv ou .txt (máx 50MB)</small>
+                <small class="text-muted">Arquivos .csv, .txt ou .zip (máx 50MB)</small>
+            </form>
+            
+            <hr class="my-3">
+            
+            <p class="small text-muted mb-2">Ou baixe automaticamente da Receita Federal:</p>
+            <form method="post" action="/admin/localidades/sync">
+                <input type="hidden" name="_token" value="<?= \App\Core\Csrf::token() ?>">
+                <input type="hidden" name="action" value="munic_url">
+                <input type="hidden" name="munic_url" value="https://arquivos.receitafederal.gov.br/public.php/dav/files/YggdBLfdninEJX9/2026-01/Municipios.zip">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-cloud-download me-1"></i> Baixar e Importar
+                </button>
             </form>
         </div>
     </div>

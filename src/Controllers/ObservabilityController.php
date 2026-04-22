@@ -113,27 +113,63 @@ final class ObservabilityController
                 
                 if ($file['error'] !== UPLOAD_ERR_OK) {
                     Session::flash('error', 'Erro ao fazer upload do arquivo.');
-                    redirect('/admin#observabilidade');
+                    redirect('/admin/observabilidade');
                 }
 
-                $allowedExtensions = ['csv', 'txt'];
+                $allowedExtensions = ['csv', 'txt', 'zip'];
                 $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
                 if (!in_array($extension, $allowedExtensions)) {
-                    Session::flash('error', 'Extensão inválida. Use .csv ou .txt');
-                    redirect('/admin#observabilidade');
+                    Session::flash('error', 'Extensão inválida. Use .csv, .txt ou .zip');
+                    redirect('/admin/observabilidade');
                 }
 
                 $maxSize = 50 * 1024 * 1024;
                 if ($file['size'] > $maxSize) {
                     Session::flash('error', 'Arquivo muito grande. Máximo 50MB.');
-                    redirect('/admin#observabilidade');
+                    redirect('/admin/observabilidade');
                 }
 
                 $importService = new \App\Services\MunicipalityImportService();
-                $result = $importService->importMunicCsv($file['tmp_name']);
+                
+                if ($extension === 'zip') {
+                    $tempDir = sys_get_temp_dir() . '/munic_' . time();
+                    $zipPath = $file['tmp_name'];
+                    mkdir($tempDir);
+                    
+                    $zip = new \ZipArchive();
+                    if ($zip->open($zipPath) === true) {
+                        $zip->extractTo($tempDir);
+                        $zip->close();
+                    }
+                    
+                    $csvFiles = glob($tempDir . '/*.{csv,txt,CSV,TXT}', GLOB_BRACE);
+                    $csvFile = $csvFiles[0] ?? null;
+                    
+                    if ($csvFile) {
+                        $result = $importService->importMunicCsv($csvFile);
+                    } else {
+                        $result = ['success' => 0, 'errors' => 0, 'message' => 'Arquivo CSV não encontrado no ZIP'];
+                    }
+                    
+                    array_map('unlink', glob($tempDir . '/*'));
+                    rmdir($tempDir);
+                } else {
+                    $result = $importService->importMunicCsv($file['tmp_name']);
+                }
 
                 Session::flash('success', $result['message']);
-                redirect('/admin#observabilidade');
+                redirect('/admin/observabilidade');
+            }
+
+            if ($action === 'munic_url' && !empty($_POST['munic_url'])) {
+                $url = $_POST['munic_url'];
+                
+                $importService = new \App\Services\MunicipalityImportService();
+                Session::flash('info', 'Baixando arquivo da Receita Federal...');
+                
+                $result = $importService->importFromUrl($url);
+                Session::flash('success', $result['message']);
+                redirect('/admin/observabilidade');
             }
 
             $service = new IbgeService();
