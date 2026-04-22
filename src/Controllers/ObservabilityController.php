@@ -11,6 +11,7 @@ use App\Services\SetupService;
 use App\Services\IbgeService;
 use App\Core\Session;
 use App\Core\Csrf;
+use App\Core\Auth;
 use ReflectionClass;
 use Throwable;
 
@@ -93,6 +94,12 @@ final class ObservabilityController
 
     public function syncMunicipalities(): void
     {
+        if (!\App\Core\Auth::can(['admin'])) {
+            http_response_code(403);
+            echo 'Acesso negado.';
+            return;
+        }
+
         if (!\App\Core\Csrf::validate($_POST['_token'] ?? null)) {
             Session::flash('error', 'Sessão expirada.');
             redirect('/admin#observabilidade');
