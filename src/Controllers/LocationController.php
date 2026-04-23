@@ -15,6 +15,7 @@ use App\Services\RateLimiterService;
 use App\Support\Translation\TranslationService;
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Core\Logger;
 
 final class LocationController extends Controller
 {
