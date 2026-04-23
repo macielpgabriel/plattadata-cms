@@ -145,7 +145,7 @@ $router->post('/localidades/{uf}/atualizar', [LocationController::class, 'refres
 $router->get('/localidades/{uf}', [LocationController::class, 'state']);
 $router->get('/localidades/cidade/{ibge}', [LocationController::class, 'municipality']);
 $router->get('/localidades/{uf}/{slug}', [LocationController::class, 'municipality']);
-$router->post('/localidades/{uf}/{slug}/atualizar', [LocationController::class, 'refresh']);
+$router->post('/localidades/{uf}/{slug}/atualizar', [LocationController::class, 'refreshSingleMunicipality']);
 
 // Rotas de Atividades
 $router->get('/atividades', [ActivityController::class, 'index']);

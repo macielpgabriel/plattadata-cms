@@ -78,6 +78,64 @@ final class LocationController extends Controller
         }
     }
 
+    public function refreshSingleMunicipality(array $params): void
+    {
+        $maxPublic = max(1, (int) config('app.rate_limit.location_refresh_public_per_hour', 3));
+        $maxAuth = max(1, (int) config('app.rate_limit.location_refresh_auth_per_hour', 10));
+
+        $isAuthenticated = Auth::check();
+        $user = Auth::user();
+
+        if (!$isAuthenticated) {
+            $limit = RateLimiterService::hit('location_refresh', 'ip:' . RateLimiterService::getClientIp(), $maxPublic, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
+        } else {
+            if (!Auth::can(['admin', 'editor'])) {
+                http_response_code(403);
+                echo 'Permissão negada.';
+                return;
+            }
+            $limit = RateLimiterService::hit('location_refresh', 'user:' . $user['id'], $maxAuth, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
+        }
+
+        $uf = strtoupper((string) ($params['uf'] ?? ''));
+        $slug = (string) ($params['slug'] ?? '');
+
+        try {
+            $muni = $this->municipalityService->getMunicipalityBySlug($slug, $uf);
+            
+            if (!$muni) {
+                Session::flash('error', 'Município não encontrado.');
+                redirect('/localidades/' . strtolower($uf));
+                return;
+            }
+
+            $ibgeCode = (int) $muni['ibge_code'];
+            $stats = $this->ibgeService->fetchMunicipalityStats($ibgeCode, true);
+            
+            if ($stats) {
+                Session::flash('success', 'Dados de ' . $muni['name'] . ' atualizados.');
+            } else {
+                Session::flash('error', 'Não foi possível atualizar os dados.');
+            }
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Erro: ' . $e->getMessage());
+        }
+
+        redirect('/localidades/' . strtolower($uf) . '/' . $slug);
+    }
+
     public function states(): void
     {
         $states = $this->ibgeService->fetchAndCacheStates();
