@@ -25,7 +25,7 @@ $ibgeCode = $municipality['ibge_code'] ?? 0;
                             <p class="lead text-muted"><?= htmlspecialchars((string)($municipality['state_uf'] ?? '')) ?> - Brasil</p>
                         </div>
                         <div class="d-flex gap-2">
-                            <?php if (Auth::can(['admin', 'editor'])): ?>
+                            <?php if (!empty($_SESSION['user_id'])): ?>
                                 <form action="/localidades/<?= strtolower((string)($municipality['state_uf'] ?? '')) ?>/<?= htmlspecialchars((string)($municipality['slug'] ?? '')) ?>/atualizar" method="POST" class="d-inline">
                                     <input type="hidden" name="_token" value="<?= e(Csrf::token()) ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-primary shadow-sm sync-trigger">
