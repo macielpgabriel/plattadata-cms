@@ -129,16 +129,21 @@ final class StateRepository
     {
         $pdo = Database::connection();
         
+        $existingState = $this->findByUf($uf);
+        
         $statesApiData = $this->fetchStateDataFromApi($uf);
         
-        if (!$statesApiData || empty($statesApiData['area']) || $statesApiData['area'] == 0) {
-            Logger::warning("StateRepository: dados da API incompletos para {$uf}, usando cache local");
+        if (!$statesApiData) {
+            Logger::warning("StateRepository: dados da API não disponíveis para {$uf}, usando cache local");
             $statesApiData = $this->getHardcodedStateData($uf);
         }
         
         if (!$statesApiData) {
             return false;
         }
+
+        $areaFromDb = $existingState['area_km2'] ?? 0;
+        $areaToSave = !empty($statesApiData['area']) ? $statesApiData['area'] : $areaFromDb;
 
         $gdpPerCapita = $statesApiData['population'] > 0 
             ? round($statesApiData['gdp'] * 1000000 / $statesApiData['population'], 2) 
@@ -162,7 +167,7 @@ final class StateRepository
             'population' => $statesApiData['population'],
             'gdp' => $statesApiData['gdp'],
             'gdp_per_capita' => $gdpPerCapita,
-            'area_km2' => $statesApiData['area'],
+            'area_km2' => $areaToSave,
             'capital_city' => $statesApiData['capital'],
         ]);
     }
