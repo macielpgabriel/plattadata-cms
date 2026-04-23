@@ -968,7 +968,7 @@ final class SetupService
             if (!$this->schemaService->tableExists($pdo, 'municipalities')) {
                 $pdo->exec("CREATE TABLE IF NOT EXISTS municipalities (
                     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    state_code CHAR(2) NULL,
+                    state_uf CHAR(2) NULL,
                     ibge_code INT UNSIGNED NULL,
                     name VARCHAR(120) NOT NULL,
                     name_raw VARCHAR(120) NULL,
@@ -998,7 +998,7 @@ final class SetupService
                     views INT UNSIGNED DEFAULT 0,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX idx_municipality_state (state_code),
+                    INDEX idx_municipality_state (state_uf),
                     INDEX idx_municipality_ibge (ibge_code),
                     INDEX idx_municipality_name (name),
                     INDEX idx_municipality_raw (name_raw),
