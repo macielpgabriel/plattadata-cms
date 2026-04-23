@@ -13,6 +13,7 @@ use App\Repositories\MunicipalityRepository;
 use App\Services\IbgeService;
 use App\Services\RateLimiterService;
 use App\Support\Translation\TranslationService;
+use App\Controllers\Location\LocationMunicipalityService;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Logger;
@@ -20,10 +21,12 @@ use App\Core\Logger;
 final class LocationController extends Controller
 {
     private IbgeService $ibgeService;
+    private LocationMunicipalityService $municipalityService;
 
     public function __construct()
     {
         $this->ibgeService = new IbgeService();
+        $this->municipalityService = new LocationMunicipalityService();
     }
 
     public function refresh(array $params): void
