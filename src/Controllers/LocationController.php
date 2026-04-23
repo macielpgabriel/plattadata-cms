@@ -22,7 +22,6 @@ final class LocationController extends Controller
 
     public function __construct()
     {
-        parent::__construct();
         $this->ibgeService = new IbgeService();
     }
 
