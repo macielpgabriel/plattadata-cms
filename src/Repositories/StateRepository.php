@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Core\Database;
+use App\Core\Logger;
 use PDO;
 
 final class StateRepository
@@ -126,6 +127,136 @@ final class StateRepository
 
     public function syncStateStats(string $uf): bool
     {
+        $pdo = Database::connection();
+        
+        $statesApiData = $this->fetchStateDataFromApi($uf);
+        
+        if (!$statesApiData) {
+            Logger::warning("StateRepository: dados da API não disponíveis para {$uf}, usando cache local");
+            $statesApiData = $this->getHardcodedStateData($uf);
+        }
+        
+        if (!$statesApiData) {
+            return false;
+        }
+
+        $gdpPerCapita = $statesApiData['population'] > 0 
+            ? round($statesApiData['gdp'] * 1000000 / $statesApiData['population'], 2) 
+            : null;
+
+        $stmt = $pdo->prepare("
+            UPDATE states SET
+                population = :population,
+                gdp = :gdp,
+                gdp_per_capita = :gdp_per_capita,
+                area_km2 = :area_km2,
+                capital_city = :capital_city,
+                ibge_code = :ibge_code,
+                updated_at = NOW()
+            WHERE uf = :uf
+        ");
+
+        return $stmt->execute([
+            'uf' => $uf,
+            'ibge_code' => $statesApiData['ibge'],
+            'population' => $statesApiData['population'],
+            'gdp' => $statesApiData['gdp'],
+            'gdp_per_capita' => $gdpPerCapita,
+            'area_km2' => $statesApiData['area'],
+            'capital_city' => $statesApiData['capital'],
+        ]);
+    }
+
+    private function fetchStateDataFromApi(string $uf): ?array
+    {
+        $uf = strtoupper($uf);
+        
+        $urls = [
+            "https://brasilapi.com.br/api/ibge/uf/v1/{$uf}",
+            "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{$uf}",
+        ];
+        
+        foreach ($urls as $url) {
+            try {
+                $context = stream_context_create([
+                    'http' => [
+                        'method' => 'GET',
+                        'timeout' => 15,
+                        'header' => "User-Agent: Mozilla/5.0\r\nAccept: application/json\r\n",
+                    ]
+                ]);
+                
+                $response = @file_get_contents($url, false, $context);
+                if ($response === false) {
+                    continue;
+                }
+                
+                $data = json_decode($response, true);
+                if (!is_array($data) || empty($data)) {
+                    continue;
+                }
+                
+                if (isset($data['populacao']) && $data['populacao'] > 0) {
+                    return [
+                        'ibge' => (int) ($data['codigo_ibge'] ?? $data['id'] ?? 0),
+                        'population' => (int) $data['populacao'],
+                        'gdp' => isset($data['pib']) ? (float) $data['pib'] : $this->getStateGdpFromApi($uf),
+                        'area' => isset($data['area']) ? (float) $data['area'] : 164123.04,
+                        'capital' => $data['capital'] ?? '',
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Logger::warning("StateRepository: erro ao buscar {$uf}: " . $e->getMessage());
+                continue;
+            }
+        }
+        
+        return null;
+    }
+
+    private function getStateGdpFromApi(string $uf): float
+    {
+        $url = "https://servicodados.ibge.gov.br/api/v3/agregados/5938/periodos/2021/variaveis/37?localidades=N3[{$uf}]";
+        
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'GET',
+                    'timeout' => 15,
+                    'header' => "User-Agent: Mozilla/5.0\r\nAccept: application/json\r\n",
+                ]
+            ]);
+            
+            $response = @file_get_contents($url, false, $context);
+            if ($response === false) {
+                return 0;
+            }
+            
+            $data = json_decode($response, true);
+            if (!is_array($data)) {
+                return 0;
+            }
+            
+            foreach ($data as $variable) {
+                foreach ($variable['resultados'] ?? [] as $result) {
+                    foreach ($result['series'] ?? [] as $series) {
+                        foreach (['2021', '2022', '2020'] as $year) {
+                            if (isset($series['serie'][$year]) && $series['serie'][$year] !== '...') {
+                                return (float) $series['serie'][$year] * 1000;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Logger::warning("StateRepository: erro PIB {$uf}: " . $e->getMessage());
+        }
+        
+        return 0;
+    }
+
+    private function getHardcodedStateData(string $uf): ?array
+    {
         $states = [
             'AC' => ['ibge' => 12, 'population' => 906876, 'gdp' => 16061, 'area' => 164123.04, 'capital' => 'Rio Branco'],
             'AL' => ['ibge' => 27, 'population' => 3365351, 'gdp' => 78456, 'area' => 27848.14, 'capital' => 'Maceió'],
@@ -157,33 +288,6 @@ final class StateRepository
         ];
 
         $uf = strtoupper($uf);
-        if (!isset($states[$uf])) {
-            return false;
-        }
-
-        $data = $states[$uf];
-        $gdpPerCapita = $data['gdp'] > 0 ? round($data['gdp'] * 1000000 / $data['population'], 2) : null;
-
-        $stmt = Database::connection()->prepare("
-            UPDATE states SET
-                population = :population,
-                gdp = :gdp,
-                gdp_per_capita = :gdp_per_capita,
-                area_km2 = :area_km2,
-                capital_city = :capital_city,
-                ibge_code = :ibge_code,
-                updated_at = NOW()
-            WHERE uf = :uf
-        ");
-
-        return $stmt->execute([
-            'uf' => $uf,
-            'ibge_code' => $data['ibge'],
-            'population' => $data['population'],
-            'gdp' => $data['gdp'],
-            'gdp_per_capita' => $gdpPerCapita,
-            'area_km2' => $data['area'],
-            'capital_city' => $data['capital'],
-        ]);
+        return $states[$uf] ?? null;
     }
 }

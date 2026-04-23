@@ -37,6 +37,19 @@ final class IbgeApiService
 
     public function getMunicipalityPopulationFromApi(int $ibgeCode): ?int
     {
+        if ($pop = $this->getPopulationFromIbgeDirect($ibgeCode)) {
+            return $pop;
+        }
+        
+        if ($pop = $this->getPopulationFromIbgePesquisas($ibgeCode)) {
+            return $pop;
+        }
+
+        return null;
+    }
+
+    private function getPopulationFromIbgeDirect(int $ibgeCode): ?int
+    {
         $endpoints = [
             "https://servicodados.ibge.gov.br/api/v3/agregados/9514/periodos/2022/variaveis/93?localidades=N6[{$ibgeCode}]",
             "https://servicodados.ibge.gov.br/api/v3/agregados/9514/periodos/2022/variaveis/93?localidades=N6[{$ibgeCode}]&view=normal",
@@ -62,7 +75,7 @@ final class IbgeApiService
                     }
                 }
             } catch (\Throwable $e) {
-                Logger::warning('Erro ao buscar população IBGE: ' . $e->getMessage());
+                Logger::warning('Erro ao buscar população IBGE Direct: ' . $e->getMessage());
                 continue;
             }
         }
@@ -70,7 +83,39 @@ final class IbgeApiService
         return null;
     }
 
+    private function getPopulationFromIbgePesquisas(int $ibgeCode): ?int
+    {
+        $urls = [
+            "https://servicodados.ibge.gov.br/api/v1/pesquisas/CP2022/periodos/2022/indicadores/9326/resultados/N6[{$ibgeCode}]",
+            "https://servicodados.ibge.gov.br/api/v1/pesquisas/-/periodos/2022/indicadores/9324/resultados/N6[{$ibgeCode}]",
+        ];
+        
+        foreach ($urls as $url) {
+            try {
+                $data = $this->fetchJson($url);
+                if ($data && isset($data[0]['resultados'][0]['series'][0]['serie']['2022'])) {
+                    $val = $data[0]['resultados'][0]['series'][0]['serie']['2022'];
+                    if (is_numeric($val) && $val > 0) return (int) $val;
+                }
+            } catch (\Throwable $e) {
+                Logger::warning('Erro IBGE Pesquisas: ' . $e->getMessage());
+                continue;
+            }
+        }
+        
+        return null;
+    }
+
     public function getMunicipalityGdpFromApi(int $ibgeCode): ?array
+    {
+        if ($gdpData = $this->getGdpFromIbgeDirect($ibgeCode)) {
+            return $gdpData;
+        }
+
+        return null;
+    }
+
+    private function getGdpFromIbgeDirect(int $ibgeCode): ?array
     {
         $url = "https://servicodados.ibge.gov.br/api/v3/agregados/5938/periodos/2021/variaveis/37?localidades=N6[{$ibgeCode}]";
         $data = $this->fetchJson($url);
