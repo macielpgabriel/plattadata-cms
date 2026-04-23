@@ -33,6 +33,8 @@ return [
         'cnpj_search_public_per_minute' => (int) env('RL_CNPJ_PUBLIC_PER_MINUTE', '20'),
         'cnpj_search_auth_user_per_minute' => (int) env('RL_CNPJ_AUTH_USER_PER_MINUTE', '60'),
         'cnpj_search_auth_ip_per_minute' => (int) env('RL_CNPJ_AUTH_IP_PER_MINUTE', '120'),
+        'location_refresh_public_per_hour' => (int) env('RL_LOCATION_REFRESH_PUBLIC_PER_HOUR', '3'),
+        'location_refresh_auth_per_hour' => (int) env('RL_LOCATION_REFRESH_AUTH_PER_HOUR', '10'),
     ],
     'lgpd' => [
         'audit' => [

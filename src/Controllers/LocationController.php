@@ -4,47 +4,74 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Auth;
-use App\Core\Cache;
 use App\Core\Database;
-use App\Core\Logger;
 use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
-use App\Core\SafeDatabase;
-use App\Services\IbgeService;
-use App\Services\OpenMeteoService;
-use App\Services\DddService;
+use App\Repositories\StateRepository;
 use App\Repositories\MunicipalityRepository;
-use App\Repositories\ExchangeRateRepository;
-use App\Repositories\VehicleTypeRepository;
-use App\Controllers\Location\LocationStatesService;
-use App\Controllers\Location\LocationMunicipalityService;
-use App\Controllers\Location\LocationBrasilService;
+use App\Services\IbgeService;
+use App\Services\RateLimiterService;
+use App\Support\Translation\TranslationService;
+use App\Core\Auth;
 
-final class LocationController
+final class LocationController extends Controller
 {
     private IbgeService $ibgeService;
-    private OpenMeteoService $weatherService;
-    private DddService $dddService;
-    private MunicipalityRepository $municipalityRepository;
-    private LocationStatesService $statesService;
-    private LocationMunicipalityService $municipalityService;
-    private LocationBrasilService $brasilService;
-    private $marketIntelligenceService;
-    private $bcbService;
 
     public function __construct()
     {
+        parent::__construct();
         $this->ibgeService = new IbgeService();
-        $this->weatherService = new OpenMeteoService();
-        $this->dddService = new DddService();
-        $this->municipalityRepository = new MunicipalityRepository();
-        $this->statesService = new LocationStatesService();
-        $this->municipalityService = new LocationMunicipalityService();
-        $this->brasilService = new LocationBrasilService();
-        $this->marketIntelligenceService = class_exists('\App\Services\MarketIntelligenceService') ? new \App\Services\MarketIntelligenceService() : null;
-        $this->bcbService = class_exists('\App\Services\BcbService') ? new \App\Services\BcbService() : null;
+    }
+
+    public function refresh(array $params): void
+    {
+        $maxPublic = max(1, (int) config('app.rate_limit.location_refresh_public_per_hour', 3));
+        $maxAuth = max(1, (int) config('app.rate_limit.location_refresh_auth_per_hour', 10));
+
+        $isAuthenticated = Auth::check();
+        $user = Auth::user();
+
+        if (!$isAuthenticated) {
+            $limit = RateLimiterService::hit('location_refresh', 'ip:' . RateLimiterService::getClientIp(), $maxPublic, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
+        } else {
+            if (!Auth::can(['admin', 'editor'])) {
+                http_response_code(403);
+                echo 'Permissão negada.';
+                return;
+            }
+            $limit = RateLimiterService::hit('location_refresh', 'user:' . $user['id'], $maxAuth, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
+        }
+
+        $uf = strtoupper((string) ($params['uf'] ?? ''));
+        $slug = (string) ($params['slug'] ?? '');
+        $force = isset($_GET['force']);
+
+        try {
+            $municipalities = $this->ibgeService->fetchAndCacheMunicipalitiesByState($uf, $force);
+            Session::flash('success', count($municipalities) . ' municípios sincronizados.');
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Erro: ' . $e->getMessage());
+        }
+
+        if ($slug) {
+            redirect('/localidades/' . strtolower($uf) . '/' . $slug);
+        } else {
+            redirect('/localidades/' . strtolower($uf));
+        }
     }
 
     public function states(): void
@@ -427,6 +454,16 @@ final class LocationController
         if (!Auth::can(['admin'])) {
             http_response_code(403);
             echo 'Permissão negada.';
+            return;
+        }
+
+        $maxAuth = max(1, (int) config('app.rate_limit.location_refresh_auth_per_hour', 10));
+        $user = Auth::user();
+        $limit = RateLimiterService::hit('location_refresh', 'user:' . $user['id'], $maxAuth, 3600);
+        if (!$limit['success']) {
+            $minutes = (int) ceil($limit['retry_after'] / 60);
+            http_response_code(429);
+            echo "Limite atingido. Tente novamente em {$minutes} minutos.";
             return;
         }
 
