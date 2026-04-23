@@ -413,37 +413,6 @@ final class LocationController extends Controller
         ]);
     }
 
-    public function refresh(array $params): void
-    {
-        if (!Auth::check()) {
-            redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
-            return;
-        }
-
-        if (!Auth::can(['admin', 'editor'])) {
-            http_response_code(403);
-            echo 'Permissão negada.';
-            return;
-        }
-
-        $uf = strtoupper((string) ($params['uf'] ?? ''));
-        $slug = (string) ($params['slug'] ?? '');
-        $force = isset($_GET['force']);
-
-        try {
-            $municipalities = $this->ibgeService->fetchAndCacheMunicipalitiesByState($uf, $force);
-            Session::flash('success', count($municipalities) . ' municípios sincronizados.');
-        } catch (\Throwable $e) {
-            Session::flash('error', 'Erro: ' . $e->getMessage());
-        }
-
-        if ($slug) {
-            redirect('/localidades/' . strtolower($uf) . '/' . $slug);
-        } else {
-            redirect('/localidades/' . strtolower($uf));
-        }
-    }
-
     public function refreshState(array $params): void
     {
         if (!Auth::check()) {
