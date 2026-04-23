@@ -88,8 +88,15 @@ final class SetupService
             return false;
         }
 
-        return $this->schemaService->tableExists($pdo, 'municipalities')
-            && $this->schemaService->tableExists($pdo, 'states');
+        if (!$this->schemaService->tableExists($pdo, 'municipalities') || !$this->schemaService->tableExists($pdo, 'states')) {
+            return false;
+        }
+
+        if (!$this->schemaService->columnExists($pdo, 'municipalities', 'state_uf')) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getLastConnectionError(): ?string
