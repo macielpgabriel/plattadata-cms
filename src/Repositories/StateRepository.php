@@ -131,8 +131,8 @@ final class StateRepository
         
         $statesApiData = $this->fetchStateDataFromApi($uf);
         
-        if (!$statesApiData) {
-            Logger::warning("StateRepository: dados da API não disponíveis para {$uf}, usando cache local");
+        if (!$statesApiData || empty($statesApiData['area']) || $statesApiData['area'] == 0) {
+            Logger::warning("StateRepository: dados da API incompletos para {$uf}, usando cache local");
             $statesApiData = $this->getHardcodedStateData($uf);
         }
         
@@ -201,7 +201,7 @@ final class StateRepository
                         'ibge' => (int) ($data['codigo_ibge'] ?? $data['id'] ?? 0),
                         'population' => (int) $data['populacao'],
                         'gdp' => isset($data['pib']) ? (float) $data['pib'] : $this->getStateGdpFromApi($uf),
-                        'area' => isset($data['area']) ? (float) $data['area'] : 164123.04,
+                        'area' => isset($data['area_km2']) ? (float) $data['area_km2'] : 0,
                         'capital' => $data['capital'] ?? '',
                     ];
                 }
