@@ -83,7 +83,7 @@ Para evitar campos vazios na tela da empresa (`/empresas/{cnpj}`), o sistema com
   - só dispara se o último sync estiver antigo
   - possui trava de cache para evitar loop
 
-### 1.5 Enriquecimento Automático de Dados
+### 1.5 Enriquecimento de Dados
 
 Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 
@@ -95,7 +95,23 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 | DDD Telefônico | Inferido automaticamente | Telefone da região |
 | CNAE | Receita Federal | Atividades principal e secundárias |
 
-### 1.6 SEO e Marketing
+### 1.6 Rankings e Comparações
+
+- Rankings por estado e município
+- Rankings por CNAE/atividade
+- Rankings por porte
+- Comparação detalhada de empresas
+- Ferramentas de comparação customizáveis
+- Rankings de faturamento
+
+### 1.7 Alertas e Monitoramento
+
+- Monitoramento de alterações em empresas
+- Alertas de menções (notícias/blogs)
+- Notificações em tempo real
+- Histórico de alterações
+
+### 1.8 SEO e Marketing
 
 - Canonical URLs e Open Graph
 - Schema.org para empresas (JSON-LD)
@@ -104,21 +120,33 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Rankings por estado/município
 - URLs amigáveis (/empresas/12.345.678/0001-90)
 
-### 1.7 Indicadores Econômicos
+### 1.9 Indicadores Econômicos
 
 - Cotações de câmbio em tempo real (BCB/PTAX)
 - Histórico de câmbio (30 dias)
 - Impostômetro (arrecadação federal)
 - Dados de arrecadação por período
+- Indicadores demográficos (IBGE)
+- Frota de veículos por município
+- PIB municipal
 
-### 1.8 Sistema de Remoção (LGPD)
+### 1.10 Dados Geográficos
+
+- Listagem de estados brasileiros
+- Listagem de municípios por UF
+- Dados demográficos (população, PIB)
+- Mapa de empresas por localização
+- Coordenadas GPS (latitude/longitude)
+- Geocodificação via Nominatim
+
+### 1.11 Sistema de Remoção (LGPD)
 
 - Solicitação pública de remoção de empresas
 - Verificação por e-mail ou documento
 - Aprovação por moderadores
 - Armazenamento de documentos em Google Drive
 
-### 1.9 Sistema de Avaliações de Empresas
+### 1.12 Sistema de Avaliações de Empresas
 
 - Usuários autenticados podem avaliar empresas (1-5 estrelas)
 - Comentários públicos com sistema de moderação
@@ -126,7 +154,7 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Sistema de reports para avaliações inadequadas
 - Limite: 1 avaliação por usuário/empresa a cada 7 dias
 
-### 1.10 Dashboard Empresarial (Owners)
+### 1.13 Dashboard Empresarial (Owners)
 
 - Validação de propriedade via e-mail da Receita ou documento
 - Edição de dados complementares (descrição, redes sociais)
@@ -134,48 +162,34 @@ Ao consultar um CNPJ, o sistema automaticamente enriquece com:
 - Cadastro de WhatsApp para contato
 - Resposta às avaliações de clientes
 
-### 1.11 Portabilidade de Dados (LGPD Art. 18-V)
+### 1.14 Portabilidade de Dados (LGPD Art. 18-V)
 
 - Página `/meus-dados` com explicação sobre portabilidade
 - Download dos dados do usuário em formato JSON
 - Link no menu do usuário autenticado
 - Conformidade total com LGPD
 
-### 1.12 RIPD - Relatório de Impacto (LGPD Art. 5-XVII)
+### 1.15 RIPD - Relatório de Impacto (LGPD Art. 5-XVII)
 
 - Página pública `/ripd` com relatório completo
 - Base legal, dados tratados, medidas de segurança
 - Análise de riscos e mitigações
 - Direitos dos titulares e contato do DPO
 
-### 1.13 Consentimento LGPD
+### 1.16 Consentimento LGPD
 
 - Checkbox obrigatório no cadastro de usuários
 - Link para Política de Privacidade e Termos de Serviço
 - Consentimento armazenado com timestamp
 
-### 1.14 Sistema de Jobs
-
-- Fila de processamento baseada em banco de dados
-- Interface de gerenciamento web
-- Status: pending, processing, completed, failed
-- Retry automático de jobs falhos
-- Scheduling via cron
-
-### 1.15 Observabilidade
+### 1.17 Observabilidade
 
 - Healthcheck JSON (`GET /health`)
 - Dashboard com gráficos de uso
 - Logs de consultas por hora
 - Histórico de chamadas API
 - API Tester integrado
-
-### 1.16 Dados Geográficos
-
-- Listagem de estados brasileiros
-- Listagem de municípios por UF
-- Dados demográficos (população, PIB)
-- Mapa de empresas por localização
+- Eventos de segurança
 
 ---
 
@@ -247,23 +261,29 @@ platadata-cms/
 │
 ├── src/
 │   ├── Core/              # Componentes centrais
-│   │   ├── Router.php    # Sistema de roteamento
+│   │   ├── Router.php     # Sistema de roteamento
 │   │   ├── Database.php  # Conexão PDO
 │   │   ├── SafeDatabase.php # Wrapper seguro
 │   │   ├── Auth.php      # Autenticação e autorização
 │   │   ├── Session.php   # Gerenciamento de sessões
-│   │   ├── Cache.php     # Sistema de cache
+│   │   ├── Cache.php    # Sistema de cache
+│   │   │   ├── FileCacheDriver.php
+│   │   │   ├── RedisCacheDriver.php
+│   │   │   └── MemcachedCacheDriver.php
 │   │   ├── Logger.php    # Sistema de logging
 │   │   ├── View.php      # Renderização de templates
 │   │   ├── Response.php # Respostas HTTP
 │   │   ├── Controller.php # Controller base
 │   │   ├── Csrf.php      # Proteção CSRF
-│   │   └── Env.php       # Variáveis de ambiente
+│   │   ├── Env.php       # Variáveis de ambiente
+│   │   ├── Encryption.php # Criptografia
+│   │   ├── Cron.php      # Execução de tarefas cron
+│   │   └── SecurityHeaders.php # Headers de segurança
 │   │
 │   ├── Controllers/      # Controladores HTTP
 │   │   ├── AuthController.php        # Autenticação
 │   │   ├── CompanyController.php   # Empresas
-│   │   ├── AdminController.php     # Administração
+│   │   ├── AdminController.php   # Administração
 │   │   ├── DashboardController.php # Dashboard
 │   │   ├── LocationController.php # Localidades
 │   │   ├── Api/                     # API REST
@@ -275,20 +295,26 @@ platadata-cms/
 │   │   │   ├── ComparisonRankingsService.php
 │   │   │   ├── ComparisonSearchService.php
 │   │   │   └── ComparisonToolsService.php
-│   │   ├── Company/                 # Serviços de empresa
+│   │   ├── Company/               # Serviços de empresa
 │   │   │   ├── CompanyShowService.php
 │   │   │   └── CompanySearchService.php
-│   │   ├── Location/                # Localidades
+│   │   ├── Location/              # Localidades
 │   │   │   ├── LocationBrasilService.php
 │   │   │   ├── LocationStatesService.php
 │   │   │   └── LocationMunicipalityService.php
-│   │   ├── Observability/           # Observabilidade
-│   │   │   ├── JobsService.php
+│   │   ├── Observability/         # Observabilidade
 │   │   │   ├── LogsService.php
 │   │   │   └── SyncService.php
-│   │   ├── Integration/             # Integrações
-│   │   │   ├── CompanySearchService.php
-│   │   │   └── ApiKeyService.php
+│   │   ├── CompanyReviewController.php  # Avaliações
+│   │   ├── CompanyDashboardController.php # Dashboard empresarial
+│   │   ├── CompanyRemovalController.php   # Remoções LGPD
+│   │   ├── FavoriteController.php         # Favoritos
+│   │   ├── AuditController.php         # Auditoria
+│   │   ├── AnalyticsController.php     # Analytics
+│   │   ├── EconomicController.php   # Indicadores econômicos
+│   │   ├── ImpostometroController.php # Impostômetro
+│   │   ├── ActivityController.php   # CNAEs
+│   │   ├── PartnerController.php    # Parceiros
 │   │   └── ... (outros controladores)
 │   │
 │   ├── Repositories/      # Acesso a dados (DAO)
@@ -297,26 +323,56 @@ platadata-cms/
 │   │   ├── StateRepository.php
 │   │   ├── MunicipalityRepository.php
 │   │   ├── FavoriteRepository.php
-│   │   ├── ArrecadacaoRepository.php
 │   │   ├── ExchangeRateRepository.php
+│   │   ├── ArrecadacaoRepository.php
 │   │   ├── ImpostometroRepository.php
 │   │   ├── LgpdAuditRepository.php
 │   │   ├── MarketAnalyticsRepository.php
-│   │   └── ... (outros repositories)
+│   │   ├── CnpjBlacklistRepository.php
+│   │   ├── CompanyTaxRepository.php
+│   │   ├── EconomicIndicatorRepository.php
+│   │   ├── SiteSettingRepository.php
+│   │   └── VehicleTypeRepository.php
 │   │
 │   ├── Services/        # Lógica de negócio
 │   │   ├── CnpjService.php         # Consulta CNPJ
-│   │   ├── IbgeService.php         # Dados IBGE
-│   │   ├── BcbService.php         # Banco Central
-│   │   ├── MailService.php         # Envio de e-mails
+│   │   ├── IbgeService.php       # Dados IBGE
+│   │   ├── BcbService.php       # Banco Central
+│   │   ├── MailService.php      # Envio de e-mails
 │   │   ├── LgpdComplianceService.php # LGPD
-│   │   ├── AddressService.php      # Endereços
-│   │   ├── SetupService.php        # Instalação
-│   │   │   # Servicios CNPJ
+│   │   ├── AddressService.php  # Endereços
+│   │   ├── SetupService.php   # Instalação
 │   │   ├── Cnpj/
 │   │   │   ├── CnpjApiService.php
 │   │   │   ├── CnpjEnrichmentService.php
 │   │   │   └── CnpjValidationService.php
+│   │   ├── Ibge/
+│   │   │   ├── IbgeApiService.php
+│   │   │   ├── IbgeSyncService.php
+│   │   │   ├── IbgePopulationService.php
+│   │   │   ├── IbgeDemographicsService.php
+│   │   │   ├── IbgeGdpService.php
+│   │   │   ├── IbgeVehicleFleetService.php
+│   │   │   └── IbgeBusinessUnitsService.php
+│   │   ├── Setup/
+│   │   │   ├── DatabaseSetupService.php
+│   │   │   ├── SchemaSetupService.php
+│   │   │   ├── MigrationService.php
+│   │   │   ├── ConfigSetupService.php
+│   │   │   └── CompanySchemaService.php
+│   │   ├── RateLimiterService.php    # Rate limiting
+│   │   ├── SecurityService.php       # Segurança
+│   │   ├── ObservabilityService.php   # Observabilidade
+│   │   ├── AuditLogService.php     # Logs de auditoria
+│   │   ├── AccessLogService.php     # Logs de acesso
+│   │   ├── CoordinateSyncService.php # Coordenadas GPS
+│   │   ├── NominatimService.php     # Geocodificação
+│   │   ├── MarketIntelligenceService.php # Inteligência de mercado
+│   │   ├── CreditAnalysisService.php  # Análise de crédito
+│   │   ├── StockMarketService.php   # Mercado de ações
+│   │   ├── GoogleTrendsService.php  # Google Trends
+│   │   ├── MentionAlertService.php  # Alertas de menções
+│   │   ├── NotificationService.php # Notificações
 │   │   └── ... (outros serviços)
 │   │
 │   ├── Middleware/       # Middlewares de segurança
@@ -645,30 +701,33 @@ server {
 | GET | `/empresas/validar/documento` | Enviar documento |
 | POST | `/empresas/validar/documento` | Upload documento |
 
-### 6.4 Rotas Administrativas
+### 6.4 Rotas Administrativas (Dashboard Admin)
 
 | Método | URL | Descrição | Role mínima |
 |--------|-----|-----------|------------|
-| GET | `/admin` | Painel administrativo | admin |
-| GET | `/admin/dashboard` | Dashboard admin | admin |
-| GET | `/admin/configuracoes` | Configurações | admin |
-| POST | `/admin/configuracoes` | Salvar configurações | admin |
-| GET | `/admin/observabilidade` | Observabilidade | admin |
-| GET | `/admin/jobs` | Gerenciamento de jobs | admin |
-| POST | `/admin/jobs/{id}/retry` | Retry job | admin |
-| GET | `/admin/remocoes` | Gerenciar remoções | moderator |
-| POST | `/admin/remocoes/{id}/aprovar` | Aprovar remoção | moderator |
-| POST | `/admin/remocoes/{id}/rejeitar` | Rejeitar remoção | moderator |
-| GET | `/admin/integrations` | Integrações | admin |
-| GET | `/admin/usuarios` | Gerenciar usuários | admin |
-| POST | `/admin/usuarios` | Criar usuário | admin |
-| POST | `/admin/usuarios/{id}/ativar` | Ativar usuário | admin |
-| POST | `/admin/usuarios/{id}/desativar` | Desativar usuário | admin |
-| POST | `/admin/backup/gerar` | Gerar backup | admin |
-| GET | `/admin/analytics` | Analytics | admin |
-| GET | `/admin/analytics/compare` | Comparar períodos | admin |
-| GET | `/admin/api-tester` | Testador de API | admin |
-| GET | `/admin/upload-drive` | Upload para Drive | admin |
+| GET | `/dashboard/admin` | Painel administrativo | admin |
+| GET | `/dashboard/admin/observabilidade` | Observabilidade | admin |
+| GET | `/dashboard/admin/configuracoes` | Configurações | admin |
+| POST | `/dashboard/admin/configuracoes` | Salvar configurações | admin |
+| GET | `/dashboard/admin/analytics` | Analytics | admin |
+| GET | `/dashboard/admin/auditoria` | Auditoria | admin |
+| GET | `/dashboard/admin/remocoes` | Gerenciar remoções | moderator |
+| POST | `/dashboard/admin/remocoes/{id}/aprovar` | Aprovar remoção | moderator |
+| POST | `/dashboard/admin/remocoes/{id}/recusar` | Rejeitar remoção | moderator |
+| GET | `/dashboard/admin/integracoes` | Integrações | admin |
+| GET | `/dashboard/admin/api-tester` | Testador de API | admin |
+| GET | `/dashboard/admin/bloqueados` | IPs bloqueados | admin |
+| GET | `/dashboard/admin/cron` | Status Cron | admin |
+| POST | `/admin/localidades/sync` | Sincronizar municípios | admin |
+| POST | `/admin/localidades/enrich` | Enriquecer municípios | admin |
+| POST | `/admin/cron/run` | Executar cron | admin |
+| POST | `/admin/coordenadas/sync` | Sincronizar coordenadas | admin |
+| GET | `/admin/phpstan/run` | Executar PHPStan | admin |
+| GET | `/admin/security/events` | Eventos de segurança | admin |
+| POST | `/admin/migrations/run` | Executar migrações | admin |
+| POST | `/admin/backup/baixar` | Baixar backup | admin |
+
+> Rotas legadas em `/admin` redirecionam para `/dashboard/admin` (mantidas por compatibilidade)
 
 ### 6.5 Rotas da API
 

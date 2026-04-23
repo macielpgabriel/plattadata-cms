@@ -81,6 +81,17 @@ final class SetupService
         return true;
     }
 
+    public function hasLocationTables(): bool
+    {
+        $pdo = $this->databaseService->connectApplicationDatabase();
+        if ($pdo === null) {
+            return false;
+        }
+
+        return $this->schemaService->tableExists($pdo, 'municipalities')
+            && $this->schemaService->tableExists($pdo, 'states');
+    }
+
     public function getLastConnectionError(): ?string
     {
         return $this->databaseService->getLastConnectionError();
@@ -105,6 +116,7 @@ final class SetupService
         $this->ensureMentionAlertsSchema($pdo);
         $this->ensureReviewsSystemSchema($pdo);
         $this->ensurePerformanceIndexes($pdo);
+        $this->ensureLocationsSchema($pdo);
 
         // AGORA verifica o lock - apenas após criar todas as tabelas críticas
         if ($this->isSetupLocked()) {
@@ -897,6 +909,105 @@ final class SetupService
             } catch (PDOException $e) {
                 Logger::warning('Setup index ' . $name . ': ' . $e->getMessage());
             }
+        }
+
+        @file_put_contents($lock, date('c'));
+    }
+
+    public function ensureLocationsSchema(PDO $pdo): void
+    {
+        $lock = base_path('storage/.locations_completed');
+        if (is_file($lock) && $this->schemaService->tableExists($pdo, 'states') && $this->schemaService->tableExists($pdo, 'municipalities')) {
+            return;
+        }
+
+        try {
+            if (!$this->schemaService->tableExists($pdo, 'states')) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS states (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    uf CHAR(2) NOT NULL UNIQUE,
+                    name VARCHAR(60) NOT NULL,
+                    region VARCHAR(30) NOT NULL,
+                    capital_city VARCHAR(120) NULL,
+                    area_km2 DECIMAL(12,2) NULL,
+                    population BIGINT NULL,
+                    gdp DECIMAL(15,2) NULL,
+                    gdp_per_capita DECIMAL(12,2) NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                Logger::info('Setup: Tabela states criada');
+
+                $states = [
+                    ['AC','Acre','Norte'],['AL','Alagoas','Nordeste'],['AP','Amapá','Norte'],
+                    ['AM','Amazonas','Norte'],['BA','Bahia','Nordeste'],['CE','Ceará','Nordeste'],
+                    ['DF','Distrito Federal','Centro-Oeste'],['ES','Espírito Santo','Sudeste'],
+                    ['GO','Goiás','Centro-Oeste'],['MA','Maranhão','Nordeste'],
+                    ['MT','Mato Grosso','Centro-Oeste'],['MS','Mato Grosso do Sul','Centro-Oeste'],
+                    ['MG','Minas Gerais','Sudeste'],['PA','Pará','Norte'],
+                    ['PB','Paraíba','Nordeste'],['PR','Paraná','Sul'],
+                    ['PE','Pernambuco','Nordeste'],['PI','Piauí','Nordeste'],
+                    ['RJ','Rio de Janeiro','Sudeste'],['RN','Rio Grande do Norte','Nordeste'],
+                    ['RS','Rio Grande do Sul','Sul'],['RO','Rondônia','Norte'],
+                    ['RR','Roraima','Norte'],['SC','Santa Catarina','Sul'],
+                    ['SP','São Paulo','Sudeste'],['SE','Sergipe','Nordeste'],
+                    ['TO','Tocantins','Norte']
+                ];
+
+                $stmt = $pdo->prepare("INSERT IGNORE INTO states (uf, name, region) VALUES (:uf, :name, :region)");
+                foreach ($states as $state) {
+                    $stmt->execute(['uf' => $state[0], 'name' => $state[1], 'region' => $state[2]]);
+                }
+                Logger::info('Setup: 27 estados inseridos');
+            }
+        } catch (PDOException $e) {
+            Logger::warning('Setup states: ' . $e->getMessage());
+        }
+
+        try {
+            if (!$this->schemaService->tableExists($pdo, 'municipalities')) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS municipalities (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    state_code CHAR(2) NULL,
+                    ibge_code INT UNSIGNED NULL,
+                    name VARCHAR(120) NOT NULL,
+                    name_raw VARCHAR(120) NULL,
+                    slug VARCHAR(130) NULL,
+                    population INT UNSIGNED NULL,
+                    gdp DECIMAL(15,2) NULL,
+                    gdp_per_capita DECIMAL(12,2) NULL,
+                    ddd VARCHAR(8) NULL,
+                    region VARCHAR(120) NULL,
+                    mesoregion VARCHAR(120) NULL,
+                    microregion VARCHAR(120) NULL,
+                    latitude DECIMAL(10,7) NULL,
+                    longitude DECIMAL(10,7) NULL,
+                    area_km2 DECIMAL(12,2) NULL,
+                    vehicle_fleet INT UNSIGNED NULL,
+                    business_units INT UNSIGNED NULL,
+                    population_male INT UNSIGNED NULL,
+                    population_female INT UNSIGNED NULL,
+                    population_male_percent TINYINT UNSIGNED NULL,
+                    population_female_percent TINYINT UNSIGNED NULL,
+                    gdp_agri DECIMAL(15,2) NULL,
+                    gdp_industry DECIMAL(15,2) NULL,
+                    gdp_services DECIMAL(15,2) NULL,
+                    gdp_admin DECIMAL(15,2) NULL,
+                    weather_data JSON NULL,
+                    weather_updated_at DATETIME NULL,
+                    views INT UNSIGNED DEFAULT 0,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_municipality_state (state_code),
+                    INDEX idx_municipality_ibge (ibge_code),
+                    INDEX idx_municipality_name (name),
+                    INDEX idx_municipality_raw (name_raw),
+                    INDEX idx_municipality_slug (slug)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+                Logger::info('Setup: Tabela municipalities criada');
+            }
+        } catch (PDOException $e) {
+            Logger::warning('Setup municipalities: ' . $e->getMessage());
         }
 
         @file_put_contents($lock, date('c'));

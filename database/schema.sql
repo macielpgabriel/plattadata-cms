@@ -100,8 +100,9 @@ CREATE TABLE IF NOT EXISTS states (
 CREATE TABLE IF NOT EXISTS municipalities (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     state_code CHAR(2) NOT NULL,
-    ibge_code INT UNSIGNED NOT NULL UNIQUE,
+    ibge_code INT UNSIGNED NULL,
     name VARCHAR(120) NOT NULL,
+    name_raw VARCHAR(120) NULL,
     population INT UNSIGNED NULL,
     gdp DECIMAL(15,2) NULL,
     ddd VARCHAR(8) NULL,
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS municipalities (
     INDEX idx_municipality_state (state_code),
     INDEX idx_municipality_ibge (ibge_code),
     INDEX idx_municipality_name (name),
-    CONSTRAINT fk_municipality_state FOREIGN KEY (state_code) REFERENCES states(code) ON DELETE RESTRICT
+    INDEX idx_municipality_raw (name_raw)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS company_partners (

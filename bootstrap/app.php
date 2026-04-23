@@ -80,12 +80,20 @@ SecurityHeadersService::apply();
 // Setup e Retenção
 $setupLockFile = base_path('storage/.setup_completed');
 $reviewsLockFile = base_path('storage/.reviews_completed');
+$locationLockFile = base_path('storage/.locations_completed');
 $setupService = new SetupService();
 if (!is_file($setupLockFile) || !$setupService->hasCriticalTables()) {
     $setupService->runInitialSetup();
 } elseif (!is_file($reviewsLockFile)) {
-    // Criar tabelas de reviews se não existirem
     $setupService->runInitialSetup();
+}
+
+// Garantir tabelas de localização
+if (!is_file($locationLockFile) || !$setupService->hasLocationTables()) {
+    $pdo = \App\Core\Database::connection();
+    if ($pdo !== null) {
+        $setupService->ensureLocationsSchema($pdo);
+    }
 }
 
 $retentionLockFile = base_path('storage/.retention_last_run');
