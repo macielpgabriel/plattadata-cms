@@ -8,6 +8,7 @@ use App\Core\Database;
 use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
+use App\Core\SafeDatabase;
 use App\Repositories\StateRepository;
 use App\Repositories\MunicipalityRepository;
 use App\Services\IbgeService;
