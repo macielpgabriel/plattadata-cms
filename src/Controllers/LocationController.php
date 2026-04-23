@@ -388,6 +388,11 @@ final class LocationController
 
     public function refresh(array $params): void
     {
+        if (!Auth::check()) {
+            redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
+            return;
+        }
+
         if (!Auth::can(['admin', 'editor'])) {
             http_response_code(403);
             echo 'Permissão negada.';
@@ -414,6 +419,11 @@ final class LocationController
 
     public function refreshState(array $params): void
     {
+        if (!Auth::check()) {
+            redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
+            return;
+        }
+
         if (!Auth::can(['admin'])) {
             http_response_code(403);
             echo 'Permissão negada.';
