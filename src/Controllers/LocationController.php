@@ -478,25 +478,28 @@ final class LocationController extends Controller
 
     public function refreshState(array $params): void
     {
-        if (!Auth::check()) {
-            redirect('/login?redirect=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
-            return;
-        }
-
-        if (!Auth::can(['admin'])) {
-            http_response_code(403);
-            echo 'Permissão negada.';
-            return;
-        }
-
+        $maxPublic = max(1, (int) config('app.rate_limit.location_refresh_public_per_hour', 3));
         $maxAuth = max(1, (int) config('app.rate_limit.location_refresh_auth_per_hour', 10));
+
+        $isAuthenticated = Auth::check();
         $user = Auth::user();
-        $limit = RateLimiterService::hit('location_refresh', 'user:' . $user['id'], $maxAuth, 3600);
-        if (!$limit['success']) {
-            $minutes = (int) ceil($limit['retry_after'] / 60);
-            http_response_code(429);
-            echo "Limite atingido. Tente novamente em {$minutes} minutos.";
-            return;
+
+        if (!$isAuthenticated) {
+            $limit = RateLimiterService::hit('location_refresh', 'ip:' . RateLimiterService::getClientIp(), $maxPublic, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
+        } else {
+            $limit = RateLimiterService::hit('location_refresh', 'user:' . $user['id'], $maxAuth, 3600);
+            if (!$limit['success']) {
+                $minutes = (int) ceil($limit['retry_after'] / 60);
+                http_response_code(429);
+                echo "Limite atingido. Tente novamente em {$minutes} minutos.";
+                return;
+            }
         }
 
         $uf = strtoupper((string) ($params['uf'] ?? ''));

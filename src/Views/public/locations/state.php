@@ -29,7 +29,7 @@ $stateCapitalDisplay = !empty($state['capital_city']) ? htmlspecialchars($state[
                     <h1 class="display-4 fw-bold mb-2"><?= htmlspecialchars($stateName) ?> (<?= $stateUf ?>)</h1>
                     <p class="text-muted lead mb-4">Capital: <?= htmlspecialchars($stateCapital) ?> | Área: <?= $stateArea ?> km²</p>
                     
-                    <?php if (!empty($_SESSION['user_id']) && \App\Core\Auth::can(['admin'])): ?>
+                    <?php if (!empty($_SESSION['user_id'])): ?>
                     <form method="POST" action="/localidades/<?= strtolower($stateUf) ?>/atualizar" class="mb-3" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').innerHTML='Atualizando...';">
                         <input type="hidden" name="_token" value="<?= e(\App\Core\Csrf::token()) ?>">
                         <button type="submit" class="btn btn-outline-primary btn-sm">
