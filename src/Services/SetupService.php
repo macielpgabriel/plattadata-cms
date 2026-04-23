@@ -1005,6 +1005,20 @@ final class SetupService
                     INDEX idx_municipality_slug (slug)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
                 Logger::info('Setup: Tabela municipalities criada');
+            } else {
+                if (!$this->schemaService->columnExists($pdo, 'municipalities', 'state_uf')) {
+                    $pdo->exec("ALTER TABLE municipalities ADD COLUMN state_uf CHAR(2) NULL AFTER id");
+                    $pdo->exec("CREATE INDEX idx_municipality_state ON municipalities(state_uf)");
+                    Logger::info('Setup: Coluna state_uf adicionada em municipalities');
+                }
+                if (!$this->schemaService->columnExists($pdo, 'municipalities', 'name_raw')) {
+                    $pdo->exec("ALTER TABLE municipalities ADD COLUMN name_raw VARCHAR(120) NULL");
+                    Logger::info('Setup: Coluna name_raw adicionada em municipalities');
+                }
+                if (!$this->schemaService->columnExists($pdo, 'municipalities', 'slug')) {
+                    $pdo->exec("ALTER TABLE municipalities ADD COLUMN slug VARCHAR(130) NULL");
+                    Logger::info('Setup: Coluna slug adicionada em municipalities');
+                }
             }
         } catch (PDOException $e) {
             Logger::warning('Setup municipalities: ' . $e->getMessage());
